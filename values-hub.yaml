@@ -5,14 +5,24 @@ clusterGroup:
   namespaces:
   - vault
   - golang-external-secrets
+  - ansible-automation-platform
 
   subscriptions:
+    - name: ansible-automation-platform-operator
+      namespace: ansible-automation-platform
+      channel: stable-2.1
+      csv: aap-operator.v2.1.0-0.1639138915
 
   projects:
   - hub
   - golang-external-secrets
+  - ansible-automation-platform
 
   applications:
+  - name: ansible-automation-platform
+    project: ansible-automation-platform
+    path: charts/hub/ansible-automation-platform
+
   - name: vault
     namespace: vault
     project: hub

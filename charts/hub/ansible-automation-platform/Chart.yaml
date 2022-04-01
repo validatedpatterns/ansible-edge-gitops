@@ -1,0 +1,7 @@
+apiVersion: v2
+description: A Helm chart to configure ansible-automation-platform
+keywords:
+- pattern
+name: ansible-automation-platform
+version: 0.0.1
+dependencies:
