@@ -2,6 +2,7 @@ apiVersion: console.openshift.io/v1
 kind: ConsoleLink
 metadata:
   name: controller
+  namespace: ansible-automation-platform
 spec:
   applicationMenu:
     section: Red Hat applications
