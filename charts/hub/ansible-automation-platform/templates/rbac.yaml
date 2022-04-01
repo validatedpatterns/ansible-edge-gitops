@@ -2,6 +2,8 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "openshift-config-default-cluster-admin"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 subjects:
   - kind: ServiceAccount
     name: default
