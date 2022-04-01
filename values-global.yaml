@@ -1,6 +1,6 @@
 ---
 global:
-  pattern: multicloud-gitops
+  pattern: ansible-edge-gitops
 
   options:
     useCSV: false
