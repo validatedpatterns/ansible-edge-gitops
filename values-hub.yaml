@@ -7,6 +7,7 @@ clusterGroup:
   - golang-external-secrets
   - ansible-automation-platform
   - openshift-cnv
+  - openshift-storage
 
   subscriptions:
     - name: ansible-automation-platform-operator
@@ -19,6 +20,12 @@ clusterGroup:
       namespace: openshift-cnv
       channel: stable
       csv: kubevirt-hyperconverged-operator.v4.10.0
+
+      # OpenShift Data Foundation
+    - name: odf-operator
+      namespace: openshift-storage
+      channel: stable-4.9
+      csv: odf-operator.v4.9.5
 
   projects:
   - hub
