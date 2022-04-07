@@ -24,7 +24,7 @@
       register: manifest_file
       become: false
 
-    - name: Retrieve admin password for AAP
+    - name: Retrieve API hostname for AAP
       kubernetes.core.k8s_info:
         kind: Route
         namespace: ansible-automation-platform
@@ -53,6 +53,10 @@
     #    msg: 'Host: {{ ansible_host }} PW: {{ admin_password }}'
 
     - name: Wait for API to become available
+      retries: 20
+      delay: 5
+      register: api_status
+      until: api_status.status == 200
       uri:
         url: https://{{ ansible_host }}/api/v2/config/
         method: GET
@@ -61,9 +65,11 @@
         body_format: json
         validate_certs: false
         force_basic_auth: true
-      retries: 10
-      delay: 5
-      no_log: true
+      #no_log: true
+
+    #- name: Debug api_status
+    #  debug:
+    #    msg: '{{ api_status }}'
 
     - name: Post manifest file
       uri:
