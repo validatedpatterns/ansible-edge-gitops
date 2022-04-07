@@ -13,7 +13,7 @@ help:
 
 install: deploy ## installs the pattern, inits the vault and loads the secrets
 	make vault-init
-	make load-secrets
+	./scripts/loadlic.yml
 	echo "Installed"
 
 common-test:
