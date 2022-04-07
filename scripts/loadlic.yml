@@ -4,6 +4,7 @@
   become: false
   connection: local
   hosts: localhost
+  gather_facts: false
   vars:
     values_secret: "{{ lookup('env', 'HOME') }}/values-secret.yaml"
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
@@ -43,13 +44,26 @@
       register: admin_pw
       failed_when: admin_pw.resources | length == 0
 
-    - name: Set admin_password
+    - name: Set admin_password fact
       set_fact:
         admin_password: '{{ admin_pw.resources[0].data.password | b64decode }}'
 
-    - name: Debug items
-      debug:
-        msg: 'Host: {{ ansible_host }} PW: {{ admin_password }}'
+    #- name: Debug items
+    #  debug:
+    #    msg: 'Host: {{ ansible_host }} PW: {{ admin_password }}'
+
+    - name: Wait for API to become available
+      uri:
+        url: https://{{ ansible_host }}/api/v2/config/
+        method: GET
+        user: admin
+        password: "{{admin_password}}"
+        body_format: json
+        validate_certs: false
+        force_basic_auth: true
+      retries: 10
+      delay: 5
+      no_log: true
 
     - name: Post manifest file
       uri:
@@ -61,3 +75,4 @@
         body_format: json
         validate_certs: false
         force_basic_auth: true
+      no_log: true
