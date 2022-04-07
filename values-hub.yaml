@@ -14,7 +14,8 @@ clusterGroup:
       channel: stable-2.1
       csv: aap-operator.v2.1.0-0.1639138915
 
-    - name: OpenShift Virtualization
+      # OpenShift Virtualization
+    - name: kubevirt-hyperconverged-operator
       namespace: openshift-cnv
       channel: stable
       csv: kubevirt-hyperconverged-operator.v4.10.0
