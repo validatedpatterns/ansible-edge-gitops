@@ -6,13 +6,18 @@ clusterGroup:
   - vault
   - golang-external-secrets
   - ansible-automation-platform
-  - cnv
+  - openshift-cnv
 
   subscriptions:
     - name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
       channel: stable-2.1
       csv: aap-operator.v2.1.0-0.1639138915
+
+    - name: kubevirt-hyperconverged-operator
+      namespace: openshift-cnv
+      channel: stable
+      csv: kubevirt-hyperconverged-operator.v4.10.0
 
   projects:
   - hub
@@ -55,8 +60,8 @@ clusterGroup:
     project: golang-external-secrets
     path: charts/hub/golang-external-secrets
 
-  - name: container-native-virtualization
-    namespace: cnv
+  - name: openshift-cnv
+    namespace: openshift-cnv
     project: hub
     path: charts/hub/cnv
 
