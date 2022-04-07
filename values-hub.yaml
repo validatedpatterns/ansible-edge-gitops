@@ -6,6 +6,7 @@ clusterGroup:
   - vault
   - golang-external-secrets
   - ansible-automation-platform
+  - cnv
 
   subscriptions:
     - name: ansible-automation-platform-operator
@@ -53,6 +54,11 @@ clusterGroup:
     namespace: golang-external-secrets
     project: golang-external-secrets
     path: charts/hub/golang-external-secrets
+
+  - name: container-native-virtualization
+    namespace: cnv
+    project: hub
+    path: charts/hub/cnv
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
