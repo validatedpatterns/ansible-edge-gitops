@@ -24,6 +24,16 @@
       register: manifest_file
       become: false
 
+    - name: Wait for API/UI route to deploy
+      kubernetes.core.k8s_info:
+        kind: Route
+        namespace: ansible-automation-platform
+        name: controller
+      register: aap_host
+      retries: 20
+      delay: 5
+      until: aap_host.resources | length > 0
+
     - name: Retrieve API hostname for AAP
       kubernetes.core.k8s_info:
         kind: Route
