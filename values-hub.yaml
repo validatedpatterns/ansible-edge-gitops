@@ -72,6 +72,9 @@ clusterGroup:
     namespace: openshift-cnv
     project: hub
     path: charts/hub/cnv
+    overrides:
+    - name: cnv.debug.useEmulation
+      value: "true"
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []

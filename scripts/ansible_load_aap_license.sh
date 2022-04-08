@@ -24,6 +24,16 @@
       register: manifest_file
       become: false
 
+    - name: Wait for API/UI route to deploy
+      kubernetes.core.k8s_info:
+        kind: Route
+        namespace: ansible-automation-platform
+        name: controller
+      register: aap_host
+      retries: 20
+      delay: 5
+      until: aap_host.resources | length > 0
+
     - name: Retrieve API hostname for AAP
       kubernetes.core.k8s_info:
         kind: Route
@@ -48,10 +58,6 @@
       set_fact:
         admin_password: '{{ admin_pw.resources[0].data.password | b64decode }}'
 
-    #- name: Debug items
-    #  debug:
-    #    msg: 'Host: {{ ansible_host }} PW: {{ admin_password }}'
-
     - name: Wait for API to become available
       retries: 20
       delay: 5
@@ -65,11 +71,7 @@
         body_format: json
         validate_certs: false
         force_basic_auth: true
-      #no_log: true
-
-    #- name: Debug api_status
-    #  debug:
-    #    msg: '{{ api_status }}'
+      no_log: true
 
     - name: Post manifest file
       uri:
@@ -82,3 +84,15 @@
         validate_certs: false
         force_basic_auth: true
       no_log: true
+
+    - name: Report AAP Endpoint
+      debug:
+        msg: 'AAP Endpoint: https://{{ ansible_host }}'
+
+    - name: Report AAP User
+      debug:
+        msg: 'AAP Admin User: admin'
+
+    - name: Report AAP Admin Password
+      debug:
+        msg: 'AAP Admin Password: {{ admin_password }}'
