@@ -13,7 +13,7 @@ help:
 
 install: deploy ## installs the pattern, inits the vault and loads the secrets
 	make vault-init
-	./ansible_load_aap_license.sh
+	./scripts/ansible_load_aap_license.sh
 	echo "Installed"
 
 common-test:
