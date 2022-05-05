@@ -1,61 +1,56 @@
-#!/usr/bin/env -S -vvv ansible-playbook
+#!/usr/bin/env ansible-playbook
 ---
-- name: "Install manifest on AAP controller"
+- name: "Install a metal worker"
   become: false
   connection: local
   hosts: localhost
   gather_facts: false
   vars:
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
-    metal_field: 'spec.template.spec.providerSpec.value.instanceType'
-    metal_type: 'c5.metal'
+    machineset_blockdevices:
+      - ebs:
+          iops: 0
+          volumeSize: 120
+          volumeType: gp2
+    machineset_instance_type: c5n.metal
+    machineset_machine_role: worker
+    machineset_machine_type: worker
+    machineset_name: metal-worker
+    machineset_node_labels:
+      node-role.kubernetes.io/worker: ""
+    machineset_replicas: 1
+    machineset_user_data_secret: worker-user-data
   tasks:
-    - name: Fetch infrastructure values
-      kubernetes.core.k8s_info:
+    - name: Query Cluster Infrastructure Name
+      community.kubernetes.k8s_info:
+        api_version: config.openshift.io/v1
         kind: Infrastructure
-        namespace: ''
         name: cluster
-      register: infra_values
+      register: cluster_info
 
-# Do platform specific set facts here
+    - name: Assert Platform is AWS
+      ansible.builtin.assert:
+        fail_msg: "Platform for OpenShift cluster must be AWS!"
+        that:
+          - cluster_info.resources[0].status.platform == "AWS"
 
-    - name: Check for metal machinesets
-      kubernetes.core.k8s_info:
-        api: "machine.openshift.io/v1beta1"
+    - name: Query MachineSets
+      community.kubernetes.k8s_info:
+        api_version: machine.openshift.io/v1beta1
         kind: MachineSet
         namespace: openshift-machine-api
-        field_selectors:
-          - '{{ metal_field }}={{ metal_type }}'
-          #- spec.template.spec.providerSpec.value.instanceType=c5.metal
-      register: metal_machinesets
+      register: cluster_machinesets
 
-    - name: Display metal machinesets
-      ansible.builtin.debug:
-        msg: '{{ metal_machinesets }}'
+    - name: Set Dynamic MachineSet Facts
+      ansible.builtin.set_fact:
+        machineset_ami_id: "{{ cluster_machinesets.resources[0].spec.template.spec.providerSpec.value.ami.id }}"
+        machineset_subnet: "{{ cluster_machinesets.resources[0].spec.template.spec.providerSpec.value.subnet.filters[0]['values'][0] }}"
+        machineset_tags: "{{ cluster_machinesets.resources[0].spec.template.spec.providerSpec.value.tags }}"
+        machineset_zone: "{{ cluster_machinesets.resources[0].spec.template.spec.providerSpec.value.placement.availabilityZone }}"
+        infrastructure_name: "{{ cluster_info.resources[0].status.infrastructureName }}"
+        infrastructure_region: "{{ cluster_info.resources[0].status.platformStatus.aws.region }}"
 
-    - name: "End play early if found"
-      meta: end_play
-      when: metal_machinesets.resources | length > 0
-
-    - name: "End play"
-      meta: end_play
-
-    - name: Display infrastructure values
-      ansible.builtin.debug:
-        msg: '{{ infra_values }}'
-
-    - name: Fetch machinesets
-      kubernetes.core.k8s_info:
-        api: "machine.openshift.io/v1beta1"
-        kind: MachineSet
-        namespace: openshift-machine-api
-      register: machine_sets
-
-    - name: Display machineset values
-      ansible.builtin.debug:
-        msg: '{{ machine_sets.resources[0] }}'
-
-    - name: Copy machineset values
-      ansible.builtin.copy:
-        content: '{{ machine_sets.resources[0] | to_nice_yaml }}'
-        dest: /tmp/ms1.yaml
+    - name: Create MachineSet
+      community.kubernetes.k8s:
+        definition: "{{ lookup('template', 'machineset.yaml.j2') | from_yaml }}"
+        state: present
