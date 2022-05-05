@@ -74,7 +74,7 @@ clusterGroup:
     path: charts/hub/cnv
     overrides:
     - name: cnv.debug.useEmulation
-      value: "true"
+      value: "false"
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
