@@ -96,3 +96,21 @@
     - name: Report AAP Admin Password
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
+
+    - name: Load Project
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.projects
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_projects:
+          - name: "HMI Demo"
+            #organization: "Default"
+            scm_branch: 'main'
+            scm_clean: "no"
+            scm_delete_on_update: "no"
+            scm_type: "git"
+            scm_update_on_launch: "no"
+            scm_url: "https://github.com/stolostron/hmi-demo.git"
+            validate_certs: false
