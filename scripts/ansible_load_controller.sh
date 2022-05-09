@@ -97,7 +97,14 @@
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
 
-    - name: Load Project
+    # Add a user
+    # Add an organization
+    # Add an inventory
+    # Add a credential
+    # Project
+    # Job Templates
+
+    - name: Configure Projects
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.projects
       vars:
@@ -105,12 +112,45 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_projects:
+          - name: "Demo Project"
+            state: absent
           - name: "HMI Demo"
-            #organization: "Default"
+            organization: "Default"
             scm_branch: 'main'
             scm_clean: "no"
             scm_delete_on_update: "no"
             scm_type: "git"
             scm_update_on_launch: "no"
             scm_url: "https://github.com/stolostron/hmi-demo.git"
+            validate_certs: false
+
+    - name: Configure Job Templates
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.job_templates
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_templates:
+          - name: "Demo Job Template"
+            state: absent
+          - name: "Kiosk Playbook"
+            project: "HMI Demo"
+            job_type: run
+            playbook: "ansible/kiosk_playbook.yml"
+            inventory: "Demo Inventory"
+            validate_certs: false
+
+          - name: "Podman Playbook"
+            project: "HMI Demo"
+            job_type: run
+            playbook: "ansible/podman_playbook.yml"
+            inventory: "Demo Inventory"
+            validate_certs: false
+
+          - name: "IDM Playbook"
+            project: "HMI Demo"
+            job_type: run
+            playbook: "ansible/idm/playbooks/deploy-idm.yml"
+            inventory: "Demo Inventory"
             validate_certs: false
