@@ -54,6 +54,19 @@
         url: "{{ item.json.body.href }}"
       loop: "{{ image_urls.results }}"
 
-    - name: Debug image_urls
+    - name: Get route for upload proxy
+      kubernetes.core.k8s_info:
+        kind: Route
+        namespace: openshift-cnv
+        name: cdi-uploadproxy
+      register: uploadproxy_route
+
+    - name: "Set host variable"
+      ansible.builtin.set_fact:
+        uploadproxy_url: 'https://{{ uploadproxy_route.resources[0].spec.host }}'
+
+    - name: "debug host variable"
       ansible.builtin.debug:
-        msg: '{{ image_urls }}'
+        msg: '{{ uploadproxy_url }}'
+
+    #- name: Upload images to CDI proxy
