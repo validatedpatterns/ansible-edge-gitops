@@ -13,9 +13,13 @@
     redhat_api_url: https://api.access.redhat.com/management/v1
     image_checksums:
       # rhel-8.5-x86_64-kvm.qcow2
-      - "9b63267716fa557f76df4899fb6a591c4c8a6ae2828f6297458815bff55ce8cc"
+      #- "9b63267716fa557f76df4899fb6a591c4c8a6ae2828f6297458815bff55ce8cc"
       # rhel-8.5-x86_64-boot.iso
-      - "61fe463758f6ee9b21c4d6698671980829ca4f747a066d556fa0e5eefc45382c"
+      #- "61fe463758f6ee9b21c4d6698671980829ca4f747a066d556fa0e5eefc45382c"
+      # rhel-8.6-x86_64-kvm.qcow2
+      - "c9b32bef88d605d754b932aad0140e1955ab9446818c70c4c36ca75d6f442fe9"
+      # rhel-8.6-x86_64-boot.iso
+      - "4a3ffcec86ba40c89fc2608c8e3bb00b71d572da219f30904536cdce80b58e76"
     initial_download_path: /tmp
   tasks:
     - name: "Debug vars"
@@ -49,3 +53,7 @@
         dest: "{{ initial_download_path }}/{{ item.json.body.filename }}"
         url: "{{ item.json.body.href }}"
       loop: "{{ image_urls.results }}"
+
+    - name: Debug image_urls
+      ansible.builtin.debug:
+        msg: '{{ image_urls }}'
