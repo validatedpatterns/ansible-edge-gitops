@@ -1,4 +1,4 @@
-#!/usr/bin/env -S -vvv ansible-playbook
+#!/usr/bin/env ansible-playbook
 ---
 - name: "Install manifest on AAP controller"
   become: false
