@@ -84,6 +84,10 @@
         validate_certs: false
         force_basic_auth: true
       no_log: true
+      retries: 20
+      delay: 5
+      register: api_status
+      until: api_status.status == 200
 
     - name: Report AAP Endpoint
       debug:
@@ -96,3 +100,64 @@
     - name: Report AAP Admin Password
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
+
+#    - name: Delete initial deployment
+#      kubernetes.core.k8s:
+#        kind: Deployment
+#        namespace: ansible-automation-platform
+#        name: controller
+
+    # Add a user
+    # Add an organization
+    # Add an inventory
+    # Add a credential
+    # Project
+    # Job Templates
+
+    - name: Configure Projects
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.projects
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_projects:
+          - name: "Demo Project"
+            state: absent
+          - name: "HMI Demo"
+            scm_branch: 'main'
+            scm_clean: "no"
+            scm_delete_on_update: "no"
+            scm_type: "git"
+            scm_update_on_launch: "no"
+            scm_url: "https://github.com/stolostron/hmi-demo.git"
+
+    - name: Configure Job Templates
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.job_templates
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_templates:
+          - name: "Demo Job Template"
+            state: absent
+          - name: "Kiosk Playbook"
+            project: "HMI Demo"
+            job_type: run
+            playbook: "ansible/kiosk_playbook.yml"
+            inventory: "Demo Inventory"
+
+          - name: "Podman Playbook"
+            project: "HMI Demo"
+            job_type: run
+            playbook: "ansible/podman_playbook.yml"
+            inventory: "Demo Inventory"
+
+          - name: "IDM Playbook"
+            project: "HMI Demo"
+            job_type: run
+            playbook: "ansible/idm/playbooks/deploy-idm.yml"
+            inventory: "Demo Inventory"
