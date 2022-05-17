@@ -25,6 +25,6 @@ spec:
       {{- end }}     
       useEmulation: {{ $.Values.cnv.debug.useEmulation }}
   customizeComponents: {}
-  uninstallStrategy: BlockUninstallIfWorkloadsExist
+  uninstallStrategy: RemoveWorkloads
   workloadUpdateStrategy: {}
 

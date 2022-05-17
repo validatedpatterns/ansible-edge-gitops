@@ -69,4 +69,11 @@
       ansible.builtin.debug:
         msg: '{{ uploadproxy_url }}'
 
-    #- name: Upload images to CDI proxy
+    - name: Upload images to CDI proxy
+      community.kubevirt.kubevirt_cdi_upload:
+        pvc_namespace: default
+        pvc_name: 'pvc-{{ item.json.body.filename }}'
+        upload_host_validate_certs: false
+        upload_host: '{{ uploadproxy_url }}'
+        dest: "{{ initial_download_path }}/{{ item.json.body.filename }}"
+      loop: "{{ image_urls.results }}"
