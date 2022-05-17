@@ -7,7 +7,7 @@ metadata:
   labels:
     {{- include "common.labels.labels" . | nindent 4 }}
     {{- toYaml .Values.kubevirtCR.labels | nindent 4 }}
-  name: rfe
+  name: cnv
 spec:
   certificateRotateStrategy:
     selfSigned:
@@ -22,7 +22,7 @@ spec:
       featureGates:
       {{- range $feature := .Values.kubevirtCR.featureGates }}
       - {{$feature }}
-      {{- end }}     
+      {{- end }}
       useEmulation: {{ $.Values.cnv.debug.useEmulation }}
   customizeComponents: {}
   uninstallStrategy: RemoveWorkloads
