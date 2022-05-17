@@ -68,12 +68,12 @@ clusterGroup:
     project: golang-external-secrets
     path: charts/hub/golang-external-secrets
 
-  - name: odf
+  - name: openshift-cnv
     namespace: openshift-cnv
     project: hub
     path: charts/hub/cnv
 
-  - name: openshift-cnv
+  - name: odf
     namespace: openshift-storage
     project: hub
     path: charts/hub/odf
