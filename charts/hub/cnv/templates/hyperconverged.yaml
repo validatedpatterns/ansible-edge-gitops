@@ -38,4 +38,3 @@ spec:
     workloadUpdateMethods:
     - LiveMigrate
   workloads: {}
-  dataImportSchedule: 2 2/12 * * *
