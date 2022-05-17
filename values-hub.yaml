@@ -68,13 +68,15 @@ clusterGroup:
     project: golang-external-secrets
     path: charts/hub/golang-external-secrets
 
-  - name: openshift-cnv
+  - name: odf
     namespace: openshift-cnv
     project: hub
     path: charts/hub/cnv
-    overrides:
-    - name: cnv.debug.useEmulation
-      value: "false"
+
+  - name: openshift-cnv
+    namespace: openshift-storage
+    project: hub
+    path: charts/hub/odf
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
