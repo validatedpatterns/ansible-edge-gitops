@@ -1,4 +1,4 @@
-ocs:
+odf:
   namespace: openshift-storage
   mon:
     requests:
@@ -26,10 +26,8 @@ ocs:
       memory: 5Gi
     pvc:
       storage: 2Ti
-      storageClassName: gp2
   storageClass:
     name: ocs-storagecluster-ceph-rgw
-    region: us-east-1
     objectStoreName: ocs-storagecluster-cephobjectstore
 
 toolbox:
