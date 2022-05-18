@@ -30,6 +30,17 @@ odf:
     name: ocs-storagecluster-ceph-rgw
     objectStoreName: ocs-storagecluster-cephobjectstore
 
+job:
+  image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+
+rbac:
+  createRBAC: true
+  createRoleBinding: true
+  roles: [ ]
+  serviceAccount:
+    name: odf-sa
+    namespace: openshift-cnv
+
 toolbox:
   name: ocsinit
   enableCephTools: true
