@@ -74,6 +74,10 @@
       no_log: true
 
     - name: Post manifest file
+      retries: 20
+      delay: 5
+      register: api_status
+      until: api_status.status == 200
       uri:
         url: https://{{ ansible_host }}/api/v2/config/
         method: POST
@@ -84,10 +88,6 @@
         validate_certs: false
         force_basic_auth: true
       #no_log: true
-      retries: 20
-      delay: 5
-      register: api_status
-      until: api_status.status == 200
 
     - name: debug
       debug:
