@@ -14,3 +14,5 @@ kubevirtCR:
 cnv:
   debug:
     useEmulation: false
+
+namespaceOverride: openshift-cnv
