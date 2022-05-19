@@ -71,7 +71,7 @@
         body_format: json
         validate_certs: false
         force_basic_auth: true
-      no_log: true
+      #no_log: true
 
     - name: Post manifest file
       retries: 20
@@ -88,6 +88,7 @@
         validate_certs: false
         force_basic_auth: true
       #no_log: true
+      ignore_errors: True
 
     - name: debug
       debug:
