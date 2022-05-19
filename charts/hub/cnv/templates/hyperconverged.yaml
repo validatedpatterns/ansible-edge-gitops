@@ -23,7 +23,7 @@ spec:
       renewBefore: 12h0m0s
   featureGates:
     enableCommonBootImageImport: true
-    sriovLiveMigration: false
+    sriovLiveMigration: true
     withHostPassthroughCPU: false
   infra: {}
   liveMigrationConfig:
@@ -31,7 +31,7 @@ spec:
     parallelMigrationsPerCluster: 5
     parallelOutboundMigrationsPerNode: 2
     progressTimeout: 150
-  uninstallStrategy: RemoveWorkloads
+  uninstallStrategy: BlockUninstallIfWorkloadsExist
   workloadUpdateStrategy:
     batchEvictionInterval: 1m0s
     batchEvictionSize: 10
