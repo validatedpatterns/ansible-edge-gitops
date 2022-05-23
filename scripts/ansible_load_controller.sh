@@ -115,9 +115,6 @@
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
 
-    - name: End play
-      meta: end_play
-
 #    - name: Delete initial deployment
 #      kubernetes.core.k8s:
 #        kind: Deployment
@@ -142,7 +139,9 @@
         controller_projects:
           - name: "Demo Project"
             state: absent
+
           - name: "HMI Demo"
+            organization: Default
             scm_branch: 'main'
             scm_clean: "no"
             scm_delete_on_update: "no"
@@ -161,19 +160,23 @@
         controller_templates:
           - name: "Demo Job Template"
             state: absent
+
           - name: "Kiosk Playbook"
+            organization: Default
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
             inventory: "Demo Inventory"
 
           - name: "Podman Playbook"
+            organization: Default
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
             inventory: "Demo Inventory"
 
           - name: "IDM Playbook"
+            organization: Default
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/idm/playbooks/deploy-idm.yml"
