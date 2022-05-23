@@ -80,7 +80,10 @@
         controller_password: '{{ admin_password }}'
         manifest: '{{ manifest_file_ref }}'
         validate_certs: false
-      register: api_status
+      retries: 20
+      delay: 5
+      register: result
+      until: result is not failed
 
 #    - name: Post manifest file
 #      retries: 20
