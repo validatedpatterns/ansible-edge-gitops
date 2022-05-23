@@ -80,8 +80,8 @@
         controller_password: '{{ admin_password }}'
         manifest: '{{ manifest_file_ref }}'
         validate_certs: false
-      retries: 20
-      delay: 5
+      retries: 30
+      delay: 10
       register: result
       until: result is not failed
 
