@@ -8,6 +8,7 @@ clusterGroup:
   - ansible-automation-platform
   - openshift-cnv
   - openshift-storage
+  - edge-gitops-vms
 
   subscriptions:
     - name: ansible-automation-platform-operator
@@ -77,6 +78,11 @@ clusterGroup:
     namespace: openshift-storage
     project: hub
     path: charts/hub/odf
+
+  - name: edge-gitops-vms
+    namespace: edge-gitops-vms
+    project: hub
+    path: charts/hub/edge-gitops-vms
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
