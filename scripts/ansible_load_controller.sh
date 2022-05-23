@@ -73,22 +73,31 @@
         force_basic_auth: true
       #no_log: true
 
-    - name: Post manifest file
-      retries: 20
-      delay: 5
-      register: api_status
-      until: api_status.status == 200
-      uri:
-        url: https://{{ ansible_host }}/api/v2/config/
-        method: POST
-        user: admin
-        password: "{{admin_password}}"
-        body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
-        body_format: json
+    - name: Load license the awx way
+      awx.awx.license:
+        controller_host: '{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        manifest: '{{ manifest_file_ref }}'
         validate_certs: false
-        force_basic_auth: true
-      #no_log: true
-      ignore_errors: True
+      register: api_status
+
+#    - name: Post manifest file
+#      retries: 20
+#      delay: 5
+#      register: api_status
+#      until: api_status.status == 200
+#      uri:
+#        url: https://{{ ansible_host }}/api/v2/config/
+#        method: POST
+#        user: admin
+#        password: "{{admin_password}}"
+#        body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
+#        body_format: json
+#        validate_certs: false
+#        force_basic_auth: true
+#      #no_log: true
+#      ignore_errors: True
 
     - name: debug
       debug:
@@ -105,6 +114,9 @@
     - name: Report AAP Admin Password
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
+
+    - name: End play
+      meta: end_play
 
 #    - name: Delete initial deployment
 #      kubernetes.core.k8s:
