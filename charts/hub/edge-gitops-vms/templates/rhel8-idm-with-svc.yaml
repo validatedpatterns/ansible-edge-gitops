@@ -95,6 +95,7 @@ objects:
           vm.kubevirt.io/os: rhel8
           vm.kubevirt.io/workload: server
         labels:
+          vm.kubevirt.io/name: ${NAME}
           kubevirt.io/domain: ${NAME}
           kubevirt.io/size: medium
       spec:
