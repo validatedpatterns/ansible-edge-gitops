@@ -205,25 +205,6 @@ objects:
     selector:
       vm.kubevirt.io/name: ${NAME}
     sessionAffinity: None
-    type: ClusterIP
-- apiVersion: v1
-  kind: Service
-  metadata:
-    name: ${NAME}-ldap-service
-  spec:
-    externalTrafficPolicy: Cluster
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-    - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-    - port: 38900
-      protocol: TCP
-      targetPort: 389
-    selector:
-      kubevirt.io/domain: ${NAME}
-      vm.kubevirt.io/name: ${NAME}
-    sessionAffinity: None
     type: NodePort
 parameters:
 - description: VM name

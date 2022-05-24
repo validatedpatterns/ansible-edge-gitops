@@ -163,7 +163,7 @@ objects:
     selector:
       vm.kubevirt.io/name: ${NAME}
     sessionAffinity: None
-    type: ClusterIP
+    type: NodePort
 parameters:
 - description: VM name
   from: rhel8-kiosk-[a-z0-9]{4}
