@@ -11,19 +11,20 @@ clusterGroup:
   - edge-gitops-vms
 
   subscriptions:
-    - name: ansible-automation-platform-operator
+    aap-operator:
+      name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
       channel: stable-2.1
       csv: aap-operator.v2.1.0-0.1639138915
 
-      # OpenShift Virtualization
-    - name: kubevirt-hyperconverged
+    openshift-virtualization:
+      name: kubevirt-hyperconverged
       namespace: openshift-cnv
       channel: stable
       csv: kubevirt-hyperconverged-operator.v4.10.0
 
-      # OpenShift Data Foundation
-    - name: odf-operator
+    openshift-data-foundation:
+      name: odf-operator
       namespace: openshift-storage
       channel: stable-4.9
       csv: odf-operator.v4.9.5
@@ -34,55 +35,61 @@ clusterGroup:
   - ansible-automation-platform
 
   applications:
-  - name: ansible-automation-platform
-    project: ansible-automation-platform
-    path: charts/hub/ansible-automation-platform
+    aap:
+      name: ansible-automation-platform
+      project: ansible-automation-platform
+      path: charts/hub/ansible-automation-platform
 
-  - name: vault
-    namespace: vault
-    project: hub
-    chart: vault
-    repoURL: https://helm.releases.hashicorp.com
-    targetRevision: v0.19.0
-    overrides:
-    - name: global.openshift
-      value: "true"
-    - name: injector.enabled
-      value: "false"
-    - name: ui.enabled
-      value: "true"
-    - name: ui.serviceType
-      value: LoadBalancer
-    - name: server.route.enabled
-      value: "true"
-    - name: server.route.host
-      value: null
-    - name: server.route.tls.termination
-      value: edge
-    - name: server.image.repository
-      value: "registry.connect.redhat.com/hashicorp/vault"
-    - name: server.image.tag
-      value: "1.9.2-ubi"
+    vault:
+      name: vault
+      namespace: vault
+      project: hub
+      chart: vault
+      repoURL: https://helm.releases.hashicorp.com
+      targetRevision: v0.20.0
+      overrides:
+      - name: global.openshift
+        value: "true"
+      - name: injector.enabled
+        value: "false"
+      - name: ui.enabled
+        value: "true"
+      - name: ui.serviceType
+        value: LoadBalancer
+      - name: server.route.enabled
+        value: "true"
+      - name: server.route.host
+        value: null
+      - name: server.route.tls.termination
+        value: edge
+      - name: server.image.repository
+        value: "registry.connect.redhat.com/hashicorp/vault"
+      - name: server.image.tag
+        value: "1.10.3-ubi"
 
-  - name: golang-external-secrets
-    namespace: golang-external-secrets
-    project: golang-external-secrets
-    path: charts/hub/golang-external-secrets
+    golang-external-secrets:
+      name: golang-external-secrets
+      namespace: golang-external-secrets
+      project: golang-external-secrets
+      path: charts/hub/golang-external-secrets
 
-  - name: openshift-cnv
-    namespace: openshift-cnv
-    project: hub
-    path: charts/hub/cnv
+    openshit-cnv:
+      name: openshift-cnv
+      namespace: openshift-cnv
+      project: hub
+      path: charts/hub/cnv
 
-  - name: odf
-    namespace: openshift-storage
-    project: hub
-    path: charts/hub/odf
+    odf:
+      name: odf
+      namespace: openshift-storage
+      project: hub
+      path: charts/hub/odf
 
-  - name: edge-gitops-vms
-    namespace: edge-gitops-vms
-    project: hub
-    path: charts/hub/edge-gitops-vms
+    edge-gitops-vms:
+      name: edge-gitops-vms
+      namespace: edge-gitops-vms
+      project: hub
+      path: charts/hub/edge-gitops-vms
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
