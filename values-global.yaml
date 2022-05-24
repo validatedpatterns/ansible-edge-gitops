@@ -7,5 +7,9 @@ global:
     syncPolicy: Automatic
     installPlanApproval: Automatic
 
+  hub:
+    provider: aws
+    storageClassName: gp2
+
 main:
   clusterGroupName: hub

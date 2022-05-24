@@ -71,23 +71,40 @@
         body_format: json
         validate_certs: false
         force_basic_auth: true
-      no_log: true
+      #no_log: true
 
-    - name: Post manifest file
-      uri:
-        url: https://{{ ansible_host }}/api/v2/config/
-        method: POST
-        user: admin
-        password: "{{admin_password}}"
-        body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
-        body_format: json
+    - name: Load license the awx way
+      awx.awx.license:
+        controller_host: '{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        manifest: '{{ manifest_file_ref }}'
         validate_certs: false
-        force_basic_auth: true
-      no_log: true
-      retries: 20
-      delay: 5
-      register: api_status
-      until: api_status.status == 200
+      retries: 30
+      delay: 10
+      register: result
+      until: result is not failed
+
+#    - name: Post manifest file
+#      retries: 20
+#      delay: 5
+#      register: api_status
+#      until: api_status.status == 200
+#      uri:
+#        url: https://{{ ansible_host }}/api/v2/config/
+#        method: POST
+#        user: admin
+#        password: "{{admin_password}}"
+#        body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
+#        body_format: json
+#        validate_certs: false
+#        force_basic_auth: true
+#      #no_log: true
+#      ignore_errors: True
+
+    - name: debug
+      debug:
+        msg: '{{ api_status }}'
 
     - name: Report AAP Endpoint
       debug:
@@ -125,7 +142,9 @@
         controller_projects:
           - name: "Demo Project"
             state: absent
+
           - name: "HMI Demo"
+            organization: Default
             scm_branch: 'main'
             scm_clean: "no"
             scm_delete_on_update: "no"
@@ -144,19 +163,23 @@
         controller_templates:
           - name: "Demo Job Template"
             state: absent
+
           - name: "Kiosk Playbook"
+            organization: Default
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
             inventory: "Demo Inventory"
 
           - name: "Podman Playbook"
+            organization: Default
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
             inventory: "Demo Inventory"
 
           - name: "IDM Playbook"
+            organization: Default
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/idm/playbooks/deploy-idm.yml"

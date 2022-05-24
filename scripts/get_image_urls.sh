@@ -54,6 +54,26 @@
         url: "{{ item.json.body.href }}"
       loop: "{{ image_urls.results }}"
 
-    - name: Debug image_urls
+    - name: Get route for upload proxy
+      kubernetes.core.k8s_info:
+        kind: Route
+        namespace: openshift-cnv
+        name: cdi-uploadproxy
+      register: uploadproxy_route
+
+    - name: "Set host variable"
+      ansible.builtin.set_fact:
+        uploadproxy_url: 'https://{{ uploadproxy_route.resources[0].spec.host }}'
+
+    - name: "debug host variable"
       ansible.builtin.debug:
-        msg: '{{ image_urls }}'
+        msg: '{{ uploadproxy_url }}'
+
+    - name: Upload images to CDI proxy
+      community.kubevirt.kubevirt_cdi_upload:
+        pvc_namespace: default
+        pvc_name: 'pvc-{{ item.json.body.filename }}'
+        upload_host_validate_certs: false
+        upload_host: '{{ uploadproxy_url }}'
+        dest: "{{ initial_download_path }}/{{ item.json.body.filename }}"
+      loop: "{{ image_urls.results }}"
