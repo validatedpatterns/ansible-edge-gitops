@@ -144,7 +144,7 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: ${NAME}-ssh-service
+    name: ${NAME}-service
   spec:
     ipFamilies:
     - IPv4
