@@ -176,31 +176,31 @@ objects:
       targetPort: 88
     - name: kerb88-udp
       port: 88
-      protocol: udp
+      protocol: UDP
       targetPort: 88
     - name: kerb464
       port: 464
-      protocol: tcp
+      protocol: TCP
       targetPort: 464
     - name: kerb464-udp
       port: 464
-      protocol: udp
+      protocol: UDP
       targetPort: 464
     - name: dns-tcp
       port: 53
-      protocol: tcp
+      protocol: TCP
       targetPort: 53
     - name: dns-udp
       port: 53
-      protocol: udp
+      protocol: UDP
       targetPort: 53
     - name: ntp
       port: 123
-      protocol: udp
+      protocol: TCP
       targetPort: 123
     - name: kadmind
       port: 749
-      protocol: tcp
+      protocol: TCP
       targetPort: 749
     selector:
       vm.kubevirt.io/name: ${NAME}
