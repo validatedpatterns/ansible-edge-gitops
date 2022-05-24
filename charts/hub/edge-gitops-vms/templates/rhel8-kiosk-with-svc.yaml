@@ -97,6 +97,7 @@ objects:
           vm.kubevirt.io/workload: desktop
         labels:
           kubevirt.io/domain: ${NAME}
+          vm.kubevirt.io/name: ${NAME}
           kubevirt.io/size: medium
       spec:
         domain:
@@ -145,22 +146,24 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: ${NAME}-ssh-service
+    name: ${NAME}-service
   spec:
-    externalTrafficPolicy: Cluster
-    internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
     ipFamilyPolicy: SingleStack
     ports:
-    - port: 22000
+    - name: ssh
+      port: 22
       protocol: TCP
       targetPort: 22
+    - name: rdp
+      port: 3389
+      protocol: TCP
+      targetPort: 3389
     selector:
-      kubevirt.io/domain: ${NAME}
       vm.kubevirt.io/name: ${NAME}
     sessionAffinity: None
-    type: NodePort
+    type: ClusterIP
 parameters:
 - description: VM name
   from: rhel8-kiosk-[a-z0-9]{4}
