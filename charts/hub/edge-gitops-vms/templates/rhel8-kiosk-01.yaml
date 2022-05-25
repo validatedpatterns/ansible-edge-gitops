@@ -15,18 +15,18 @@ items:
           }
         ]
     labels:
-      app: rhel8-kiosk-02
+      app: rhel8-kiosk-01
       edge-gitops-role: kiosk
       vm.kubevirt.io/template: rhel8-desktop-medium
       vm.kubevirt.io/template.revision: "1"
       vm.kubevirt.io/template.version: v0.19.4
-    name: rhel8-kiosk-02
+    name: rhel8-kiosk-01
   spec:
     dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
       metadata:
-        name: rhel8-kiosk-02
+        name: rhel8-kiosk-01
       spec:
         sourceRef:
           kind: DataSource
@@ -44,9 +44,9 @@ items:
           vm.kubevirt.io/os: rhel8
           vm.kubevirt.io/workload: desktop
         labels:
-          kubevirt.io/domain: rhel8-kiosk-02
+          kubevirt.io/domain: rhel8-kiosk-01
           kubevirt.io/size: medium
-          vm.kubevirt.io/name: rhel8-kiosk-02
+          vm.kubevirt.io/name: rhel8-kiosk-01
       spec:
         domain:
           cpu:
@@ -57,7 +57,7 @@ items:
             disks:
             - disk:
                 bus: virtio
-              name: rhel8-kiosk-02
+              name: rhel8-kiosk-01
             - disk:
                 bus: virtio
               name: cloudinitdisk
@@ -82,8 +82,8 @@ items:
         terminationGracePeriodSeconds: 180
         volumes:
         - dataVolume:
-            name: rhel8-kiosk-02
-          name: rhel8-kiosk-02
+            name: rhel8-kiosk-01
+          name: rhel8-kiosk-01
         - cloudInitNoCloud:
             userData: |-
               #cloud-config
@@ -94,7 +94,7 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: rhel8-kiosk-02-service
+    name: rhel8-kiosk-01-service
   spec:
     ipFamilies:
     - IPv4
@@ -109,7 +109,7 @@ items:
       protocol: TCP
       targetPort: 3389
     selector:
-      vm.kubevirt.io/name: rhel8-kiosk-02
+      vm.kubevirt.io/name: rhel8-kiosk-01
     sessionAffinity: None
     type: NodePort
 kind: List
