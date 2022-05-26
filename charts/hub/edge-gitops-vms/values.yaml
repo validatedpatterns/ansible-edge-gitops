@@ -66,7 +66,7 @@ vms:
   kiosk:
     count: 2
     flavor: medium
-    type: desktop
+    workload: desktop
     os: rhel8
     role: kiosk
     storage: 30Gi
