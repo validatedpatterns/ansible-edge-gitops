@@ -65,7 +65,7 @@ vms:
 
   kiosk:
     count: 2
-    size: medium
+    flavor: medium
     type: desktop
     os: rhel8
     role: kiosk
