@@ -1,0 +1,116 @@
+{{- range $vm, $vmr := .Values.vms }}
+{{- $ctr := int (coalesce $vmr.count 1) }}
+{{- range $i := until $ctr }}
+{{- $idx := printf "%03d" (add $i 1) }}
+{{- $identifier := printf "%s-%s-%s" $vmr.os $vmr.role $idx }}
+---
+apiVersion: v1
+items:
+- apiVersion: kubevirt.io/v1
+  kind: VirtualMachine
+  metadata:
+    annotations:
+      vm.kubevirt.io/validations: |
+        [
+          {
+            "name": "minimal-required-memory",
+            "path": "jsonpath::.spec.domain.resources.requests.memory",
+            "rule": "integer",
+            "message": "This VM requires more memory.",
+            "min": 1610612736
+          }
+        ]
+    labels:
+      app: {{ $identifier }}
+      edge-gitops-role: {{ $vmr.role }}
+      vm.kubevirt.io/template: {{ $vmr.template }}
+      vm.kubevirt.io/template.revision: "1"
+      vm.kubevirt.io/template.version: v0.19.4
+    name: {{ $identifier }}
+  spec:
+    dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        name: {{ $identifier }}
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: {{ $identifier }}
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: {{ $vmr.storage }}
+    running: true
+    template:
+      metadata:
+        annotations:
+          vm.kubevirt.io/flavor: {{ $vmr.flavor }}
+          vm.kubevirt.io/os: {{ $vmr.os }}
+          vm.kubevirt.io/workload: {{ $vmr.workload }}
+        labels:
+          kubevirt.io/domain: {{ $identifier }}
+          kubevirt.io/size: {{ $vmr.flavor }}
+          vm.kubevirt.io/name: {{ $identifier }}
+      spec:
+        domain:
+          cpu:
+            cores: 1
+            sockets: 1
+            threads: 1
+          devices:
+            disks:
+            - disk:
+                bus: virtio
+              name: {{ $identifier }}
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+            inputs:
+            - bus: virtio
+              name: tablet
+              type: tablet
+            interfaces:
+            - masquerade: {}
+              name: default
+            networkInterfaceMultiqueue: true
+            rng: {}
+          machine:
+            type: pc-q35-rhel8.4.0
+          resources:
+            requests:
+              memory: {{ $vmr.memory }}
+        evictionStrategy: LiveMigrate
+        networks:
+        - name: default
+          pod: {}
+        terminationGracePeriodSeconds: 180
+        volumes:
+        - dataVolume:
+            name: {{ $identifier }}
+          name: {{ $identifier }}
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: cloud-user
+              password: 6toh-n1d5-mh0k
+              chpasswd: { expire: False }
+          name: cloudinitdisk
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: {{ $identifier }}-service
+  spec:
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports: {{ $vmr.ports | toPrettyJson }}
+    selector:
+      vm.kubevirt.io/name: {{ $identifier }}
+    sessionAffinity: None
+    type: NodePort
+kind: List
+metadata: {}
+{{- end }}
+{{- end }}
