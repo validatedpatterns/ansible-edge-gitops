@@ -8,6 +8,7 @@
   vars:
     values_secret: "{{ lookup('env', 'HOME') }}/values-secret.yaml"
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
+    aap_org_name: "HMI Demo"
   tasks:
     - name: Parse "{{ values_secret }}"
       ansible.builtin.set_fact:
@@ -71,7 +72,7 @@
         body_format: json
         validate_certs: false
         force_basic_auth: true
-      #no_log: true
+      no_log: true
 
     - name: Load license the awx way
       awx.awx.license:
@@ -85,27 +86,6 @@
       register: result
       until: result is not failed
 
-#    - name: Post manifest file
-#      retries: 20
-#      delay: 5
-#      register: api_status
-#      until: api_status.status == 200
-#      uri:
-#        url: https://{{ ansible_host }}/api/v2/config/
-#        method: POST
-#        user: admin
-#        password: "{{admin_password}}"
-#        body: '{ "eula_accepted": true, "manifest": "{{ manifest_file.content }}" }'
-#        body_format: json
-#        validate_certs: false
-#        force_basic_auth: true
-#      #no_log: true
-#      ignore_errors: True
-
-    - name: debug
-      debug:
-        msg: '{{ api_status }}'
-
     - name: Report AAP Endpoint
       debug:
         msg: 'AAP Endpoint: https://{{ ansible_host }}'
@@ -118,18 +98,24 @@
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
 
-#    - name: Delete initial deployment
-#      kubernetes.core.k8s:
-#        kind: Deployment
-#        namespace: ansible-automation-platform
-#        name: controller
-
     # Add a user
     # Add an organization
     # Add an inventory
     # Add a credential
     # Project
     # Job Templates
+
+    - name: Configure Organizations
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.organizations
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_organizations:
+          - name: '{{ aap_org_name }}'
 
     - name: Configure Projects
       ansible.builtin.include_role:
@@ -144,7 +130,7 @@
             state: absent
 
           - name: "HMI Demo"
-            organization: Default
+            organization: '{{ aap_org_name }}'
             scm_branch: 'main'
             scm_clean: "no"
             scm_delete_on_update: "no"
@@ -165,21 +151,21 @@
             state: absent
 
           - name: "Kiosk Playbook"
-            organization: Default
+            organization: '{{ aap_org_name }}'
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
             inventory: "Demo Inventory"
 
           - name: "Podman Playbook"
-            organization: Default
+            organization: '{{ aap_org_name }}'
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
             inventory: "Demo Inventory"
 
           - name: "IDM Playbook"
-            organization: Default
+            organization: '{{ aap_org_name }}'
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/idm/playbooks/deploy-idm.yml"
