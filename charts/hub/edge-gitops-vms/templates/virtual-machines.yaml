@@ -36,7 +36,7 @@ items:
       spec:
         sourceRef:
           kind: DataSource
-          name: {{ $identifier }}
+          name: {{ $vmr.os }}
           namespace: openshift-virtualization-os-images
         storage:
           resources:
