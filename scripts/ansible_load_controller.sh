@@ -25,6 +25,10 @@
       register: manifest_file
       become: false
 
+    - name: Wait for 10 minutes
+      ansible.builtin.pause:
+        minutes: 10
+
     - name: Get web pod name
       retries: 60
       delay: 10
