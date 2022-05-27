@@ -6,7 +6,7 @@ clusterGroup:
   - vault
   - golang-external-secrets
   - ansible-automation-platform
-  - openshift-cnv
+  #- openshift-cnv
   - openshift-storage
   - edge-gitops-vms
 
