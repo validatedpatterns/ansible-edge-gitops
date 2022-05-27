@@ -25,9 +25,9 @@
       register: manifest_file
       become: false
 
-    - name: Wait for 10 minutes
+    - name: Wait for 5 minutes to ensure controller install completes
       ansible.builtin.pause:
-        minutes: 10
+        minutes: 5
 
     - name: Get web pod name
       retries: 60
