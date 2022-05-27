@@ -53,7 +53,7 @@
       register: awx_status
       retries: 60
       delay: 10
-      until: awx_status.changed
+      until: awx_status is not failed
 
     - name: Wait for API/UI route to deploy
       kubernetes.core.k8s_info:
