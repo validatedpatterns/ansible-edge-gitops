@@ -25,6 +25,42 @@
       register: manifest_file
       become: false
 
+    - name: Get web pod name
+      retries: 60
+      delay: 10
+      kubernetes.core.k8s_info:
+        kind: pod
+        namespace: ansible-automation-platform
+        label_selectors:
+          - 'app.kubernetes.io/name = controller'
+      register: aappods
+      until: aappods.resources | length >= 1
+
+    - name: Sed podname fact
+      ansible.builtin.set_fact:
+        webpodname: '{{ aappods.resources[0].metadata.name }}'
+
+    - name: Ensure migrations are done
+      kubernetes.core.k8s_exec:
+        namespace: 'ansible-automation-platform'
+        pod: '{{ webpodname }}'
+        container: controller-web
+        command: 'awx-manage check'
+      register: awx_status
+      retries: 60
+      delay: 10
+      until: awx_status.changed
+
+    - name: Wait for API/UI route to deploy
+      kubernetes.core.k8s_info:
+        kind: Route
+        namespace: ansible-automation-platform
+        name: controller
+      register: aap_host
+      retries: 20
+      delay: 5
+      until: aap_host.resources | length > 0
+
     - name: Wait for API/UI route to deploy
       kubernetes.core.k8s_info:
         kind: Route
