@@ -15,7 +15,7 @@ clusterGroup:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
       channel: stable-2.2
-      csv: aap-operator.v2.1.0-0.1639138915
+      csv: aap-operator.v2.2.0-0.1653444770
 
     openshift-virtualization:
       name: kubevirt-hyperconverged
