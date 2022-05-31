@@ -1,3 +1,11 @@
+NAME=ansible-edge-gitops
+PATTERN=ansible-edge-gitops
+SECRETS=~/values-secret.yaml
+TARGET_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+HUBCLUSTER_APPS_DOMAIN=$(shell oc get ingresses.config/cluster -o jsonpath={.spec.domain})
+TARGET_REPO=$(shell git remote show origin | grep Push | sed -e 's/.*URL:[[:space:]]*//' -e 's%^git@%%' -e 's%^https://%%' -e 's%:%/%' -e 's%^%https://%')
+CHART_OPTS=-f common/examples/values-secret.yaml -f values-global.yaml -f values-hub.yaml --set global.targetRevision=main --set global.valuesDirectoryURL="https://github.com/pattern-clone/pattern/raw/main/" --set global.pattern="$(NAME)" --set global.namespace="$(NAME)"
+HELM_OPTS=-f values-global.yaml -f values-hub.yaml -f $(SECRETS) --set main.git.repoURL="$(TARGET_REPO)" --set main.git.revision=$(TARGET_BRANCH) --set global.hubClusterDomain=$(HUBCLUSTER_APPS_DOMAIN) --set global.localClusterDomain=$(HUBCLUSTER_APPS_DOMAIN)
 BOOTSTRAP=1
 
 .PHONY: default
@@ -14,16 +22,15 @@ help:
 install: deploy ## installs the pattern, inits the vault and loads the secrets
 	make vault-init
 	./scripts/deploy_kubevirt_worker.sh
-	ansible-playbook -vvv ./scripts/ansible_load_controller.sh
+	./scripts/ansible_load_controller.sh
 	echo "Installed"
 
 common-test:
 	make -C common -f common/Makefile test
 
 test:
-	make -f common/Makefile CHARTS="$(wildcard charts/all/*)" PATTERN_OPTS="-f values-global.yaml -f values-hub.yaml" test
-	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="-f values-global.yaml -f values-hub.yaml" test
-	#make -f common/Makefile CHARTS="$(wildcard charts/region/*)" PATTERN_OPTS="-f values-region-one.yaml" test
+	make -f common/Makefile CHARTS="$(wildcard charts/all/*)" PATTERN_OPTS="$(HELM_OPTS)" test
+	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(HELM_OPTS)" test
 
 helmlint:
 	# no regional charts just yet: "$(wildcard charts/region/*)"

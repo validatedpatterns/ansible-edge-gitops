@@ -1,0 +1,20 @@
+---
+collections:
+  - name: ansible.posix
+    source: https://galaxy.ansible.com
+  - name: oasis_roles.system
+    source: https://galaxy.ansible.com
+  - name: fedora.linux_system_roles
+    source: https://galaxy.ansible.com
+#  - name: redhat.rhel_idm
+#    source: https://cloud.redhat.com/api/automation-hub/
+#  - name: redhat.openshift
+#    source: https://cloud.redhat.com/api/automation-hub/
+  - name: community.general
+    source: https://galaxy.ansible.com
+  - name: containers.podman
+    source: https://galaxy.ansible.com
+  - name: freeipa.ansible_freeipa
+    source: https://galaxy.ansible.com
+  - name: community.okd
+    source: https://galaxy.ansible.com

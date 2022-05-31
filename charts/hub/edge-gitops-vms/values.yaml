@@ -1,1 +1,83 @@
 ---
+vms:
+  idm:
+    count: 1
+    flavor: medium
+    workload: server
+    os: rhel8
+    role: idm
+    storage: 30Gi
+    memory: 4Gi
+    template: rhel8-server-medium
+    ports:
+      - name: ssh
+        port: 22
+        protocol: TCP
+        targetPort: 22
+      - name: http
+        port: 80
+        protocol: TCP
+        targetPort: 80
+      - name: https
+        port: 443
+        protocol: TCP
+        targetPort: 443
+      - name: ldap
+        port: 389
+        protocol: TCP
+        targetPort: 389
+      - name: ldaps
+        port: 636
+        protocol: TCP
+        targetPort: 636
+      - name: kerb88
+        port: 88
+        protocol: TCP
+        targetPort: 88
+      - name: kerb88-udp
+        port: 88
+        protocol: UDP
+        targetPort: 88
+      - name: kerb464
+        port: 464
+        protocol: TCP
+        targetPort: 464
+      - name: kerb464-udp
+        port: 464
+        protocol: UDP
+        targetPort: 464
+      - name: dns-tcp
+        port: 53
+        protocol: TCP
+        targetPort: 53
+      - name: dns-udp
+        port: 53
+        protocol: UDP
+        targetPort: 53
+      - name: ntp
+        port: 123
+        protocol: TCP
+        targetPort: 123
+      - name: kadmind
+        port: 749
+        protocol: TCP
+        targetPort: 749
+
+  kiosk:
+    count: 2
+    flavor: medium
+    workload: desktop
+    os: rhel8
+    role: kiosk
+    storage: 30Gi
+    memory: 4Gi
+    template: rhel8-desktop-medium
+    ports:
+      - name: ssh
+        port: 22
+        protocol: TCP
+        targetPort: 22
+      - name: rdp
+        port: 3389
+        protocol: TCP
+        targetPort: 3389
