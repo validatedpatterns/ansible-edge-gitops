@@ -1,5 +1,0 @@
-apiVersion: v2
-name: common
-description: RFE Common Chart
-type: library
-version: 0.1.0
