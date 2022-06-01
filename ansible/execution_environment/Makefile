@@ -1,2 +1,2 @@
 ee:
-	ansible-builder build --tag=aeg-ee
+	ansible-builder build --tag=ansible-edge-gitops-ee
