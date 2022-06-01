@@ -54,3 +54,8 @@ storageSystem:
     kind: storagecluster.ocs.openshift.io/v1
     name: ocs-storagecluster
     namespace: ""
+
+# Default to AWS storage class until others provide metal nodes
+global:
+  hub:
+    storageClassName: gp2
