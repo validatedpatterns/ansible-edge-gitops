@@ -97,6 +97,9 @@ items:
   kind: Service
   metadata:
     name: rhel8-idm-001-service
+    labels:
+      app: rhel8-idm-001
+      edge-gitops-role: idm
   spec:
     ipFamilies:
     - IPv4
@@ -286,6 +289,9 @@ items:
   kind: Service
   metadata:
     name: rhel8-kiosk-001-service
+    labels:
+      app: rhel8-kiosk-001
+      edge-gitops-role: kiosk
   spec:
     ipFamilies:
     - IPv4
@@ -409,6 +415,9 @@ items:
   kind: Service
   metadata:
     name: rhel8-kiosk-002-service
+    labels:
+      app: rhel8-kiosk-002
+      edge-gitops-role: kiosk
   spec:
     ipFamilies:
     - IPv4
