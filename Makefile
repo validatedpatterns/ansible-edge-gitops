@@ -30,6 +30,7 @@ common-test:
 
 test:
 	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(CHART_OPTS)" test
+	echo Tests SUCCESSFUL
 
 helmlint:
 	# no regional charts just yet: "$(wildcard charts/region/*)"
