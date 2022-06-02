@@ -178,6 +178,23 @@
         controller_organizations:
           - name: '{{ aap_org_name }}'
 
+    - name: Configure Credentials
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credentials
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credentials:
+          - name: 'Kubeconfig'
+            description: "Local Cluster Kubeconfig"
+            organization: "{{ aap_org_name }}"
+            credential_type: "Kubeconfig"
+            inputs:
+              kube_config: "{{ lookup('file', kubeconfig) }}"
+
     - name: Configure Inventories
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.inventories
