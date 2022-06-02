@@ -101,6 +101,7 @@ items:
   kind: Service
   metadata:
     name: {{ $identifier }}-service
+    labels: {{ $vmr.labels | toPrettyJson }}
   spec:
     ipFamilies:
     - IPv4
