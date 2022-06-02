@@ -25,9 +25,9 @@
       register: manifest_file
       become: false
 
-    - name: Wait for 5 minutes to ensure controller install completes
-      ansible.builtin.pause:
-        minutes: 5
+    #- name: Wait for 5 minutes to ensure controller install completes
+    #  ansible.builtin.pause:
+    #    minutes: 5
 
     - name: Get web pod name
       retries: 60
@@ -49,11 +49,12 @@
         namespace: 'ansible-automation-platform'
         pod: '{{ webpodname }}'
         container: controller-web
-        command: 'awx-manage migrate || /usr/bin/wait-for-migrations'
+        command: 'bash -c "awx-manage migrate || /usr/bin/wait-for-migrations"'
       register: awx_status
       retries: 60
       delay: 10
       until: awx_status is not failed
+      changed_when: false
 
     - name: Wait for API/UI route to deploy
       kubernetes.core.k8s_info:
