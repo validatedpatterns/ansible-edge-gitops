@@ -56,9 +56,9 @@ items:
       spec:
         domain:
           cpu:
-            cores: 1
-            sockets: 1
-            threads: 1
+            cores: {{ $vmr.cores }}
+            sockets: {{ $vmr.sockets }}
+            threads: {{ $vmr.threads }}
           devices:
             disks:
             - disk:
