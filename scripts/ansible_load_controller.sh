@@ -66,16 +66,6 @@
       delay: 5
       until: aap_host.resources | length > 0
 
-    - name: Wait for API/UI route to deploy
-      kubernetes.core.k8s_info:
-        kind: Route
-        namespace: ansible-automation-platform
-        name: controller
-      register: aap_host
-      retries: 20
-      delay: 5
-      until: aap_host.resources | length > 0
-
     - name: Retrieve API hostname for AAP
       kubernetes.core.k8s_info:
         kind: Route
@@ -178,6 +168,18 @@
             scm_type: "git"
             scm_update_on_launch: "no"
             scm_url: "https://github.com/stolostron/hmi-demo.git"
+
+    - name: Configure Execution Environments
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.execution_environments
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_execution_environments:
+          - name: "Ansible Edge GitOps EE"
+            image: quay.io/martjack/ansible-edge-gitops-ee
 
     - name: Configure Job Templates
       ansible.builtin.include_role:
