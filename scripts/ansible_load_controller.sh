@@ -138,6 +138,34 @@
     # Project
     # Job Templates
 
+    - name: Configure Credential Types
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credential_types
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credential_types:
+          - name: Kubeconfig
+            description: kubeconfig file
+            kind: "cloud"
+            inputs:
+              fields:
+                - id: kube_config
+                  type: string
+                  label: kubeconfig
+                  secret: true
+                  multiline: true
+              required:
+                - kube_config
+            injectors:
+              env:
+                K8S_AUTH_KUBECONFIG: "{  { tower.filename.kubeconfig }}"
+              file:
+                template.kubeconfig: "{  { kube_config }}"
+
     - name: Configure Organizations
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.organizations
@@ -150,7 +178,7 @@
         controller_organizations:
           - name: '{{ aap_org_name }}'
 
-    - name: Configure Projects
+    - name: Configure Inventories
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.inventories
       vars:
