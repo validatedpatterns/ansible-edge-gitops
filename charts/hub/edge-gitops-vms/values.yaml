@@ -11,9 +11,6 @@ vms:
     cores: 1
     sockets: 1
     threads: 1
-    labels:
-      - role: idm
-      - os: rhel8
     template: rhel8-server-medium
     ports:
       - name: ssh
@@ -81,9 +78,6 @@ vms:
     sockets: 1
     threads: 1
     template: rhel8-desktop-medium
-    labels:
-      - role: kiosk
-      - os: rhel8
     ports:
       - name: ssh
         port: 22

@@ -101,7 +101,9 @@ items:
   kind: Service
   metadata:
     name: {{ $identifier }}-service
-    labels: {{ $vmr.labels | toPrettyJson }}
+    labels:
+      app: {{ $identifier }}
+      edge-gitops-role: {{ $vmr.role }}
   spec:
     ipFamilies:
     - IPv4
