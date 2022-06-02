@@ -8,6 +8,9 @@ vms:
     role: idm
     storage: 30Gi
     memory: 4Gi
+    cores: 1
+    sockets: 1
+    threads: 1
     template: rhel8-server-medium
     ports:
       - name: ssh
@@ -71,6 +74,9 @@ vms:
     role: kiosk
     storage: 30Gi
     memory: 4Gi
+    cores: 1
+    sockets: 1
+    threads: 1
     template: rhel8-desktop-medium
     ports:
       - name: ssh

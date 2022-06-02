@@ -9,6 +9,8 @@
     values_secret: "{{ lookup('env', 'HOME') }}/values-secret.yaml"
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
     aap_org_name: "HMI Demo"
+    aap_execution_environment: "Ansible Edge Gitops EE"
+    aap_execution_environment_image: "quay.io/martjack/ansible-edge-gitops-ee"
   tasks:
     - name: Parse "{{ values_secret }}"
       ansible.builtin.set_fact:
@@ -25,9 +27,9 @@
       register: manifest_file
       become: false
 
-    - name: Wait for 5 minutes to ensure controller install completes
-      ansible.builtin.pause:
-        minutes: 5
+    #- name: Wait for 5 minutes to ensure controller install completes
+    #  ansible.builtin.pause:
+    #    minutes: 5
 
     - name: Get web pod name
       retries: 60
@@ -49,21 +51,12 @@
         namespace: 'ansible-automation-platform'
         pod: '{{ webpodname }}'
         container: controller-web
-        command: 'awx-manage check'
+        command: 'bash -c "awx-manage migrate || /usr/bin/wait-for-migrations"'
       register: awx_status
       retries: 60
       delay: 10
       until: awx_status is not failed
-
-    - name: Wait for API/UI route to deploy
-      kubernetes.core.k8s_info:
-        kind: Route
-        namespace: ansible-automation-platform
-        name: controller
-      register: aap_host
-      retries: 20
-      delay: 5
-      until: aap_host.resources | length > 0
+      changed_when: false
 
     - name: Wait for API/UI route to deploy
       kubernetes.core.k8s_info:
@@ -145,6 +138,34 @@
     # Project
     # Job Templates
 
+    - name: Configure Credential Types
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credential_types
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credential_types:
+          - name: Kubeconfig
+            description: kubeconfig file
+            kind: "cloud"
+            inputs:
+              fields:
+                - id: kube_config
+                  type: string
+                  label: kubeconfig
+                  secret: true
+                  multiline: true
+              required:
+                - kube_config
+            injectors:
+              env:
+                K8S_AUTH_KUBECONFIG: "{  { tower.filename.kubeconfig }}"
+              file:
+                template.kubeconfig: "{  { kube_config }}"
+
     - name: Configure Organizations
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.organizations
@@ -156,6 +177,38 @@
         controller_configuration_async_retries: 10
         controller_organizations:
           - name: '{{ aap_org_name }}'
+
+    - name: Configure Credentials
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credentials
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credentials:
+          - name: 'Kubeconfig'
+            description: "Local Cluster Kubeconfig"
+            organization: "{{ aap_org_name }}"
+            credential_type: "Kubeconfig"
+            inputs:
+              kube_config: "{{ lookup('file', kubeconfig) }}"
+
+    - name: Configure Inventories
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.inventories
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_inventories:
+          - name: "HMI Demo IDM"
+            organization: "{{ aap_org_name }}"
+
+          - name: "HMI Demo Kiosks"
+            organization: "{{ aap_org_name }}"
 
     - name: Configure Projects
       ansible.builtin.include_role:
@@ -169,6 +222,15 @@
           - name: "Demo Project"
             state: absent
 
+          - name: "AEG GitOps"
+            organization: '{{ aap_org_name }}'
+            scm_branch: 'main'
+            scm_clean: "no"
+            scm_delete_on_update: "no"
+            scm_type: "git"
+            scm_update_on_launch: "yes"
+            scm_url: "https://github.com/mhjacks/ansible-edge-gitops.git"
+
           - name: "HMI Demo"
             organization: '{{ aap_org_name }}'
             scm_branch: 'main'
@@ -177,6 +239,18 @@
             scm_type: "git"
             scm_update_on_launch: "no"
             scm_url: "https://github.com/stolostron/hmi-demo.git"
+
+    - name: Configure Execution Environments
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.execution_environments
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_execution_environments:
+          - name: '{{ aap_execution_environment }}'
+            image: '{{ aap_execution_environment_image }}'
 
     - name: Configure Job Templates
       ansible.builtin.include_role:
@@ -196,6 +270,7 @@
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
             inventory: "Demo Inventory"
+            execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Podman Playbook"
             organization: '{{ aap_org_name }}'
@@ -203,6 +278,7 @@
             job_type: run
             playbook: "ansible/podman_playbook.yml"
             inventory: "Demo Inventory"
+            execution_environment: '{{ aap_execution_environment }}'
 
           - name: "IDM Playbook"
             organization: '{{ aap_org_name }}'
@@ -210,3 +286,4 @@
             job_type: run
             playbook: "ansible/idm/playbooks/deploy-idm.yml"
             inventory: "Demo Inventory"
+            execution_environment: '{{ aap_execution_environment }}'
