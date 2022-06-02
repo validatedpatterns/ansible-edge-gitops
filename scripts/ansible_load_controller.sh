@@ -205,6 +205,15 @@
           - name: "Demo Project"
             state: absent
 
+          - name: "AEG GitOps"
+            organization: '{{ aap_org_name }}'
+            scm_branch: 'main'
+            scm_clean: "no"
+            scm_delete_on_update: "no"
+            scm_type: "git"
+            scm_update_on_launch: "yes"
+            scm_url: "https://github.com/mhjacks/ansible-edge-gitops.git"
+
           - name: "HMI Demo"
             organization: '{{ aap_org_name }}'
             scm_branch: 'main'
