@@ -49,7 +49,7 @@
         namespace: 'ansible-automation-platform'
         pod: '{{ webpodname }}'
         container: controller-web
-        command: 'awx-manage check'
+        command: 'awx-manage migrate || /usr/bin/wait-for-migrations'
       register: awx_status
       retries: 60
       delay: 10
