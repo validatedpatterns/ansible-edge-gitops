@@ -152,6 +152,21 @@
 
     - name: Configure Projects
       ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.inventories
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_inventories:
+          - name: "HMI Demo IDM"
+            organization: "{{ aap_org_name }}"
+
+          - name: "HMI Demo Kiosks"
+            organization: "{{ aap_org_name }}"
+
+    - name: Configure Projects
+      ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.projects
       vars:
         controller_hostname: 'https://{{ ansible_host }}'
