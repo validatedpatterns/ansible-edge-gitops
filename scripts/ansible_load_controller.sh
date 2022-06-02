@@ -9,6 +9,8 @@
     values_secret: "{{ lookup('env', 'HOME') }}/values-secret.yaml"
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
     aap_org_name: "HMI Demo"
+    aap_execution_environment: "Ansible Edge Gitops EE"
+    aap_execution_environment_image: "quay.io/martjack/ansible-edge-gitops-ee"
   tasks:
     - name: Parse "{{ values_secret }}"
       ansible.builtin.set_fact:
@@ -178,8 +180,8 @@
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
         controller_execution_environments:
-          - name: "Ansible Edge GitOps EE"
-            image: quay.io/martjack/ansible-edge-gitops-ee
+          - name: '{{ aap_execution_environment }}'
+            image: '{{ aap_execution_environment_image }}'
 
     - name: Configure Job Templates
       ansible.builtin.include_role:
@@ -199,6 +201,7 @@
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
             inventory: "Demo Inventory"
+            execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Podman Playbook"
             organization: '{{ aap_org_name }}'
@@ -206,6 +209,7 @@
             job_type: run
             playbook: "ansible/podman_playbook.yml"
             inventory: "Demo Inventory"
+            execution_environment: '{{ aap_execution_environment }}'
 
           - name: "IDM Playbook"
             organization: '{{ aap_org_name }}'
@@ -213,3 +217,4 @@
             job_type: run
             playbook: "ansible/idm/playbooks/deploy-idm.yml"
             inventory: "Demo Inventory"
+            execution_environment: '{{ aap_execution_environment }}'
