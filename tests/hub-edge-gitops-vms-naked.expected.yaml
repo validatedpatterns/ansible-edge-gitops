@@ -1,5 +1,62 @@
 ---
 # Source: edge-gitops-vms/templates/virtual-machines.yaml
+apiVersion: "external-secrets.io/v1alpha1"
+kind: ExternalSecret
+metadata:
+  name: es-authorizedsshkeys-rhel8-idm-001
+spec:
+  refreshInterval: 90s
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: authorizedsshkeys-rhel8-idm-001
+    template:
+  data:
+    - secretKey: key
+      remoteRef:
+        key: secret/data/hub/idm-ssh
+        property: publickey
+---
+# Source: edge-gitops-vms/templates/virtual-machines.yaml
+apiVersion: "external-secrets.io/v1alpha1"
+kind: ExternalSecret
+metadata:
+  name: es-authorizedsshkeys-rhel8-kiosk-001
+spec:
+  refreshInterval: 90s
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: authorizedsshkeys-rhel8-kiosk-001
+    template:
+  data:
+    - secretKey: key
+      remoteRef:
+        key: secret/data/hub/kiosk-ssh
+        property: publickey
+---
+# Source: edge-gitops-vms/templates/virtual-machines.yaml
+apiVersion: "external-secrets.io/v1alpha1"
+kind: ExternalSecret
+metadata:
+  name: es-authorizedsshkeys-rhel8-kiosk-002
+spec:
+  refreshInterval: 90s
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: authorizedsshkeys-rhel8-kiosk-002
+    template:
+  data:
+    - secretKey: key
+      remoteRef:
+        key: secret/data/hub/kiosk-ssh
+        property: publickey
+---
+# Source: edge-gitops-vms/templates/virtual-machines.yaml
 apiVersion: v1
 items:
 - apiVersion: kubevirt.io/v1
@@ -50,6 +107,16 @@ items:
           kubevirt.io/size: medium
           vm.kubevirt.io/name: rhel8-idm-001
       spec:
+        accessCredentials:
+          - sshPublicKey:
+              propagationMethod:
+              #  configDrive: {}
+                qemuGuestAgent:
+                  users:
+                    - "cloud-user"
+              source:
+                secret:
+                  secretName: authorizedsshkeys-rhel8-idm-001
         domain:
           cpu:
             cores: 1
@@ -242,6 +309,16 @@ items:
           kubevirt.io/size: medium
           vm.kubevirt.io/name: rhel8-kiosk-001
       spec:
+        accessCredentials:
+          - sshPublicKey:
+              propagationMethod:
+              #  configDrive: {}
+                qemuGuestAgent:
+                  users:
+                    - "cloud-user"
+              source:
+                secret:
+                  secretName: authorizedsshkeys-rhel8-kiosk-001
         domain:
           cpu:
             cores: 1
@@ -368,6 +445,16 @@ items:
           kubevirt.io/size: medium
           vm.kubevirt.io/name: rhel8-kiosk-002
       spec:
+        accessCredentials:
+          - sshPublicKey:
+              propagationMethod:
+              #  configDrive: {}
+                qemuGuestAgent:
+                  users:
+                    - "cloud-user"
+              source:
+                secret:
+                  secretName: authorizedsshkeys-rhel8-kiosk-002
         domain:
           cpu:
             cores: 1
