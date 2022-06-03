@@ -74,8 +74,11 @@ items:
       spec:
         accessCredentials:
           - sshPublicKey:
-              #propagationMethod:
+              propagationMethod:
               #  configDrive: {}
+                qemuGuestAgent:
+                  users:
+                    - "cloud-user"
               source:
                 secret:
                   secretName: authorizedsshkeys-{{ $identifier }}
