@@ -273,7 +273,7 @@
 
     - name: Configure Inventory Sources
       ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.inventories
+        name: redhat_cop.controller_configuration.inventory_sources
       vars:
         controller_hostname: 'https://{{ ansible_host }}'
         controller_username: admin
@@ -283,18 +283,20 @@
           - name: "HMI Demo IDM Source"
             organization: "{{ aap_org_name }}"
             inventory: "HMI Demo IDM"
-            credential: "idm-private-key"
+            credential: "Kubeconfig"
             update_on_launch: true
-            source: "AEG GitOps"
+            source: "scm"
+            source_project: "AEG GitOps"
             source_path: "ansible/inventory/openshift_cluster.yml"
             host_filter: ".*idm.*service"
 
           - name: "HMI Demo Kiosk Source"
             organization: "{{ aap_org_name }}"
             inventory: "HMI Demo Kiosks"
-            credential: "kiosk-private-key"
+            credential: "Kubeconfig"
             update_on_launch: true
-            source: "AEG GitOps"
+            source: "scm"
+            source_project: "AEG GitOps"
             source_path: "ansible/inventory/openshift_cluster.yml"
             host_filter: ".*kiosk.*service"
 
