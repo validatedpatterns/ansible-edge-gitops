@@ -195,6 +195,13 @@
             inputs:
               kube_config: "{{ lookup('file', kubeconfig) }}"
 
+#          - name: 'idm-private-key'
+#            description: "IDM SSH private Key"
+#            organization: "{{ aap_org_name }}"
+#            credential_type: "Machine"
+#            inputs:
+#              kube_config: "{{ lookup('file', kubeconfig) }}"
+
     - name: Configure Inventories
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.inventories

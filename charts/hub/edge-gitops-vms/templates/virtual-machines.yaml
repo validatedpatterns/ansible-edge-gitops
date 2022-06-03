@@ -74,8 +74,8 @@ items:
       spec:
         accessCredentials:
           - sshPublicKey:
-              propagationMethod:
-                configDrive: {}
+              #propagationMethod:
+              #  configDrive: {}
               source:
                 secret:
                   secretName: authorizedsshkeys-{{ $identifier }}
