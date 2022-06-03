@@ -46,13 +46,6 @@ items:
       vm.kubevirt.io/template.version: v0.19.4
     name: {{ $identifier }}
   spec:
-    accessCredentials:
-      - sshPublicKey:
-          propagationMethod:
-            configDrive: {}
-          source:
-            secret:
-              secretName: authorizedsshkeys-{{ $identifier }}
     dataVolumeTemplates:
     - apiVersion: cdi.kubevirt.io/v1beta1
       kind: DataVolume
@@ -79,6 +72,13 @@ items:
           kubevirt.io/size: {{ $vmr.flavor }}
           vm.kubevirt.io/name: {{ $identifier }}
       spec:
+        accessCredentials:
+          - sshPublicKey:
+              propagationMethod:
+                configDrive: {}
+              source:
+                secret:
+                  secretName: authorizedsshkeys-{{ $identifier }}
         domain:
           cpu:
             cores: {{ $vmr.cores }}
