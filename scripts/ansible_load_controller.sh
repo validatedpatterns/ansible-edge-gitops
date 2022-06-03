@@ -178,45 +178,6 @@
         controller_organizations:
           - name: '{{ aap_org_name }}'
 
-    - name: Configure Credentials
-      ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.credentials
-      vars:
-        controller_hostname: 'https://{{ ansible_host }}'
-        controller_username: admin
-        controller_password: '{{ admin_password }}'
-        controller_validate_certs: false
-        controller_configuration_async_retries: 10
-        controller_credentials:
-          - name: 'Kubeconfig'
-            description: "Local Cluster Kubeconfig"
-            organization: "{{ aap_org_name }}"
-            credential_type: "Kubeconfig"
-            inputs:
-              kube_config: "{{ lookup('file', kubeconfig) }}"
-
-#          - name: 'idm-private-key'
-#            description: "IDM SSH private Key"
-#            organization: "{{ aap_org_name }}"
-#            credential_type: "Machine"
-#            inputs:
-#              kube_config: "{{ lookup('file', kubeconfig) }}"
-
-    - name: Configure Inventories
-      ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.inventories
-      vars:
-        controller_hostname: 'https://{{ ansible_host }}'
-        controller_username: admin
-        controller_password: '{{ admin_password }}'
-        controller_validate_certs: false
-        controller_inventories:
-          - name: "HMI Demo IDM"
-            organization: "{{ aap_org_name }}"
-
-          - name: "HMI Demo Kiosks"
-            organization: "{{ aap_org_name }}"
-
     - name: Configure Projects
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.projects
@@ -247,6 +208,96 @@
             scm_update_on_launch: "no"
             scm_url: "https://github.com/stolostron/hmi-demo.git"
 
+    - name: Debug idmkey
+      debug:
+        msg: "{{ all_values['secrets']['idm-ssh']['privatekey'] }}"
+
+    - name: Debug kioskkey
+      debug:
+        msg: "{{ all_values['secrets']['kiosk-ssh']['privatekey'] }}"
+
+
+    - name: Configure Kubernetes Credentials
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credentials
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credentials:
+          - name: 'Kubeconfig'
+            description: "Local Cluster Kubeconfig"
+            organization: "{{ aap_org_name }}"
+            credential_type: "Kubeconfig"
+            inputs:
+              kube_config: "{{ lookup('file', kubeconfig) }}"
+
+    - name: Configure Machine Credentials
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credentials
+      loop:
+        - idm
+        - kiosk
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credentials:
+          - name: '{{ item }}-private-key'
+            description: "Machine credential for {{ item }} type machines"
+            organization: "{{ aap_org_name }}"
+            credential_type: Machine
+            inputs:
+              username: "{{ all_values['secrets'][item ~ '-ssh']['username']  }}"
+              ssh_key_data: "{{ lookup('file', all_values['files'][item ~ '-ssh']['privatekey'])  }}"
+
+
+    - name: Configure Inventories
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.inventories
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_inventories:
+          - name: "HMI Demo IDM"
+            organization: "{{ aap_org_name }}"
+
+          - name: "HMI Demo Kiosks"
+            organization: "{{ aap_org_name }}"
+
+    - name: Configure Inventory Sources
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.inventories
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_inventory_sources:
+          - name: "HMI Demo IDM Source"
+            organization: "{{ aap_org_name }}"
+            inventory: "HMI Demo IDM"
+            credential: "idm-private-key"
+            update_on_launch: true
+            source: "AEG GitOps"
+            source_path: "ansible/inventory/openshift_cluster.yml"
+            host_filter: ".*idm.*service"
+
+          - name: "HMI Demo Kiosk Source"
+            organization: "{{ aap_org_name }}"
+            inventory: "HMI Demo Kiosks"
+            credential: "kiosk-private-key"
+            update_on_launch: true
+            source: "AEG GitOps"
+            source_path: "ansible/inventory/openshift_cluster.yml"
+            host_filter: ".*kiosk.*service"
+
     - name: Configure Execution Environments
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.execution_environments
@@ -276,7 +327,7 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
-            inventory: "Demo Inventory"
+            inventory: "HMI Demo Kiosks"
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Podman Playbook"
@@ -284,7 +335,7 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
-            inventory: "Demo Inventory"
+            inventory: "HMI Demo Kiosks"
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "IDM Playbook"
@@ -292,5 +343,5 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/idm/playbooks/deploy-idm.yml"
-            inventory: "Demo Inventory"
+            inventory: "HMI Demo IDM"
             execution_environment: '{{ aap_execution_environment }}'
