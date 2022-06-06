@@ -208,14 +208,9 @@
             scm_update_on_launch: "no"
             scm_url: "https://github.com/stolostron/hmi-demo.git"
 
-    - name: Debug idmkey
-      debug:
-        msg: "{{ all_values['secrets']['idm-ssh']['privatekey'] }}"
-
     - name: Debug kioskkey
       debug:
         msg: "{{ all_values['secrets']['kiosk-ssh']['privatekey'] }}"
-
 
     - name: Configure Kubernetes Credentials
       ansible.builtin.include_role:
@@ -238,7 +233,6 @@
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.credentials
       loop:
-        - idm
         - kiosk
       vars:
         controller_hostname: 'https://{{ ansible_host }}'
@@ -350,13 +344,5 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
-            inventory: "HMI Demo"
-            execution_environment: '{{ aap_execution_environment }}'
-
-          - name: "IDM Playbook"
-            organization: '{{ aap_org_name }}'
-            project: "HMI Demo"
-            job_type: run
-            playbook: "ansible/idm/playbooks/deploy-idm.yml"
             inventory: "HMI Demo"
             execution_environment: '{{ aap_execution_environment }}'
