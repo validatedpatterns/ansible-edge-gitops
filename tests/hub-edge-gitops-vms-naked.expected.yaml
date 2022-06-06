@@ -110,10 +110,7 @@ items:
         accessCredentials:
           - sshPublicKey:
               propagationMethod:
-              #  configDrive: {}
-                qemuGuestAgent:
-                  users:
-                    - "cloud-user"
+                configDrive: {}
               source:
                 secret:
                   secretName: authorizedsshkeys-rhel8-idm-001
@@ -153,7 +150,7 @@ items:
         - dataVolume:
             name: rhel8-idm-001
           name: rhel8-idm-001
-        - cloudInitNoCloud:
+        - cloudInitConfigDrive:
             userData: |-
               #cloud-config
               user: cloud-user
@@ -312,10 +309,7 @@ items:
         accessCredentials:
           - sshPublicKey:
               propagationMethod:
-              #  configDrive: {}
-                qemuGuestAgent:
-                  users:
-                    - "cloud-user"
+                configDrive: {}
               source:
                 secret:
                   secretName: authorizedsshkeys-rhel8-kiosk-001
@@ -355,7 +349,7 @@ items:
         - dataVolume:
             name: rhel8-kiosk-001
           name: rhel8-kiosk-001
-        - cloudInitNoCloud:
+        - cloudInitConfigDrive:
             userData: |-
               #cloud-config
               user: cloud-user
@@ -448,10 +442,7 @@ items:
         accessCredentials:
           - sshPublicKey:
               propagationMethod:
-              #  configDrive: {}
-                qemuGuestAgent:
-                  users:
-                    - "cloud-user"
+                configDrive: {}
               source:
                 secret:
                   secretName: authorizedsshkeys-rhel8-kiosk-002
@@ -491,7 +482,7 @@ items:
         - dataVolume:
             name: rhel8-kiosk-002
           name: rhel8-kiosk-002
-        - cloudInitNoCloud:
+        - cloudInitConfigDrive:
             userData: |-
               #cloud-config
               user: cloud-user
