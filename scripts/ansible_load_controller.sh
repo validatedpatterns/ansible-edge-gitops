@@ -329,6 +329,14 @@
           - name: "Demo Job Template"
             state: absent
 
+          - name: "Ping Playbook"
+            organization: '{{ aap_org_name }}'
+            project: "AEG GitOps"
+            job_type: run
+            playbook: "ansible/playbooks/ping.yml"
+            inventory: "HMI Demo Kiosks"
+            execution_environment: '{{ aap_execution_environment }}'
+
           - name: "Kiosk Playbook"
             organization: '{{ aap_org_name }}'
             project: "HMI Demo"
