@@ -265,10 +265,7 @@
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
         controller_inventories:
-          - name: "HMI Demo IDM"
-            organization: "{{ aap_org_name }}"
-
-          - name: "HMI Demo Kiosks"
+          - name: "HMI Demo"
             organization: "{{ aap_org_name }}"
 
     - name: Configure Inventory Sources
@@ -282,7 +279,7 @@
         controller_inventory_sources:
           - name: "HMI Demo IDM Source"
             organization: "{{ aap_org_name }}"
-            inventory: "HMI Demo IDM"
+            inventory: "HMI Demo"
             credential: "Kubeconfig"
             update_on_launch: true
             source: "scm"
@@ -292,13 +289,21 @@
 
           - name: "HMI Demo Kiosk Source"
             organization: "{{ aap_org_name }}"
-            inventory: "HMI Demo Kiosks"
+            inventory: "HMI Demo"
             credential: "Kubeconfig"
             update_on_launch: true
             source: "scm"
             source_project: "AEG GitOps"
             source_path: "ansible/inventory/openshift_cluster.yml"
             host_filter: ".*kiosk.*service"
+
+          - name: "HMI Demo Static Source"
+            organization: "{{ aap_org_name }}"
+            inventory: "HMI Demo"
+            update_on_launch: true
+            source: "scm"
+            source_project: "AEG GitOps"
+            source_path: "ansible/inventory/hosts"
 
     - name: Configure Execution Environments
       ansible.builtin.include_role:
