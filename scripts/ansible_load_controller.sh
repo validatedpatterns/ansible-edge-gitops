@@ -262,6 +262,11 @@
           - name: "HMI Demo"
             organization: "{{ aap_org_name }}"
 
+          - name: "HMI Demo Kiosks"
+            organization: "{{ aap_org_name }}"
+            kind: smart
+            host_filter: 'name__icontains=kiosk'
+
     - name: Configure Inventory Sources
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.inventory_sources
