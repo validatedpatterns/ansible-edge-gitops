@@ -1,4 +1,8 @@
 ---
+secretStore:
+  name: vault-backend
+  kind: ClusterSecretStore
+
 vms:
   idm:
     count: 1
@@ -12,6 +16,8 @@ vms:
     sockets: 1
     threads: 1
     template: rhel8-server-medium
+    sshsecret: secret/data/hub/idm-ssh
+    sshpubkeyfield: publickey
     ports:
       - name: ssh
         port: 22
@@ -78,6 +84,8 @@ vms:
     sockets: 1
     threads: 1
     template: rhel8-desktop-medium
+    sshsecret: secret/data/hub/kiosk-ssh
+    sshpubkeyfield: publickey
     ports:
       - name: ssh
         port: 22

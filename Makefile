@@ -21,6 +21,7 @@ help:
 
 install: deploy ## installs the pattern, inits the vault and loads the secrets
 	make vault-init
+	./common/scripts/ansible-push-vault-secrets.sh
 	./scripts/deploy_kubevirt_worker.sh
 	./scripts/ansible_load_controller.sh
 	echo "Installed"

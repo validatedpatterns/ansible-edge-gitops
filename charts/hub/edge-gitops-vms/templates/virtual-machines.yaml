@@ -4,6 +4,24 @@
 {{- $idx := printf "%03d" (add $i 1) }}
 {{- $identifier := printf "%s-%s-%s" $vmr.os $vmr.role $idx }}
 ---
+apiVersion: "external-secrets.io/v1alpha1"
+kind: ExternalSecret
+metadata:
+  name: es-authorizedsshkeys-{{ $identifier }}
+spec:
+  refreshInterval: 90s
+  secretStoreRef:
+    name: {{ $.Values.secretStore.name }}
+    kind: {{ $.Values.secretStore.kind }}
+  target:
+    name: authorizedsshkeys-{{ $identifier }}
+    template:
+  data:
+    - secretKey: key
+      remoteRef:
+        key: {{ $vmr.sshsecret }}
+        property: {{ $vmr.sshpubkeyfield }}
+---
 apiVersion: v1
 items:
 - apiVersion: kubevirt.io/v1
@@ -54,6 +72,13 @@ items:
           kubevirt.io/size: {{ $vmr.flavor }}
           vm.kubevirt.io/name: {{ $identifier }}
       spec:
+        accessCredentials:
+          - sshPublicKey:
+              propagationMethod:
+                configDrive: {}
+              source:
+                secret:
+                  secretName: authorizedsshkeys-{{ $identifier }}
         domain:
           cpu:
             cores: {{ $vmr.cores }}
@@ -90,7 +115,7 @@ items:
         - dataVolume:
             name: {{ $identifier }}
           name: {{ $identifier }}
-        - cloudInitNoCloud:
+        - cloudInitConfigDrive:
             userData: |-
               #cloud-config
               user: cloud-user
