@@ -346,3 +346,22 @@
             playbook: "ansible/podman_playbook.yml"
             inventory: "HMI Demo"
             execution_environment: '{{ aap_execution_environment }}'
+
+    - name: Configure Schedules
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.schedules
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_schedules:
+          - name: "Update Project HMI Demo"
+            organization: '{{ aap_org_name }}'
+            unified_job_template: "HMI Demo"
+            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=15"
+
+          - name: "Update Project AEG GitOps"
+            organization: '{{ aap_org_name }}'
+            unified_job_template: "AEG GitOps"
+            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=5"
