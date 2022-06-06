@@ -277,25 +277,25 @@
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
         controller_inventory_sources:
-          - name: "HMI Demo IDM Source"
-            organization: "{{ aap_org_name }}"
-            inventory: "HMI Demo"
-            credential: "Kubeconfig"
-            update_on_launch: true
-            source: "scm"
-            source_project: "AEG GitOps"
-            source_path: "ansible/inventory/openshift_cluster.yml"
-            host_filter: ".*idm.*service"
-
-          - name: "HMI Demo Kiosk Source"
-            organization: "{{ aap_org_name }}"
-            inventory: "HMI Demo"
-            credential: "Kubeconfig"
-            update_on_launch: true
-            source: "scm"
-            source_project: "AEG GitOps"
-            source_path: "ansible/inventory/openshift_cluster.yml"
-            host_filter: ".*kiosk.*service"
+#          - name: "HMI Demo IDM Source"
+#            organization: "{{ aap_org_name }}"
+#            inventory: "HMI Demo"
+#            credential: "Kubeconfig"
+#            update_on_launch: true
+#            source: "scm"
+#            source_project: "AEG GitOps"
+#            source_path: "ansible/inventory/openshift_cluster.yml"
+#            host_filter: ".*idm.*service"
+#
+#          - name: "HMI Demo Kiosk Source"
+#            organization: "{{ aap_org_name }}"
+#            inventory: "HMI Demo"
+#            credential: "Kubeconfig"
+#            update_on_launch: true
+#            source: "scm"
+#            source_project: "AEG GitOps"
+#            source_path: "ansible/inventory/openshift_cluster.yml"
+#            host_filter: ".*kiosk.*service"
 
           - name: "HMI Demo Static Source"
             organization: "{{ aap_org_name }}"
@@ -342,7 +342,7 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
-            inventory: "HMI Demo Kiosks"
+            inventory: "HMI Demo"
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Podman Playbook"
@@ -350,7 +350,7 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
-            inventory: "HMI Demo Kiosks"
+            inventory: "HMI Demo"
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "IDM Playbook"
@@ -358,5 +358,5 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/idm/playbooks/deploy-idm.yml"
-            inventory: "HMI Demo IDM"
+            inventory: "HMI Demo"
             execution_environment: '{{ aap_execution_environment }}'
