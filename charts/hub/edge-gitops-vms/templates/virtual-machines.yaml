@@ -115,7 +115,7 @@ items:
         - dataVolume:
             name: {{ $identifier }}
           name: {{ $identifier }}
-        - cloudInitNoCloud:
+        - cloudInitConfigDrive:
             userData: |-
               #cloud-config
               user: cloud-user
