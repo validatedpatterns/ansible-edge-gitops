@@ -334,7 +334,7 @@
             project: "AEG GitOps"
             job_type: run
             playbook: "ansible/playbooks/ping.yml"
-            inventory: "HMI Demo Kiosks"
+            inventory: "HMI Demo"
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Kiosk Playbook"
