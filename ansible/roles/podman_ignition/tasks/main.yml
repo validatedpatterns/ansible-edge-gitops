@@ -1,0 +1,12 @@
+---
+- name: Login to default registry and create ${XDG_RUNTIME_DIR}/containers/auth.json
+  containers.podman.podman_login:
+    username: "{{ podman_username }}"
+    password: "{{ podman_password }}"
+    registry: quay.io
+
+- name: Run container
+  containers.podman.podman_container:
+    name: container
+    image: quay.io/cferman/ubi-ignition
+    state: started

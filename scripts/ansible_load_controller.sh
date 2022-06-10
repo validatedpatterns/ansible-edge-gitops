@@ -11,6 +11,9 @@
     aap_org_name: "HMI Demo"
     aap_execution_environment: "Ansible Edge Gitops EE"
     aap_execution_environment_image: "quay.io/martjack/ansible-edge-gitops-ee"
+    kiosk_demo_inventory: "HMI Demo Kiosks"
+    aeg_project_repo: https://github.com/hybrid-cloud-patterns/ansible-edge-gitops.git
+    aeg_project_branch: main
   tasks:
     - name: Parse "{{ values_secret }}"
       ansible.builtin.set_fact:
@@ -26,10 +29,6 @@
         src: '{{ manifest_file_ref }}'
       register: manifest_file
       become: false
-
-    #- name: Wait for 5 minutes to ensure controller install completes
-    #  ansible.builtin.pause:
-    #    minutes: 5
 
     - name: Get web pod name
       retries: 60
@@ -131,12 +130,7 @@
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
 
-    # Add a user
-    # Add an organization
-    # Add an inventory
-    # Add a credential
-    # Project
-    # Job Templates
+    # Controller is ready, time to start configuring it
 
     - name: Configure Credential Types
       ansible.builtin.include_role:
@@ -166,6 +160,27 @@
               file:
                 template.kubeconfig: "{  { kube_config }}"
 
+          - name: RHSMcredential
+            description: RHSM Credentials
+            kind: "cloud"
+            inputs:
+              fields:
+                - id: username
+                  type: string
+                  label: RHSM User name
+                  secret: true
+                - id: password
+                  type: string
+                  label: RHSM password
+                  secret: true
+              required:
+                - username
+                - password
+            injectors:
+              extra_vars:
+                rhsm_username: '{  { username }}'
+                rhsm_password: '{  { password }}'
+
     - name: Configure Organizations
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.organizations
@@ -192,30 +207,12 @@
 
           - name: "AEG GitOps"
             organization: '{{ aap_org_name }}'
-            scm_branch: 'main'
+            scm_branch: '{{ aeg_project_branch }}'
             scm_clean: "no"
             scm_delete_on_update: "no"
             scm_type: "git"
             scm_update_on_launch: "yes"
-            scm_url: "https://github.com/mhjacks/ansible-edge-gitops.git"
-
-          - name: "HMI Demo"
-            organization: '{{ aap_org_name }}'
-            scm_branch: 'main'
-            scm_clean: "no"
-            scm_delete_on_update: "no"
-            scm_type: "git"
-            scm_update_on_launch: "no"
-            scm_url: "https://github.com/stolostron/hmi-demo.git"
-
-    - name: Debug idmkey
-      debug:
-        msg: "{{ all_values['secrets']['idm-ssh']['privatekey'] }}"
-
-    - name: Debug kioskkey
-      debug:
-        msg: "{{ all_values['secrets']['kiosk-ssh']['privatekey'] }}"
-
+            scm_url: '{{ aeg_project_repo }}'
 
     - name: Configure Kubernetes Credentials
       ansible.builtin.include_role:
@@ -238,7 +235,6 @@
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.credentials
       loop:
-        - idm
         - kiosk
       vars:
         controller_hostname: 'https://{{ ansible_host }}'
@@ -255,6 +251,24 @@
               username: "{{ all_values['secrets'][item ~ '-ssh']['username']  }}"
               ssh_key_data: "{{ lookup('file', all_values['files'][item ~ '-ssh']['privatekey'])  }}"
 
+    - name: Configure RHSM Credential
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credentials
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credentials:
+          - name: 'rhsm_credential'
+            description: "RHSM credential registering RHEL VMs"
+            organization: "{{ aap_org_name }}"
+            credential_type: RHSMcredential
+            inputs:
+              username: "{{ all_values['secrets']['rhsm']['username']  }}"
+              password: "{{ all_values['secrets']['rhsm']['password']  }}"
+
 
     - name: Configure Inventories
       ansible.builtin.include_role:
@@ -267,6 +281,13 @@
         controller_inventories:
           - name: "HMI Demo"
             organization: "{{ aap_org_name }}"
+
+          - name: '{{ kiosk_demo_inventory }}'
+            organization: "{{ aap_org_name }}"
+            kind: smart
+            host_filter: 'name__icontains=kiosk'
+            variables:
+              ansible_user: "{{ all_values['secrets']['kiosk-ssh']['username'] }}"
 
     - name: Configure Inventory Sources
       ansible.builtin.include_role:
@@ -333,30 +354,48 @@
             organization: '{{ aap_org_name }}'
             project: "AEG GitOps"
             job_type: run
-            playbook: "ansible/playbooks/ping.yml"
-            inventory: "HMI Demo"
+            playbook: "ansible/ping.yml"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - kiosk-private-key
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Kiosk Playbook"
             organization: '{{ aap_org_name }}'
-            project: "HMI Demo"
+            project: "AEG GitOps"
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
-            inventory: "HMI Demo"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - kiosk-private-key
+              - rhsm_credential
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Podman Playbook"
             organization: '{{ aap_org_name }}'
-            project: "HMI Demo"
+            project: "AEG GitOps"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
-            inventory: "HMI Demo"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - kiosk-private-key
             execution_environment: '{{ aap_execution_environment }}'
 
-          - name: "IDM Playbook"
+    - name: Configure Schedules
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.schedules
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_schedules:
+          - name: "Update Project AEG GitOps"
             organization: '{{ aap_org_name }}'
-            project: "HMI Demo"
-            job_type: run
-            playbook: "ansible/idm/playbooks/deploy-idm.yml"
-            inventory: "HMI Demo"
-            execution_environment: '{{ aap_execution_environment }}'
+            unified_job_template: "AEG GitOps"
+            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=5"
+
+          - name: "HMI Demo Static Source Update"
+            organization: '{{ aap_org_name }}'
+            unified_job_template: "HMI Demo Static Source"
+            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=5"
