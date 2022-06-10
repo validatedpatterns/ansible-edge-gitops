@@ -221,15 +221,6 @@
             scm_update_on_launch: "yes"
             scm_url: "https://github.com/mhjacks/ansible-edge-gitops.git"
 
-          - name: "HMI Demo"
-            organization: '{{ aap_org_name }}'
-            scm_branch: 'main'
-            scm_clean: "no"
-            scm_delete_on_update: "no"
-            scm_type: "git"
-            scm_update_on_launch: "no"
-            scm_url: "https://github.com/stolostron/hmi-demo.git"
-
     - name: Configure Kubernetes Credentials
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.credentials
@@ -378,9 +369,9 @@
 
           - name: "Kiosk Playbook"
             organization: '{{ aap_org_name }}'
-            project: "HMI Demo"
+            project: "AEG GitOps"
             job_type: run
-            playbook: "ansible/kiosk_playbook.yml"
+            playbook: "ansible/playbooks/kiosk_playbook.yml"
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
               - kiosk-private-key
@@ -389,9 +380,9 @@
 
           - name: "Podman Playbook"
             organization: '{{ aap_org_name }}'
-            project: "HMI Demo"
+            project: "AEG GitOps"
             job_type: run
-            playbook: "ansible/podman_playbook.yml"
+            playbook: "ansible/playbooks/podman_playbook.yml"
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
               - kiosk-private-key
@@ -406,11 +397,6 @@
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
         controller_schedules:
-          - name: "Update Project HMI Demo"
-            organization: '{{ aap_org_name }}'
-            unified_job_template: "HMI Demo"
-            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=15"
-
           - name: "Update Project AEG GitOps"
             organization: '{{ aap_org_name }}'
             unified_job_template: "AEG GitOps"
