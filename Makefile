@@ -26,6 +26,13 @@ install: deploy ## installs the pattern, inits the vault and loads the secrets
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 	echo "Installed"
 
+upgrade:
+	make vault-init
+	./common/scripts/ansible-push-vault-secrets.sh
+	./scripts/deploy_kubevirt_worker.sh
+	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
+	echo "Upgraded"
+
 common-test:
 	make -C common -f common/Makefile test
 
