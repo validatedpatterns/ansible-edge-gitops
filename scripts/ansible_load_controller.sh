@@ -381,6 +381,8 @@
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
             inventory: "HMI Demo"
+            credentials:
+              - rhsm_credential
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Podman Playbook"
