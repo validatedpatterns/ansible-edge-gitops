@@ -166,6 +166,27 @@
               file:
                 template.kubeconfig: "{  { kube_config }}"
 
+          - name: RHSMcredential
+            description: RHSM Credentials
+            kind: "cloud"
+            inputs:
+              fields:
+                - id: username
+                  type: string
+                  label: RHSM User name
+                  secret: true
+                - id: password
+                  type: string
+                  label: RHSM password
+                  secret: true
+              required:
+                - username
+                - password
+            injectors:
+              extra_vars:
+                rhsm_username: '{ { username }}'
+                rhsm_password: '{ { password }}'
+
     - name: Configure Organizations
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.organizations
@@ -248,6 +269,24 @@
             inputs:
               username: "{{ all_values['secrets'][item ~ '-ssh']['username']  }}"
               ssh_key_data: "{{ lookup('file', all_values['files'][item ~ '-ssh']['privatekey'])  }}"
+
+    - name: Configure RHSM Credential
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credentials
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credentials:
+          - name: 'rhsm_credential'
+            description: "RHSM credential registering RHEL VMs"
+            organization: "{{ aap_org_name }}"
+            credential_type: RHSMcredential
+            inputs:
+              username: "{{ all_values['secrets']['rhsm']['username']  }}"
+              password: "{{ all_values['secrets']['rhsm']['password']  }}"
 
 
     - name: Configure Inventories
