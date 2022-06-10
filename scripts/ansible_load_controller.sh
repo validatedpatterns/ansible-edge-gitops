@@ -12,6 +12,8 @@
     aap_execution_environment: "Ansible Edge Gitops EE"
     aap_execution_environment_image: "quay.io/martjack/ansible-edge-gitops-ee"
     kiosk_demo_inventory: "HMI Demo Kiosks"
+    aeg_project_repo: https://github.com/hybrid-cloud-patterns/ansible-edge-gitops.git
+    aeg_project_branch: main
   tasks:
     - name: Parse "{{ values_secret }}"
       ansible.builtin.set_fact:
@@ -27,10 +29,6 @@
         src: '{{ manifest_file_ref }}'
       register: manifest_file
       become: false
-
-    #- name: Wait for 5 minutes to ensure controller install completes
-    #  ansible.builtin.pause:
-    #    minutes: 5
 
     - name: Get web pod name
       retries: 60
@@ -132,12 +130,7 @@
       debug:
         msg: 'AAP Admin Password: {{ admin_password }}'
 
-    # Add a user
-    # Add an organization
-    # Add an inventory
-    # Add a credential
-    # Project
-    # Job Templates
+    # Controller is ready, time to start configuring it
 
     - name: Configure Credential Types
       ansible.builtin.include_role:
@@ -214,12 +207,12 @@
 
           - name: "AEG GitOps"
             organization: '{{ aap_org_name }}'
-            scm_branch: 'main'
+            scm_branch: '{{ aeg_project_branch }}'
             scm_clean: "no"
             scm_delete_on_update: "no"
             scm_type: "git"
             scm_update_on_launch: "yes"
-            scm_url: "https://github.com/mhjacks/ansible-edge-gitops.git"
+            scm_url: '{{ aeg_project_repo }}'
 
     - name: Configure Kubernetes Credentials
       ansible.builtin.include_role:
