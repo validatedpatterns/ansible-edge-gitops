@@ -11,6 +11,7 @@
     aap_org_name: "HMI Demo"
     aap_execution_environment: "Ansible Edge Gitops EE"
     aap_execution_environment_image: "quay.io/martjack/ansible-edge-gitops-ee"
+    kiosk_demo_inventory: "HMI Demo Kiosks"
   tasks:
     - name: Parse "{{ values_secret }}"
       ansible.builtin.set_fact:
@@ -184,8 +185,8 @@
                 - password
             injectors:
               extra_vars:
-                rhsm_username: '{ { username }}'
-                rhsm_password: '{ { password }}'
+                rhsm_username: '{  { username }}'
+                rhsm_password: '{  { password }}'
 
     - name: Configure Organizations
       ansible.builtin.include_role:
@@ -228,10 +229,6 @@
             scm_type: "git"
             scm_update_on_launch: "no"
             scm_url: "https://github.com/stolostron/hmi-demo.git"
-
-    - name: Debug kioskkey
-      debug:
-        msg: "{{ all_values['secrets']['kiosk-ssh']['privatekey'] }}"
 
     - name: Configure Kubernetes Credentials
       ansible.builtin.include_role:
@@ -301,10 +298,12 @@
           - name: "HMI Demo"
             organization: "{{ aap_org_name }}"
 
-          - name: "HMI Demo Kiosks"
+          - name: '{{ kiosk_demo_inventory }}'
             organization: "{{ aap_org_name }}"
             kind: smart
             host_filter: 'name__icontains=kiosk'
+            variables:
+              ansible_user: "{{ all_values['secrets']['kiosk-ssh']['username'] }}"
 
     - name: Configure Inventory Sources
       ansible.builtin.include_role:
@@ -372,7 +371,9 @@
             project: "AEG GitOps"
             job_type: run
             playbook: "ansible/playbooks/ping.yml"
-            inventory: "HMI Demo"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - kiosk-private-key
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Kiosk Playbook"
@@ -380,8 +381,9 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/kiosk_playbook.yml"
-            inventory: "HMI Demo"
+            inventory: '{{ kiosk_demo_inventory }}'
             credentials:
+              - kiosk-private-key
               - rhsm_credential
             execution_environment: '{{ aap_execution_environment }}'
 
@@ -390,7 +392,9 @@
             project: "HMI Demo"
             job_type: run
             playbook: "ansible/podman_playbook.yml"
-            inventory: "HMI Demo"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - kiosk-private-key
             execution_environment: '{{ aap_execution_environment }}'
 
     - name: Configure Schedules
