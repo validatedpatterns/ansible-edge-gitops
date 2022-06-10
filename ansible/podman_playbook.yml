@@ -1,7 +1,7 @@
 ---
 - name: Configure Podman to run quay.io/kelee/ubi-ignition container on hmi device
   hosts: all
-  become: yes
+  become: true
   vars:
     systemd_units_dir: "/etc/systemd/system/"
     service_name: "inductive-automation-ignition"
