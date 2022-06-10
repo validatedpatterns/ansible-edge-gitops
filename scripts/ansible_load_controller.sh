@@ -361,7 +361,7 @@
             organization: '{{ aap_org_name }}'
             project: "AEG GitOps"
             job_type: run
-            playbook: "ansible/playbooks/ping.yml"
+            playbook: "ansible/ping.yml"
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
               - kiosk-private-key
@@ -371,7 +371,7 @@
             organization: '{{ aap_org_name }}'
             project: "AEG GitOps"
             job_type: run
-            playbook: "ansible/playbooks/kiosk_playbook.yml"
+            playbook: "ansible/kiosk_playbook.yml"
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
               - kiosk-private-key
@@ -382,7 +382,7 @@
             organization: '{{ aap_org_name }}'
             project: "AEG GitOps"
             job_type: run
-            playbook: "ansible/playbooks/podman_playbook.yml"
+            playbook: "ansible/podman_playbook.yml"
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
               - kiosk-private-key
