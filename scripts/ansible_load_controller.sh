@@ -411,3 +411,8 @@
             organization: '{{ aap_org_name }}'
             unified_job_template: "AEG GitOps"
             rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=5"
+
+          - name: "HMI Demo Static Source Update"
+            organization: '{{ aap_org_name }}'
+            unified_job_template: "HMI Demo Static Source"
+            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=5"
