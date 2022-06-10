@@ -1,0 +1,100 @@
+---
+# tasks file for kiosk_mode
+- name: Ensure hostname set
+  hostname:
+    name: "{{ inventory_hostname.split('.')[0] }}"
+
+- name: Register as user with password and auto-subscribe to available content.
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ rhsm_username }}"
+    password: "{{ rhsm_password }}"
+    auto_attach: true
+
+- name: install Gnome Desktop Environment
+  ansible.builtin.yum:
+    name: "@Server With GUI"
+    state: present
+
+- name: Create gdm configuration for kiosk kiosk_mode
+  ansible.builtin.template:
+    src: custom.conf
+    dest: /etc/gdm/custom.conf
+    mode: 0644
+
+- name: Add the user 'kiosk' 
+  ansible.builtin.user:
+    name: kiosk
+    comment: kiosk user
+    state: present
+    shell: /bin/bash
+    uid: 2000
+    group: users
+    create_home: yes
+    skeleton: true
+
+- name: configure session for kiosk username /var/lib/AccountsService/users/kiosk
+  ansible.builtin.copy:
+    src: files/kiosk.conf
+    dest: /var/lib/AccountsService/users/kiosk
+    mode: 0600
+  
+- name: Change default target to graphical.target
+  file:
+    src: /usr/lib/systemd/system/graphical.target
+    dest: /etc/systemd/system/default.target
+    state: link
+
+- name: permit traffic in default zone for https service
+  ansible.posix.firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+
+- name: install yum install gnome-session-kiosk-session
+  ansible.builtin.yum:
+    name: gnome-session-kiosk-session
+    state: present
+
+- name: create directory local bin for kiosk mode
+  ansible.builtin.file:
+    path: /home/kiosk/.local/bin
+    state: directory
+    mode: '0755'
+    owner: kiosk
+    group: users
+
+- name: create directory local bin for kiosk mode
+  ansible.builtin.file:
+    path: /home/kiosk/Desktop
+    state: directory
+    mode: '0755'
+    owner: kiosk
+    group: users
+
+- name: create config directory to disable welcome screen
+  ansible.builtin.file:
+    path: /home/kiosk/.config/
+    state: directory
+    mode: '0755'
+    owner: kiosk
+    group: users
+
+- name: create file to disable setup screens
+  ansible.builtin.file:
+    path: /home/kiosk/.config/gnome-initial-setup-done
+    state: touch
+    mode: '0755'
+    owner: kiosk
+    group: users
+
+- name: create shell script to start firefox
+  ansible.builtin.copy:
+    dest: /home/kiosk/.local/bin/redhat-kiosk
+    src: files/redhat-kiosk
+    mode: '0755'
+    owner: kiosk
+    group: users
+
+- name: reboot the machine with all defaults to deploy the changes
+  reboot:

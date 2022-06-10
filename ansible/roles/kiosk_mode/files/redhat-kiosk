@@ -1,0 +1,5 @@
+#!/bin/sh
+
+while true; do
+    /usr/bin/firefox --kiosk http://localhost:8088 --display=:0
+done

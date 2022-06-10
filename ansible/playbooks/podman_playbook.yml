@@ -1,0 +1,21 @@
+---
+- name: Configure Podman to run quay.io/kelee/ubi-ignition container on hmi device
+  hosts: all
+  become: yes
+  vars:
+    systemd_units_dir: "/etc/systemd/system/"
+    service_name: "inductive-automation-ignition"
+    container_state: "installed"
+    container_image: "quay.io/kelee/ignition-maker-ubi"
+    container_tag: "8.1.10"
+    container_port_mapping: "8088:8088"
+    container_extra_params: "--privileged -e GATEWAY_ADMIN_PASSWORD=redhat"
+  tasks:
+#    - name: Login to default registry and create ${XDG_RUNTIME_DIR}/containers/auth.json
+#      containers.podman.podman_login:
+#        username: "{{ podman_username }}"
+#        password: "{{ podman_password }}"
+#        registry: quay.io
+    - name: import container_lifecycle role
+      ansible.builtin.import_role:
+        name: container_lifecycle

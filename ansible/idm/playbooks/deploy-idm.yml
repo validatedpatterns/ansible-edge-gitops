@@ -1,0 +1,181 @@
+---
+########################
+## Master
+########################
+
+- name: Prerequisites
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Set hostname
+      hostname:
+        name: "{{ hostname }}"
+      tags:
+        - hostname
+
+    - name: inject hostname to hosts file
+      blockinfile:
+        path: /etc/hosts
+        block: "{{ ansible_host }} {{ hostname }} {{ hostname | split('.') | first }}"
+        state: present
+      tags:
+        - hostname
+
+    - name: Subscribe hosts
+      ansible.builtin.import_role:
+        name: oasis_roles.system.rhsm
+
+    - name: Gather facts - again
+      ansible.builtin.setup:
+      tags:
+        - networking
+
+    - name: Configure networking
+      ansible.builtin.import_role:
+        name: fedora.linux_system_roles.network
+      tags:
+        - networking
+
+    - name: Ensure firewalld installed
+      ansible.builtin.dnf:
+        name: firewalld
+        state: installed
+
+    - name: Ensure firewalld running
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+
+    - name: Enable firewalld ports
+      vars:
+        ports:
+          - 80/tcp
+          - 443/tcp
+          - 389/tcp
+          - 636/tcp
+          - 88/tcp
+          - 88/udp
+          - 464/tcp
+          - 464/udp
+          - 53/tcp
+          - 53/udp
+          - 123/udp
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        state: enabled
+        permanent: true
+        immediate: true
+      loop: "{{ ports }}"
+
+  tags:
+    - prereq
+
+- name: Install IdM server
+  hosts: all
+  roles:
+    - role: redhat.rhel_idm.ipaserver
+      state: "{{ set_state | default('present') }}"
+  tags:
+    - ipaserver
+
+- name: Add IdM DNS entries for replicas
+  hosts: all
+  tasks:
+    - name: Add IdM DNS entries for replicas
+      redhat.rhel_idm.ipadnsrecord:
+        ipaadmin_password: "{{ ipaadmin_password }}"
+        name: "{{ hostvars[item].hostname | split('.') | first }}"
+        zone_name: "{{ ipaserver_domain }}"
+        record_type: A
+        record_value: "{{ hostvars[item].ansible_host }}"
+      loop: "{{ groups['ipareplicas'] }}"
+  tags:
+    - dns
+
+########################
+## Replica
+########################
+
+- name: Prerequisites
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Set hostname
+      hostname:
+        name: "{{ hostname }}"
+      tags:
+        - hostname
+
+    - name: inject hostname to hosts file
+      blockinfile:
+        path: /etc/hosts
+        block: "{{ ansible_host }} {{ hostname }} {{ hostname | split('.') | first }}"
+        state: present
+      tags:
+        - hostname
+
+    - name: Subscribe hosts
+      ansible.builtin.import_role:
+        name: oasis_roles.system.rhsm
+
+    - name: Gather facts - again
+      ansible.builtin.setup:
+      tags:
+        - networking
+
+    - name: Configure networking
+      ansible.builtin.import_role:
+        name: fedora.linux_system_roles.network
+      tags:
+        - networking
+
+    - name: Ensure firewalld installed
+      ansible.builtin.dnf:
+        name: firewalld
+        state: installed
+
+    - name: Ensure firewalld running
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+
+    - name: Enable firewalld ports
+      vars:
+        ports:
+          - 80/tcp
+          - 443/tcp
+          - 389/tcp
+          - 636/tcp
+          - 88/tcp
+          - 88/udp
+          - 464/tcp
+          - 464/udp
+          - 53/tcp
+          - 53/udp
+          - 123/udp
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        state: enabled
+        permanent: true
+        immediate: true
+      loop: "{{ ports }}"
+
+  tags:
+    - prereq
+
+- name: Install IdM replicas
+  hosts: ipareplicas
+  roles:
+    - role: redhat.rhel_idm.ipareplica
+      state: "{{ set_state | default('present') }}"
+  tags:
+    - ipareplicas
+
+- name: Configure IdM users
+  hosts: all
+  tasks:
+    - name: Configure IdM users
+      redhat.rhel_idm.ipauser: "{{ item | combine({'ipaadmin_password': ipaadmin_password}) }}"
+      loop: "{{ ipaserver_users }}"
+  tags:
+    - ipausers
