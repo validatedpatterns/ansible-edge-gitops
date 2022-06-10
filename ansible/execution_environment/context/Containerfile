@@ -2,8 +2,10 @@ ARG EE_BASE_IMAGE=quay.io/ansible/ansible-runner:latest
 ARG EE_BUILDER_IMAGE=quay.io/ansible/ansible-builder:latest
 
 FROM $EE_BASE_IMAGE as galaxy
-ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS=
+ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS=-v
 USER root
+
+ADD _build/ansible.cfg ~/.ansible.cfg
 
 ADD _build /build
 WORKDIR /build
@@ -15,13 +17,20 @@ FROM $EE_BUILDER_IMAGE as builder
 
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
-RUN ansible-builder introspect --sanitize --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
+ADD _build/requirements.txt requirements.txt
+ADD _build/bindep.txt bindep.txt
+RUN ansible-builder introspect --sanitize --user-pip=requirements.txt --user-bindep=bindep.txt --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
 RUN assemble
 
 FROM $EE_BASE_IMAGE
 USER root
+RUN whoami
+RUN cat /etc/os-release
 
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
 COPY --from=builder /output/ /output/
 RUN /output/install-from-bindep && rm -rf /output/wheels
+RUN echo This is a post-install command!
+RUN ls -la /etc
+RUN pip3 install --upgrade pip setuptools
