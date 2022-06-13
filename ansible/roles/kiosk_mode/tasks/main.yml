@@ -40,7 +40,6 @@
     src: files/kiosk.conf
     dest: /var/lib/AccountsService/users/kiosk
     mode: 0600
-  notify: reboot
 
 - name: Change default target to graphical.target
   file:
@@ -95,7 +94,6 @@
     mode: '0755'
     owner: kiosk
     group: users
-  notify: reboot
 
 - name: create shell script to start firefox
   ansible.builtin.copy:
