@@ -249,7 +249,8 @@
             credential_type: Machine
             inputs:
               username: "{{ all_values['secrets'][item ~ '-ssh']['username']  }}"
-              ssh_key_data: "{{ lookup('file', all_values['files'][item ~ '-ssh']['privatekey'])  }}"
+              #ssh_key_data: "{{ lookup('file', all_values['secrets'][item ~ '-ssh']['privatekey'])  }}"
+              ssh_key_data: "{{ all_values['secrets'][item ~ '-ssh']['privatekey'] }}"
 
     - name: Configure RHSM Credential
       ansible.builtin.include_role:
