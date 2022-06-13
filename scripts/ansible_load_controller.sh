@@ -361,7 +361,18 @@
               - kiosk-private-key
             execution_environment: '{{ aap_execution_environment }}'
 
-          - name: "Kiosk Playbook"
+          - name: "Provision Kiosk Playbook"
+            organization: '{{ aap_org_name }}'
+            project: "AEG GitOps"
+            job_type: run
+            playbook: "ansible/provision_kiosk.yml"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - kiosk-private-key
+              - rhsm_credential
+            execution_environment: '{{ aap_execution_environment }}'
+
+          - name: "Kiosk Mode Playbook"
             organization: '{{ aap_org_name }}'
             project: "AEG GitOps"
             job_type: run
@@ -394,9 +405,14 @@
           - name: "Update Project AEG GitOps"
             organization: '{{ aap_org_name }}'
             unified_job_template: "AEG GitOps"
-            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=5"
+            rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
 
           - name: "HMI Demo Static Source Update"
             organization: '{{ aap_org_name }}'
             unified_job_template: "HMI Demo Static Source"
-            rrule: "DTSTART:20191219T130551Z RRULE:FREQ=MINUTELY;INTERVAL=5"
+            rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
+
+          - name: "Provision Kiosk Playbook"
+            organization: '{{ aap_org_name }}'
+            unified_job_template: "HMI Demo Static Source"
+            rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=10"
