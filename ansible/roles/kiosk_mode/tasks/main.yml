@@ -21,8 +21,9 @@
     src: custom.conf
     dest: /etc/gdm/custom.conf
     mode: 0644
+  notify: reboot
 
-- name: Add the user 'kiosk' 
+- name: Add the user 'kiosk'
   ansible.builtin.user:
     name: kiosk
     comment: kiosk user
@@ -32,18 +33,21 @@
     group: users
     create_home: yes
     skeleton: true
+  notify: reboot
 
 - name: configure session for kiosk username /var/lib/AccountsService/users/kiosk
   ansible.builtin.copy:
     src: files/kiosk.conf
     dest: /var/lib/AccountsService/users/kiosk
     mode: 0600
-  
+  notify: reboot
+
 - name: Change default target to graphical.target
   file:
     src: /usr/lib/systemd/system/graphical.target
     dest: /etc/systemd/system/default.target
     state: link
+  notify: reboot
 
 - name: permit traffic in default zone for https service
   ansible.posix.firewalld:
@@ -55,6 +59,7 @@
   ansible.builtin.yum:
     name: gnome-session-kiosk-session
     state: present
+  notify: reboot
 
 - name: create directory local bin for kiosk mode
   ansible.builtin.file:
@@ -63,6 +68,7 @@
     mode: '0755'
     owner: kiosk
     group: users
+  notify: reboot
 
 - name: create directory local bin for kiosk mode
   ansible.builtin.file:
@@ -71,6 +77,7 @@
     mode: '0755'
     owner: kiosk
     group: users
+  notify: reboot
 
 - name: create config directory to disable welcome screen
   ansible.builtin.file:
@@ -79,6 +86,7 @@
     mode: '0755'
     owner: kiosk
     group: users
+  notify: reboot
 
 - name: create file to disable setup screens
   ansible.builtin.file:
@@ -87,6 +95,7 @@
     mode: '0755'
     owner: kiosk
     group: users
+  notify: reboot
 
 - name: create shell script to start firefox
   ansible.builtin.copy:
@@ -95,6 +104,4 @@
     mode: '0755'
     owner: kiosk
     group: users
-
-- name: reboot the machine with all defaults to deploy the changes
-  reboot:
+  notify: reboot
