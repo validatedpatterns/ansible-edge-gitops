@@ -414,5 +414,5 @@
 
           - name: "Provision Kiosk Playbook"
             organization: '{{ aap_org_name }}'
-            unified_job_template: "HMI Demo Static Source"
+            unified_job_template: "Provision Kiosk Playbook"
             rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=10"
