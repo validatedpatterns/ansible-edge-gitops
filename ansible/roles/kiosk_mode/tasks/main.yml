@@ -103,3 +103,6 @@
     owner: kiosk
     group: users
   notify: reboot
+
+- name: Flush handlers (will reboot if needed)
+  ansible.builtin.meta: flush_handlers
