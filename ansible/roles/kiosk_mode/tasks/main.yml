@@ -1,7 +1,7 @@
 ---
 # tasks file for kiosk_mode
 - name: Ensure hostname set
-  hostname:
+  ansible.builtin.hostname:
     name: "{{ inventory_hostname.split('.')[0] }}"
 
 - name: Register as user with password and auto-subscribe to available content.
