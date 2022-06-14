@@ -17,7 +17,7 @@
       when: (not pre_install_container_info['containers']) or ((pre_install_container_info['containers'][0]['Name'] == "afiot-" + service_name) and pre_install_container_info['containers'][0]['ImageName'] != container_image + ":" + container_tag)
 
     - name: Re-create {{ container_image }} container with systemd service file generated in /tmp
-      containers.podman.podmain_container:
+      containers.podman.podman_container:
         name: "{{ container_image }}"
         image: "{{ container_image }}:{{ container_tag }}"
         state: present
