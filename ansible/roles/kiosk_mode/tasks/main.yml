@@ -37,7 +37,7 @@
 
 - name: configure session for kiosk username /var/lib/AccountsService/users/kiosk
   ansible.builtin.copy:
-    src: files/kiosk.conf
+    src: files/kiosk.conf.j2
     dest: /var/lib/AccountsService/users/kiosk
     mode: 0600
 
@@ -98,7 +98,7 @@
 - name: create shell script to start firefox
   ansible.builtin.copy:
     dest: /home/kiosk/.local/bin/redhat-kiosk
-    src: files/redhat-kiosk
+    src: files/redhat-kiosk.j2
     mode: '0755'
     owner: kiosk
     group: users
