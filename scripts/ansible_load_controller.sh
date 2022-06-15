@@ -92,7 +92,7 @@
         admin_password: '{{ admin_pw.resources[0].data.password | b64decode }}'
 
     - name: Wait for API to become available
-      retries: 20
+      retries: 40
       delay: 5
       register: api_status
       until: api_status.status == 200
@@ -181,6 +181,21 @@
                 rhsm_username: '{  { username }}'
                 rhsm_password: '{  { password }}'
 
+          - name: KioskExtraParams
+            description: Extra params for Kiosk Container
+            kind: "cloud"
+            inputs:
+              fields:
+                - id: container_extra_params
+                  type: string
+                  label: Container Extra params including Gateway Admin password
+                  secret: true
+              required:
+                - container_extra_params
+            injectors:
+              extra_vars:
+                container_extra_params: '{  { container_extra_params }}'
+
     - name: Configure Organizations
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.organizations
@@ -214,7 +229,7 @@
             scm_update_on_launch: "yes"
             scm_url: '{{ aeg_project_repo }}'
 
-    - name: Configure Kubernetes Credentials
+    - name: Configure Non-Loop credentials
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.credentials
       vars:
@@ -231,7 +246,22 @@
             inputs:
               kube_config: "{{ lookup('file', kubeconfig) }}"
 
-    - name: Configure Machine Credentials
+          - name: 'rhsm_credential'
+            description: "RHSM credential registering RHEL VMs"
+            organization: "{{ aap_org_name }}"
+            credential_type: RHSMcredential
+            inputs:
+              username: "{{ all_values['secrets']['rhsm']['username']  }}"
+              password: "{{ all_values['secrets']['rhsm']['password']  }}"
+
+          - name: 'kiosk_container_extra_params'
+            description: "Kiosk Extra container parameters"
+            organization: "{{ aap_org_name }}"
+            credential_type: KioskExtraParams
+            inputs:
+              container_extra_params: "{{ all_values['secrets']['kiosk-extra']['container_extra_params']  }}"
+
+    - name: Configure Looped Credentials
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.credentials
       loop:
@@ -249,27 +279,7 @@
             credential_type: Machine
             inputs:
               username: "{{ all_values['secrets'][item ~ '-ssh']['username']  }}"
-              #ssh_key_data: "{{ lookup('file', all_values['secrets'][item ~ '-ssh']['privatekey'])  }}"
               ssh_key_data: "{{ all_values['secrets'][item ~ '-ssh']['privatekey'] }}"
-
-    - name: Configure RHSM Credential
-      ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.credentials
-      vars:
-        controller_hostname: 'https://{{ ansible_host }}'
-        controller_username: admin
-        controller_password: '{{ admin_password }}'
-        controller_validate_certs: false
-        controller_configuration_async_retries: 10
-        controller_credentials:
-          - name: 'rhsm_credential'
-            description: "RHSM credential registering RHEL VMs"
-            organization: "{{ aap_org_name }}"
-            credential_type: RHSMcredential
-            inputs:
-              username: "{{ all_values['secrets']['rhsm']['username']  }}"
-              password: "{{ all_values['secrets']['rhsm']['password']  }}"
-
 
     - name: Configure Inventories
       ansible.builtin.include_role:
@@ -370,6 +380,7 @@
             credentials:
               - kiosk-private-key
               - rhsm_credential
+              - kiosk_container_extra_params
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Kiosk Mode Playbook"
@@ -391,6 +402,7 @@
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
               - kiosk-private-key
+              - kiosk_container_extra_params
             execution_environment: '{{ aap_execution_environment }}'
 
     - name: Configure Schedules
