@@ -259,7 +259,7 @@
             organization: "{{ aap_org_name }}"
             credential_type: KioskExtraParams
             inputs:
-              password: "{{ all_values['secrets']['kiosk-extra']['container_extra_params']  }}"
+              container_extra_params: "{{ all_values['secrets']['kiosk-extra']['container_extra_params']  }}"
 
     - name: Configure Looped Credentials
       ansible.builtin.include_role:
