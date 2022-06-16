@@ -319,13 +319,13 @@
 #            source_path: "ansible/inventory/openshift_cluster.yml"
 #            host_filter: ".*kiosk.*service"
 
-          - name: "HMI Demo Static Source"
-            organization: "{{ aap_org_name }}"
-            inventory: "HMI Demo"
-            update_on_launch: true
-            source: "scm"
-            source_project: "AEG GitOps"
-            source_path: "ansible/inventory/hosts"
+#          - name: "HMI Demo Static Source"
+#            organization: "{{ aap_org_name }}"
+#            inventory: "HMI Demo"
+#            update_on_launch: true
+#            source: "scm"
+#            source_project: "AEG GitOps"
+#            source_path: "ansible/inventory/hosts"
 
     - name: Configure Execution Environments
       ansible.builtin.include_role:
@@ -422,12 +422,12 @@
             unified_job_template: "AEG GitOps"
             rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
 
-          - name: "HMI Demo Static Source Update"
-            organization: '{{ aap_org_name }}'
-            unified_job_template: "HMI Demo Static Source"
-            rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
+          #- name: "HMI Demo Static Source Update"
+          #  organization: '{{ aap_org_name }}'
+          #  unified_job_template: "HMI Demo Static Source"
+          #  rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
 
-          - name: "Provision Kiosk Playbook"
+          - name: "Dynamic Provision Kiosk Playbook"
             organization: '{{ aap_org_name }}'
-            unified_job_template: "Provision Kiosk Playbook"
+            unified_job_template: "Dynamic Provision Kiosk Playbook"
             rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=10"
