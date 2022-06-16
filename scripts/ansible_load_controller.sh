@@ -309,16 +309,6 @@
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
         controller_inventory_sources:
-#          - name: "HMI Demo IDM Source"
-#            organization: "{{ aap_org_name }}"
-#            inventory: "HMI Demo"
-#            credential: "Kubeconfig"
-#            update_on_launch: true
-#            source: "scm"
-#            source_project: "AEG GitOps"
-#            source_path: "ansible/inventory/openshift_cluster.yml"
-#            host_filter: ".*idm.*service"
-#
 #          - name: "HMI Demo Kiosk Source"
 #            organization: "{{ aap_org_name }}"
 #            inventory: "HMI Demo"
@@ -378,6 +368,19 @@
             playbook: "ansible/provision_kiosk.yml"
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
+              - kiosk-private-key
+              - rhsm_credential
+              - kiosk_container_extra_params
+            execution_environment: '{{ aap_execution_environment }}'
+
+          - name: "Dyanimic Provision Kiosk Playbook"
+            organization: '{{ aap_org_name }}'
+            project: "AEG GitOps"
+            job_type: run
+            playbook: "ansible/dynamic_kiosk_provision.yml"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - Kubeconfig
               - kiosk-private-key
               - rhsm_credential
               - kiosk_container_extra_params
