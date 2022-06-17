@@ -22,14 +22,13 @@
       label_selectors: '{{ inventory_label_selectors }}'
     register: nodes
 
-  - name: Debug
-    ansible.builtin.debug:
-      msg: "{{ item }}.{{ inventory_namespace }}.svc"
-    loop: "{{ nodes | community.general.json_query('resources[*].metadata.name') }}"
-
   - name: add hosts
     ansible.builtin.add_host:
       hostname: "{{ item }}.{{ inventory_namespace }}.svc"
       groups:
         - '{{ inventory_target_group }}'
     loop: "{{ nodes | community.general.json_query('resources[*].metadata.name') }}"
+
+  - name: Debug Nodelist
+    ansible.builtin.debug:
+      var: groups
