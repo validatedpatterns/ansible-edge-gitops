@@ -10,7 +10,7 @@
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
     aap_org_name: "HMI Demo"
     aap_execution_environment: "Ansible Edge Gitops EE"
-    aap_execution_environment_image: "quay.io/martjack/ansible-edge-gitops-ee"
+    aap_execution_environment_image: "quay.io/hybridcloudpatterns/ansible-edge-gitops-ee"
     kiosk_demo_inventory: "HMI Demo Kiosks"
     aeg_project_repo: https://github.com/hybrid-cloud-patterns/ansible-edge-gitops.git
     aeg_project_branch: main
