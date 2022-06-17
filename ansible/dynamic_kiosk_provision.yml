@@ -1,0 +1,6 @@
+---
+- name: Build Dynamic inventory
+  import_playbook: inventory_preplay.yml
+
+- name: Provision Kiosks
+  import_playbook: provision_kiosk.yml

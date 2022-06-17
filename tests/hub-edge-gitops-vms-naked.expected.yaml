@@ -141,7 +141,7 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: rhel8-kiosk-001-service
+    name: rhel8-kiosk-001
     labels:
       app: rhel8-kiosk-001
       edge-gitops-role: kiosk
@@ -274,7 +274,7 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: rhel8-kiosk-002-service
+    name: rhel8-kiosk-002
     labels:
       app: rhel8-kiosk-002
       edge-gitops-role: kiosk

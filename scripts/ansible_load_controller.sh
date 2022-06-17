@@ -10,7 +10,7 @@
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
     aap_org_name: "HMI Demo"
     aap_execution_environment: "Ansible Edge Gitops EE"
-    aap_execution_environment_image: "quay.io/martjack/ansible-edge-gitops-ee"
+    aap_execution_environment_image: "quay.io/hybridcloudpatterns/ansible-edge-gitops-ee"
     kiosk_demo_inventory: "HMI Demo Kiosks"
     aeg_project_repo: https://github.com/hybrid-cloud-patterns/ansible-edge-gitops.git
     aeg_project_branch: main
@@ -216,6 +216,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_projects:
           - name: "Demo Project"
             state: absent
@@ -289,6 +290,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_inventories:
           - name: "HMI Demo"
             organization: "{{ aap_org_name }}"
@@ -308,17 +310,8 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_inventory_sources:
-#          - name: "HMI Demo IDM Source"
-#            organization: "{{ aap_org_name }}"
-#            inventory: "HMI Demo"
-#            credential: "Kubeconfig"
-#            update_on_launch: true
-#            source: "scm"
-#            source_project: "AEG GitOps"
-#            source_path: "ansible/inventory/openshift_cluster.yml"
-#            host_filter: ".*idm.*service"
-#
+        controller_configuration_async_retries: 10
+        controller_inventory_sources: []
 #          - name: "HMI Demo Kiosk Source"
 #            organization: "{{ aap_org_name }}"
 #            inventory: "HMI Demo"
@@ -327,15 +320,15 @@
 #            source: "scm"
 #            source_project: "AEG GitOps"
 #            source_path: "ansible/inventory/openshift_cluster.yml"
-#            host_filter: ".*kiosk.*service"
+#            host_filter: ".*kiosk.*"
 
-          - name: "HMI Demo Static Source"
-            organization: "{{ aap_org_name }}"
-            inventory: "HMI Demo"
-            update_on_launch: true
-            source: "scm"
-            source_project: "AEG GitOps"
-            source_path: "ansible/inventory/hosts"
+#          - name: "HMI Demo Static Source"
+#            organization: "{{ aap_org_name }}"
+#            inventory: "HMI Demo"
+#            update_on_launch: true
+#            source: "scm"
+#            source_project: "AEG GitOps"
+#            source_path: "ansible/inventory/hosts"
 
     - name: Configure Execution Environments
       ansible.builtin.include_role:
@@ -345,6 +338,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_execution_environments:
           - name: '{{ aap_execution_environment }}'
             image: '{{ aap_execution_environment_image }}'
@@ -357,6 +351,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_templates:
           - name: "Demo Job Template"
             state: absent
@@ -378,6 +373,19 @@
             playbook: "ansible/provision_kiosk.yml"
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
+              - kiosk-private-key
+              - rhsm_credential
+              - kiosk_container_extra_params
+            execution_environment: '{{ aap_execution_environment }}'
+
+          - name: "Dynamic Provision Kiosk Playbook"
+            organization: '{{ aap_org_name }}'
+            project: "AEG GitOps"
+            job_type: run
+            playbook: "ansible/dynamic_kiosk_provision.yml"
+            inventory: '{{ kiosk_demo_inventory }}'
+            credentials:
+              - Kubeconfig
               - kiosk-private-key
               - rhsm_credential
               - kiosk_container_extra_params
@@ -413,18 +421,19 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_schedules:
           - name: "Update Project AEG GitOps"
             organization: '{{ aap_org_name }}'
             unified_job_template: "AEG GitOps"
             rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
 
-          - name: "HMI Demo Static Source Update"
-            organization: '{{ aap_org_name }}'
-            unified_job_template: "HMI Demo Static Source"
-            rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
+          #- name: "HMI Demo Static Source Update"
+          #  organization: '{{ aap_org_name }}'
+          #  unified_job_template: "HMI Demo Static Source"
+          #  rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=5"
 
-          - name: "Provision Kiosk Playbook"
+          - name: "Dynamic Provision Kiosk Playbook"
             organization: '{{ aap_org_name }}'
-            unified_job_template: "Provision Kiosk Playbook"
+            unified_job_template: "Dynamic Provision Kiosk Playbook"
             rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=10"
