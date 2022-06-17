@@ -19,7 +19,7 @@
       api_version: v1
       kind: '{{ inventory_kind }}'
       namespace: '{{ inventory_namespace }}'
-      label_selectors: '{{ label_selectors }}'
+      label_selectors: '{{ inventory_label_selectors }}'
     register: nodes
 
   - name: Debug
