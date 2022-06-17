@@ -146,7 +146,7 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: ${NAME}-service
+    name: ${NAME}
   spec:
     ipFamilies:
     - IPv4
