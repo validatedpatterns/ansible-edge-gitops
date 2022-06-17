@@ -216,6 +216,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_projects:
           - name: "Demo Project"
             state: absent
@@ -289,6 +290,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_inventories:
           - name: "HMI Demo"
             organization: "{{ aap_org_name }}"
@@ -308,6 +310,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_inventory_sources: []
 #          - name: "HMI Demo Kiosk Source"
 #            organization: "{{ aap_org_name }}"
@@ -317,7 +320,7 @@
 #            source: "scm"
 #            source_project: "AEG GitOps"
 #            source_path: "ansible/inventory/openshift_cluster.yml"
-#            host_filter: ".*kiosk.*service"
+#            host_filter: ".*kiosk.*"
 
 #          - name: "HMI Demo Static Source"
 #            organization: "{{ aap_org_name }}"
@@ -335,6 +338,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_execution_environments:
           - name: '{{ aap_execution_environment }}'
             image: '{{ aap_execution_environment_image }}'
@@ -347,6 +351,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_templates:
           - name: "Demo Job Template"
             state: absent
@@ -416,6 +421,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
+        controller_configuration_async_retries: 10
         controller_schedules:
           - name: "Update Project AEG GitOps"
             organization: '{{ aap_org_name }}'
