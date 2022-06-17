@@ -308,7 +308,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_inventory_sources:
+        controller_inventory_sources: []
 #          - name: "HMI Demo Kiosk Source"
 #            organization: "{{ aap_org_name }}"
 #            inventory: "HMI Demo"
@@ -373,7 +373,7 @@
               - kiosk_container_extra_params
             execution_environment: '{{ aap_execution_environment }}'
 
-          - name: "Dyanimic Provision Kiosk Playbook"
+          - name: "Dynamic Provision Kiosk Playbook"
             organization: '{{ aap_org_name }}'
             project: "AEG GitOps"
             job_type: run
