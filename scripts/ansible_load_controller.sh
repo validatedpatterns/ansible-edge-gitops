@@ -131,6 +131,61 @@
         msg: 'AAP Admin Password: {{ admin_password }}'
 
     # Controller is ready, time to start configuring it
+    - name: Configure Settings
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.settings
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_settings: []
+
+    - name: Configure Organizations
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.organizations
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_organizations:
+          - name: '{{ aap_org_name }}'
+
+    - name: Configure Controller Labels
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.labels
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_labels: []
+
+    - name: Configure User Accounts
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.users
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_user_accounts: []
+
+    - name: Configure Teams
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.teams
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_teams: []
 
     - name: Configure Credential Types
       ansible.builtin.include_role:
@@ -196,40 +251,6 @@
               extra_vars:
                 container_extra_params: '{  { container_extra_params }}'
 
-    - name: Configure Organizations
-      ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.organizations
-      vars:
-        controller_hostname: 'https://{{ ansible_host }}'
-        controller_username: admin
-        controller_password: '{{ admin_password }}'
-        controller_validate_certs: false
-        controller_configuration_async_retries: 10
-        controller_organizations:
-          - name: '{{ aap_org_name }}'
-
-    - name: Configure Projects
-      ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.projects
-      vars:
-        controller_hostname: 'https://{{ ansible_host }}'
-        controller_username: admin
-        controller_password: '{{ admin_password }}'
-        controller_validate_certs: false
-        controller_configuration_async_retries: 10
-        controller_projects:
-          - name: "Demo Project"
-            state: absent
-
-          - name: "AEG GitOps"
-            organization: '{{ aap_org_name }}'
-            scm_branch: '{{ aeg_project_branch }}'
-            scm_clean: "no"
-            scm_delete_on_update: "no"
-            scm_type: "git"
-            scm_update_on_launch: "yes"
-            scm_url: '{{ aeg_project_repo }}'
-
     - name: Configure Non-Loop credentials
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.credentials
@@ -282,6 +303,75 @@
               username: "{{ all_values['secrets'][item ~ '-ssh']['username']  }}"
               ssh_key_data: "{{ all_values['secrets'][item ~ '-ssh']['privatekey'] }}"
 
+
+    - name: Configure Credential Input Sources
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.credential_input_sources
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_credential_input_sources: []
+
+    - name: Configure Notification Templates
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.notification_templates
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_notifications: []
+
+    - name: Configure Projects
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.projects
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_projects:
+          - name: "Demo Project"
+            state: absent
+
+          - name: "AEG GitOps"
+            organization: '{{ aap_org_name }}'
+            scm_branch: '{{ aeg_project_branch }}'
+            scm_clean: "no"
+            scm_delete_on_update: "no"
+            scm_type: "git"
+            scm_update_on_launch: "yes"
+            scm_url: '{{ aeg_project_repo }}'
+
+    - name: Configure Execution Environments
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.execution_environments
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_execution_environments:
+          - name: '{{ aap_execution_environment }}'
+            image: '{{ aap_execution_environment_image }}'
+
+    - name: Configure Applications
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.applications
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_applications: []
+
     - name: Configure Inventories
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.inventories
@@ -301,6 +391,30 @@
             host_filter: 'name__icontains=kiosk'
             variables:
               ansible_user: "{{ all_values['secrets']['kiosk-ssh']['username'] }}"
+
+    - name: Configure Instance Groups
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.instance_groups
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_instance_groups: []
+
+    - name: Update Projects
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.project_update
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_projects:
+          - name: "AEG GitOps"
+            organization: '{{ aap_org_name }}'
 
     - name: Configure Inventory Sources
       ansible.builtin.include_role:
@@ -330,18 +444,38 @@
 #            source_project: "AEG GitOps"
 #            source_path: "ansible/inventory/hosts"
 
-    - name: Configure Execution Environments
+    - name: Inventory Sources Update
       ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.execution_environments
+        name: redhat_cop.controller_configuration.inventory_source_update
       vars:
         controller_hostname: 'https://{{ ansible_host }}'
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
         controller_configuration_async_retries: 10
-        controller_execution_environments:
-          - name: '{{ aap_execution_environment }}'
-            image: '{{ aap_execution_environment_image }}'
+        controller_inventory_sources: []
+
+    - name: Configure hosts
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.hosts
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_hosts: []
+
+    - name: Configure groups
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.groups
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_groups: []
 
     - name: Configure Job Templates
       ansible.builtin.include_role:
@@ -413,6 +547,17 @@
               - kiosk_container_extra_params
             execution_environment: '{{ aap_execution_environment }}'
 
+    - name: Configure Workflow Job Templates
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.workflow_job_templates
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_workflows: []
+
     - name: Configure Schedules
       ansible.builtin.include_role:
         name: redhat_cop.controller_configuration.schedules
@@ -437,3 +582,14 @@
             organization: '{{ aap_org_name }}'
             unified_job_template: "Dynamic Provision Kiosk Playbook"
             rrule: "DTSTART:20191219T130500Z RRULE:FREQ=MINUTELY;INTERVAL=10"
+
+    - name: Configure Roles
+      ansible.builtin.include_role:
+        name: redhat_cop.controller_configuration.roles
+      vars:
+        controller_hostname: 'https://{{ ansible_host }}'
+        controller_username: admin
+        controller_password: '{{ admin_password }}'
+        controller_validate_certs: false
+        controller_configuration_async_retries: 10
+        controller_roles: []

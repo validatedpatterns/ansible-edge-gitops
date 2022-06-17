@@ -3,6 +3,10 @@ secretStore:
   name: vault-backend
   kind: ClusterSecretStore
 
+cloudInit:
+  defaultUser: 'cloud-user'
+  defaultPassword: '6toh-n1d5-9xpq'
+
 vms:
   kiosk:
     count: 2
@@ -15,6 +19,8 @@ vms:
     cores: 1
     sockets: 1
     threads: 1
+    cloudInitUser: cloud-user
+    cloudInitPassword: 6toh-n1d5-9xpq
     template: rhel8-desktop-medium
     sshsecret: secret/data/hub/kiosk-ssh
     sshpubkeyfield: publickey

@@ -118,8 +118,8 @@ items:
         - cloudInitConfigDrive:
             userData: |-
               #cloud-config
-              user: cloud-user
-              password: 6toh-n1d5-mh0k
+              user: {{ coalesce $vmr.cloudInitUser $.Values.cloudInit.defaultUser "cloud-user" }}
+              password: {{ coalesce $vmr.cloudInitPassword $.Values.cloudInit.defaultPassword "6toh-n1d5-9xpq"  }}
               chpasswd: { expire: False }
           name: cloudinitdisk
 - apiVersion: v1
