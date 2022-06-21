@@ -92,7 +92,7 @@
         admin_password: '{{ admin_pw.resources[0].data.password | b64decode }}'
 
     - name: Wait for API to become available
-      retries: 40
+      retries: 120
       delay: 5
       register: api_status
       until: api_status.status == 200
