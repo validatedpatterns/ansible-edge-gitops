@@ -22,7 +22,7 @@
     machineset_user_data_secret: worker-user-data
   tasks:
     - name: Query Cluster Infrastructure Name
-      community.kubernetes.k8s_info:
+      kubernetes.core.k8s_info:
         api_version: config.openshift.io/v1
         kind: Infrastructure
         name: cluster
@@ -35,7 +35,7 @@
           - cluster_info.resources[0].status.platform == "AWS"
 
     - name: Query MachineSets
-      community.kubernetes.k8s_info:
+      kubernetes.core.k8s_info:
         api_version: machine.openshift.io/v1beta1
         kind: MachineSet
         namespace: openshift-machine-api
@@ -111,6 +111,6 @@
                       namespace: openshift-machine-api
 
     - name: Create MachineSet
-      community.kubernetes.k8s:
+      kubernetes.core.k8s:
         definition: "{{ machineset_yaml | from_yaml }}"
         state: present
