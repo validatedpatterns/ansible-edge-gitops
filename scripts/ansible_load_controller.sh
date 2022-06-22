@@ -500,18 +500,6 @@
               - kiosk-private-key
             execution_environment: '{{ aap_execution_environment }}'
 
-          - name: "Provision Kiosk Playbook"
-            organization: '{{ aap_org_name }}'
-            project: "AEG GitOps"
-            job_type: run
-            playbook: "ansible/provision_kiosk.yml"
-            inventory: '{{ kiosk_demo_inventory }}'
-            credentials:
-              - kiosk-private-key
-              - rhsm_credential
-              - kiosk_container_extra_params
-            execution_environment: '{{ aap_execution_environment }}'
-
           - name: "Dynamic Provision Kiosk Playbook"
             organization: '{{ aap_org_name }}'
             project: "AEG GitOps"
