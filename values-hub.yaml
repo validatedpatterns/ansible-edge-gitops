@@ -31,13 +31,11 @@ clusterGroup:
 
   projects:
   - hub
-  - golang-external-secrets
-  - ansible-automation-platform
 
   applications:
     aap:
       name: ansible-automation-platform
-      project: ansible-automation-platform
+      project: hub
       path: charts/hub/ansible-automation-platform
 
     vault:
@@ -70,7 +68,7 @@ clusterGroup:
     golang-external-secrets:
       name: golang-external-secrets
       namespace: golang-external-secrets
-      project: golang-external-secrets
+      project: hub
       path: common/golang-external-secrets
 
     openshit-cnv:

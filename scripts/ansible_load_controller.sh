@@ -92,7 +92,7 @@
         admin_password: '{{ admin_pw.resources[0].data.password | b64decode }}'
 
     - name: Wait for API to become available
-      retries: 40
+      retries: 120
       delay: 5
       register: api_status
       until: api_status.status == 200
@@ -498,18 +498,6 @@
             inventory: '{{ kiosk_demo_inventory }}'
             credentials:
               - kiosk-private-key
-            execution_environment: '{{ aap_execution_environment }}'
-
-          - name: "Provision Kiosk Playbook"
-            organization: '{{ aap_org_name }}'
-            project: "AEG GitOps"
-            job_type: run
-            playbook: "ansible/provision_kiosk.yml"
-            inventory: '{{ kiosk_demo_inventory }}'
-            credentials:
-              - kiosk-private-key
-              - rhsm_credential
-              - kiosk_container_extra_params
             execution_environment: '{{ aap_execution_environment }}'
 
           - name: "Dynamic Provision Kiosk Playbook"
