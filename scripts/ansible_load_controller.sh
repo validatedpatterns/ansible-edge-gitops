@@ -360,6 +360,7 @@
         controller_execution_environments:
           - name: '{{ aap_execution_environment }}'
             image: '{{ aap_execution_environment_image }}'
+            pull: always
 
     - name: Configure Applications
       ansible.builtin.include_role:
