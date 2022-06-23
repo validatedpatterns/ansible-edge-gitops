@@ -1,6 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- name: "Install manifest on AAP controller"
+- name: "Retrieve Credentials for AAP on OpenShift"
   become: false
   connection: local
   hosts: localhost
