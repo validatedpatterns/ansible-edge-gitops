@@ -12,3 +12,5 @@ collections:
     source: https://galaxy.ansible.com
   - name: community.okd
     source: https://galaxy.ansible.com
+  - name: awx.awx
+    source: https://galaxy.ansible.com
