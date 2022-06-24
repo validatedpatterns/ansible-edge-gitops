@@ -59,7 +59,7 @@ vault-init: ## inits, unseals and configured the vault
 	common/scripts/vault-utils.sh vault_secrets_init common/pattern-vault.init
 
 vault-unseal: ## unseals the vault
-	common/scripts/vault-utils.sh vault_init common/pattern-vault.init
+	common/scripts/vault-utils.sh vault_unseal common/pattern-vault.init
 
 super-linter: ## Runs super linter locally
 	podman run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true	\
