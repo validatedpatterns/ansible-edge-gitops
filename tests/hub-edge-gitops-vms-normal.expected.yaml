@@ -1,6 +1,6 @@
 ---
 # Source: edge-gitops-vms/templates/virtual-machines.yaml
-apiVersion: "external-secrets.io/v1alpha1"
+apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-rhel8-kiosk-001
@@ -19,7 +19,7 @@ spec:
         property: publickey
 ---
 # Source: edge-gitops-vms/templates/virtual-machines.yaml
-apiVersion: "external-secrets.io/v1alpha1"
+apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-rhel8-kiosk-002
