@@ -5,3 +5,4 @@ values-secret.yaml
 .*.expected.yaml
 pattern-vault.init
 vault.init
+/ansible/execution_environment/context/_build/*
