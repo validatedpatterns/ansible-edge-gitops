@@ -1,5 +1,5 @@
 ---
-- name: Configure Podman to run quay.io/kelee/ubi-ignition container on hmi device
+- name: Configure Podman to run ignition container on hmi device
   hosts: all
   become: true
   vars:
