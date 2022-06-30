@@ -19,14 +19,14 @@ help:
 %:
 	make -f common/Makefile $*
 
-install: deploy ## installs the pattern, inits the vault and loads the secrets
+install: validate-origin deploy ## installs the pattern, inits the vault and loads the secrets
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 	echo "Installed"
 
-upgrade:
+upgrade: validate-origin
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
@@ -36,9 +36,16 @@ upgrade:
 common-test:
 	make -C common -f common/Makefile test
 
+
 test:
 	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(CHART_OPTS)" test
 	echo Tests SUCCESSFUL
+
+validate-origin: ## verify the git origin is available
+	@echo Checking repo $(TARGET_REPO) - branch $(TARGET_BRANCH)
+	@git ls-remote --exit-code --heads $(TARGET_REPO) $(TARGET_BRANCH) >/dev/null && \
+		echo "$(TARGET_REPO) - $(TARGET_BRANCH) exists" || \
+		(echo "$(TARGET_BRANCH) not found in $(TARGET_REPO)"; exit 1)
 
 helmlint:
 	# no regional charts just yet: "$(wildcard charts/region/*)"
@@ -46,9 +53,6 @@ helmlint:
 
 update-tests:
 	./scripts/update-tests.sh $(CHART_OPTS)
-
-upgrade: validate-origin ## runs helm upgrade
-	helm upgrade $(NAME) common/install/ $(HELM_OPTS)
 
 uninstall: ## runs helm uninstall
 	helm uninstall $(NAME)
