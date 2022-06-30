@@ -49,8 +49,3 @@
     - name: Display machineset values
       ansible.builtin.debug:
         msg: '{{ machine_sets.resources[0] }}'
-
-    - name: Copy machineset values
-      ansible.builtin.copy:
-        content: '{{ machine_sets.resources[0] | to_nice_yaml }}'
-        dest: /tmp/ms1.yaml

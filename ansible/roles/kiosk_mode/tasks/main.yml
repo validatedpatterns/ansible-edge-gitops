@@ -38,7 +38,7 @@
     shell: /bin/bash
     uid: 2000
     group: users
-    create_home: yes
+    create_home: true
     skeleton: true
   notify: reboot
 
@@ -58,7 +58,7 @@
 - name: permit traffic in default zone for https service
   ansible.posix.firewalld:
     service: https
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: install yum install gnome-session-kiosk-session
