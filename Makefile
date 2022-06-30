@@ -61,9 +61,6 @@ vault-init: ## inits, unseals and configured the vault
 vault-unseal: ## unseals the vault
 	common/scripts/vault-utils.sh vault_init common/pattern-vault.init
 
-load-secrets: ## loads the secrets into the vault
-	common/scripts/ansible-push-vault-secrets.sh
-
 super-linter: ## Runs super linter locally
 	podman run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true	\
 					-e VALIDATE_BASH=false \
@@ -73,3 +70,8 @@ super-linter: ## Runs super linter locally
 					-e VALIDATE_DOCKERFILE_HADOLINT=false \
 					-e VALIDATE_ANSIBLE=false \
 					-v $(PWD):/tmp/lint:rw,z docker.io/github/super-linter:slim-v4
+
+ansible-lint: ## run ansible lint on ansible/ folder
+	ansible-lint ansible/
+
+.phony: install test
