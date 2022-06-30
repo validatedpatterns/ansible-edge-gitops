@@ -30,7 +30,7 @@ galaxy_info:
   platforms:
     - name: RHEL
       versions:
-        - 8
+        - all
       #   - 25
       # - name: SomePlatform
       #   versions:

@@ -1,3 +1,6 @@
 ---
 offline: false
 requirements: ansible/execution_environment/requirements.yml
+
+warn_list:
+  - yaml
