@@ -6,3 +6,5 @@ values-secret.yaml
 pattern-vault.init
 vault.init
 /ansible/execution_environment/context/_build/*
+pattern-vault.init.bak
+super-linter.log
