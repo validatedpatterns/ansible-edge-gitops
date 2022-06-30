@@ -47,6 +47,21 @@ helmlint:
 update-tests:
 	./scripts/update-tests.sh $(CHART_OPTS)
 
+upgrade: validate-origin ## runs helm upgrade
+	helm upgrade $(NAME) common/install/ $(HELM_OPTS)
+
+uninstall: ## runs helm uninstall
+	helm uninstall $(NAME)
+
+vault-init: ## inits, unseals and configured the vault
+	common/scripts/vault-utils.sh vault_init $(shell readlink -f common/pattern-vault.init)
+
+vault-unseal: ## unseals the vault
+	common/scripts/vault-utils.sh vault_unseal $(shell readlink -f common/pattern-vault.init)
+
+load-secrets: ## loads the secrets into the vault
+	common/scripts/ansible-push-vault-secrets.sh
+
 super-linter: ## Runs super linter locally
 	podman run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true	\
 					-e VALIDATE_BASH=false \
