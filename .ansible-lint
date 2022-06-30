@@ -1,0 +1,3 @@
+---
+offline: false
+requirements: ansible/execution_environment/requirements.yml
