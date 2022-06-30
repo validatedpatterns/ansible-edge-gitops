@@ -5,5 +5,5 @@
   ansible.builtin.systemd:
     name: "afiot-{{ service_name }}"
     state: restarted
-    daemon_reload: yes
+    daemon_reload: true
   when: (( initial_start is defined ) and ( not initial_start['changed'] )) or ( initial_start is undefined )

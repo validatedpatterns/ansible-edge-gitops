@@ -20,30 +20,33 @@
       ansible.builtin.template:
         src: "templates/systemd_unit.j2"
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}.service"
+        mode: '0644'
       notify: restart container service
 
     - name: template the systemd health check timer unit file
       ansible.builtin.template:
         src: "templates/systemd_timer.j2"
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}-healthcheck.timer"
+        mode: '0644'
       notify: restart container service
 
     - name: template the systemd health check service unit file
       ansible.builtin.template:
         src: "templates/systemd_timer.j2"
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}-healthcheck.service"
+        mode: '0644'
       notify: restart container service
 
     - name: deamon reload systemd and start our service
       ansible.builtin.systemd:
         name: "afiot-{{service_name}}"
         state: started
-        enabled: yes
-        daemon_reload: yes
+        enabled: true
+        daemon_reload: true
       register: initial_start
   rescue:
     - name: override container_tag for rollback
-      set_fact:
+      ansible.builtin.set_fact:
         container_tag: "{{ pre_install_container_info['containers'][0]['ImageName']|split(':')[-1] }}"
 
     - name: template the systemd service unit file
@@ -63,10 +66,10 @@
 
     - name: deamon reload systemd and start our service
       ansible.builtin.systemd:
-        name: "afiot-{{service_name}}"
+        name: "afiot-{{ service_name }}"
         state: started
-        enabled: yes
-        daemon_reload: yes
+        enabled: true
+        daemon_reload: true
   when:
     - container_state in ["present", "installed"]
 
@@ -77,7 +80,7 @@
       ansible.builtin.systemd:
         name: "afiot-{{service_name}}"
         state: stopped
-        enabled: no
+        enabled: false
 
     - name: remove container image
       containers.podman.podman_image:
@@ -125,9 +128,7 @@
 
     - name: deamon reload systemd to remove unit files from index
       ansible.builtin.systemd:
-        daemon_reload: yes
+        daemon_reload: true
   when:
     - container_state in ["absent", "uninstalled"]
     - pre_install_container_info['containers']
-
-
