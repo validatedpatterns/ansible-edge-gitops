@@ -39,7 +39,10 @@ kubeconform: ## run helm kubeconform
 	@for t in $(CHARTS); do helm template $(TEST_OPTS) $(PATTERN_OPTS) $$t | kubeconform -strict $(KUBECONFORM_SKIP) -verbose -schema-location $(API_URL); if [ $$? != 0 ]; then exit 1; fi; done
 
 validate-origin: ## verify the git origin is available
-	git ls-remote $(TARGET_REPO)
+	@echo Checking repo $(TARGET_REPO) - branch $(TARGET_BRANCH)
+	@git ls-remote --exit-code --heads $(TARGET_REPO) $(TARGET_BRANCH) >/dev/null && \
+		echo "$(TARGET_REPO) - $(TARGET_BRANCH) exists" || \
+		(echo "$(TARGET_BRANCH) not found in $(TARGET_REPO)"; exit 1)
 
 deploy: validate-origin ## deploys the pattern
 	helm install $(NAME) common/install/ $(HELM_OPTS)
@@ -52,12 +55,14 @@ uninstall: ## runs helm uninstall
 
 vault-init: ## inits, unseals and configured the vault
 	common/scripts/vault-utils.sh vault_init common/pattern-vault.init
+	common/scripts/vault-utils.sh vault_unseal common/pattern-vault.init
+	common/scripts/vault-utils.sh vault_secrets_init common/pattern-vault.init
 
 vault-unseal: ## unseals the vault
 	common/scripts/vault-utils.sh vault_unseal common/pattern-vault.init
 
 load-secrets: ## loads the secrets into the vault
-	common/scripts/ansible-push-vault-secrets.sh
+	common/scripts/vault-utils.sh push_secrets common/pattern-vault.init
 
 super-linter: ## Runs super linter locally
 	podman run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true	\
@@ -66,6 +71,9 @@ super-linter: ## Runs super linter locally
 					-e VALIDATE_KUBERNETES_KUBEVAL=false \
 					-e VALIDATE_YAML=false \
 					-v $(PWD):/tmp/lint:rw,z docker.io/github/super-linter:slim-v4
+
+ansible-lint: ## run ansible lint on ansible/ folder
+	podman run -it -v $(PWD):/workspace:rw,z --workdir /workspace --entrypoint "/usr/local/bin/ansible-lint" quay.io/ansible/creator-ee:latest  "-vvv" "ansible/"
 
 .phony: install test
 
