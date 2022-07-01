@@ -8,9 +8,7 @@ exclude_paths:
   - .github/
   - charts/
   - common/
-  - *.yaml
   - tests/
-  - *.yaml.template
 
 warn_list:
   - yaml
