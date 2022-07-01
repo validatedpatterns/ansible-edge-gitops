@@ -353,7 +353,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_projects:
           - name: "AEG GitOps"
             organization: '{{ aap_org_name }}'
