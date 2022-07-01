@@ -6,6 +6,5 @@ warn_list:
   - yaml
   - schema
   - experimental
-  - fqcn-builtins
   - risky-file-permissions
   - var-spacing
