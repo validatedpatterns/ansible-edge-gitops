@@ -1,6 +1,16 @@
+# Vim filetype=yaml
 ---
 offline: false
 requirements: ansible/execution_environment/requirements.yml
+
+exclude_paths:
+  - .cache/
+  - .github/
+  - charts/
+  - common/
+  - *.yaml
+  - tests/
+  - *.yaml.template
 
 warn_list:
   - yaml
