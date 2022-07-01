@@ -49,7 +49,7 @@
     mode: 0600
 
 - name: Change default target to graphical.target
-  file:
+  ansible.builtin.file:
     src: /usr/lib/systemd/system/graphical.target
     dest: /etc/systemd/system/default.target
     state: link
