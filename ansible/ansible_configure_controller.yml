@@ -80,7 +80,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_settings: []
 
     - name: Configure Organizations
@@ -91,7 +91,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_organizations:
           - name: '{{ aap_org_name }}'
 
@@ -103,7 +103,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_labels: []
 
     - name: Configure User Accounts
@@ -114,7 +114,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_user_accounts: []
 
     - name: Configure Teams
@@ -125,7 +125,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_teams: []
 
     - name: Configure Credential Types
@@ -136,7 +136,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_credential_types:
           - name: Kubeconfig
             description: kubeconfig file
@@ -200,7 +200,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_credentials:
           - name: 'Kubeconfig'
             description: "Local Cluster Kubeconfig"
@@ -234,7 +234,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_credentials:
           - name: '{{ item }}-private-key'
             description: "Machine credential for {{ item }} type machines"
@@ -253,7 +253,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_credential_input_sources: []
 
     - name: Configure Notification Templates
@@ -264,7 +264,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_notifications: []
 
     - name: Configure Projects
@@ -297,7 +297,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_execution_environments:
           - name: '{{ aap_execution_environment }}'
             image: '{{ aap_execution_environment_image }}'
@@ -311,7 +311,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_applications: []
 
     - name: Configure Inventories
@@ -322,7 +322,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_inventories:
           - name: "HMI Demo"
             organization: "{{ aap_org_name }}"
@@ -342,7 +342,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_instance_groups: []
 
     - name: Update Projects
@@ -366,7 +366,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_inventory_sources: []
 #          - name: "HMI Demo Kiosk Source"
 #            organization: "{{ aap_org_name }}"
@@ -394,7 +394,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_inventory_sources: []
 
     - name: Configure hosts
@@ -405,7 +405,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_hosts: []
 
     - name: Configure groups
@@ -416,7 +416,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_groups: []
 
     - name: Configure Job Templates
@@ -427,7 +427,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_templates:
           - name: "Demo Job Template"
             state: absent
@@ -485,7 +485,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_workflows: []
 
     - name: Configure Schedules
@@ -496,7 +496,7 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_schedules:
           - name: "Update Project AEG GitOps"
             organization: '{{ aap_org_name }}'
@@ -521,5 +521,5 @@
         controller_username: admin
         controller_password: '{{ admin_password }}'
         controller_validate_certs: false
-        controller_configuration_async_retries: 10
+        controller_configuration_async_retries: 20
         controller_roles: []
