@@ -33,6 +33,22 @@ upgrade: validate-origin
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 	echo "Upgraded"
 
+legacy-install:
+	make -f common/legacy-install
+	make vault-init
+	make load-secrets
+	./scripts/deploy_kubevirt_worker.sh
+	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
+	echo "Installed"
+
+legacy-upgrade:
+	make -f common/legacy-upgrade
+	make vault-init
+	make load-secrets
+	./scripts/deploy_kubevirt_worker.sh
+	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
+	echo "Upgraded"
+
 common-test:
 	make -C common -f common/Makefile test
 
