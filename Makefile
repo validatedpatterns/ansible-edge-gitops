@@ -34,7 +34,7 @@ upgrade: validate-origin
 	echo "Upgraded"
 
 legacy-install:
-	make -f common legacy-install
+	make -f common/Makefile legacy-install
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
@@ -42,7 +42,7 @@ legacy-install:
 	echo "Installed"
 
 legacy-upgrade:
-	make -f common legacy-upgrade
+	make -f common/Makefile legacy-upgrade
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
