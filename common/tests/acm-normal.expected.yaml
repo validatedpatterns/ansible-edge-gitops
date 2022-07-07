@@ -111,7 +111,7 @@ spec:
                   name: mypattern-edge
                   namespace: openshift-gitops
                   finalizers:
-                  - argoproj.io/finalizer
+                  - resources-finalizer.argocd.argoproj.io/foreground
                 spec:
                   project: default
                   source:
@@ -119,6 +119,7 @@ spec:
                     targetRevision: main
                     path: common/clustergroup
                     helm:
+                      ignoreMissingValueFiles: true
                       valueFiles:
                       - "https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml"
                       - "https://github.com/pattern-clone/mypattern/raw/main/values-edge.yaml"

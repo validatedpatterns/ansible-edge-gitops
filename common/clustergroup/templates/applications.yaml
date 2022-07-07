@@ -5,6 +5,8 @@ kind: Application
 metadata:
   name: {{ .name }}
   namespace: {{ $namespace }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   destination:
     name: in-cluster
@@ -22,6 +24,7 @@ spec:
     plugin: {{ .plugin | toPrettyJson }}
     {{- else if not .kustomize }}
     helm:
+      ignoreMissingValueFiles: true
       valueFiles:
       - "{{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}/values-global.yaml"
       - "{{ coalesce .valuesDirectoryURL $.Values.global.valuesDirectoryURL }}/values-{{ $.Values.clusterGroup.name }}.yaml"

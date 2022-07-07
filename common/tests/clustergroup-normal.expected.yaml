@@ -80,6 +80,7 @@ data:
         cronJobName: imperative-cronjob
         image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
         imagePullPolicy: Always
+        insecureUnsealVaultInsideClusterSchedule: '*/9 * * * *'
         jobName: imperative-job
         jobs:
         - name: test
@@ -92,6 +93,7 @@ data:
         serviceAccountName: imperative-sa
         valuesConfigMap: helm-values-configmap
         verbosity: ""
+      insecureUnsealVaultInsideCluster: true
       isHubCluster: true
       managedClusterGroups:
       - clusterSelector:
@@ -278,7 +280,7 @@ spec:
           serviceAccountName: imperative-sa
           initContainers:
             # git init happens in /git/repo so that we can set the folder to 0770 permissions
-            # reason for that is ansible refuses to create temporary folders in there
+            # reason for that is ansible refuses to create temporary folders in there            
             - name: git-init
               image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
               imagePullPolicy: Always
@@ -308,28 +310,100 @@ spec:
                 - -e
                 - "@/values/values.yaml"
                 - ansible/test.yml
+              volumeMounts:                
+                - name: git
+                  mountPath: "/git"
+                - name: values-volume
+                  mountPath: /values/values.yaml
+                  subPath: values.yaml
+          containers:            
+            - name: "done"
+              image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+              imagePullPolicy: Always
+              command:
+                - 'sh'
+                - '-c'
+                - 'echo'
+                - 'done'
+                - '\n'
+          volumes:
+          - name: git
+            emptyDir: {}
+          - name: values-volume
+            configMap:
+              name: helm-values-configmap
+          restartPolicy: Never
+---
+# Source: pattern-clustergroup/templates/imperative/unsealjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: unsealvault-cronjob
+  namespace: imperative
+spec:
+  schedule: "*/9 * * * *"
+  # if previous Job is still running, skip execution of a new Job
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          name: unsealvault-job
+        spec:
+          serviceAccountName: imperative-sa
+          initContainers:
+            # git init happens in /git/repo so that we can set the folder to 0770 permissions
+            # reason for that is ansible refuses to create temporary folders in there            
+            - name: git-init
+              image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+              imagePullPolicy: Always
+              env:
+                - name: HOME
+                  value: /git/home
+              command:
+              - 'sh'
+              - '-c'
+              - "mkdir /git/{repo,home};git clone --single-branch --branch  --depth 1 -- https://github.com/pattern-clone/mypattern /git/repo;chmod 0770 /git/{repo,home}"
               volumeMounts:
               - name: git
                 mountPath: "/git"
-              - name: values-volume
-                mountPath: /values/values.yaml
-                subPath: values.yaml
-          containers:
-          - name: imperative-job-done
-            image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
-            imagePullPolicy: Always
-            command:
-            - 'sh'
-            - '-c'
-            - echo
-            - test
-            - '\n'
-            volumeMounts:
-            - name: git
-              mountPath: "/git"
-            - name: values-volume
-              mountPath: /values/values.yaml
-              subPath: values.yaml
+            - name: unseal-playbook
+              image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+              imagePullPolicy: Always
+              env:
+                - name: HOME
+                  value: /git/home
+              workingDir: /git/repo
+              # We have a default timeout of 600s for each playbook. Can be overridden
+              # on a per-job basis
+              command:
+                - timeout
+                - "600"
+                - ansible-playbook
+                - -e
+                - "@/values/values.yaml"
+                - -e
+                - '{"file_unseal": false}'
+                - -t
+                - 'vault_init,vault_unseal,vault_secrets_init'
+                - "common/ansible/playbooks/vault/vault.yaml"
+              volumeMounts:                
+                - name: git
+                  mountPath: "/git"
+                - name: values-volume
+                  mountPath: /values/values.yaml
+                  subPath: values.yaml
+          containers:            
+            - name: "done"
+              image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+              imagePullPolicy: Always
+              command:
+                - 'sh'
+                - '-c'
+                - 'echo'
+                - 'done'
+                - '\n'
           volumes:
           - name: git
             emptyDir: {}
@@ -368,6 +442,8 @@ kind: Application
 metadata:
   name: acm
   namespace: mypattern-example
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   destination:
     name: in-cluster
@@ -378,6 +454,7 @@ spec:
     targetRevision: 
     path: common/acm
     helm:
+      ignoreMissingValueFiles: true
       valueFiles:
       - "https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml"
       - "https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml"
@@ -416,6 +493,8 @@ kind: Application
 metadata:
   name: pipelines
   namespace: mypattern-example
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   destination:
     name: in-cluster
@@ -426,6 +505,7 @@ spec:
     targetRevision: 
     path: charts/datacenter/pipelines
     helm:
+      ignoreMissingValueFiles: true
       valueFiles:
       - "https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml"
       - "https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml"
@@ -466,22 +546,32 @@ spec:
   # Not the greatest way to pass git/quay info to sub-applications, but it will do until
   # we can support helmChart with kustomize
   # The other option is to pass them in as environment variables eg. BLUEPRINT_VERSION
-  configManagementPlugins: "- name: kustomize-version\n  generate:\n    command: [sh,
-    -c]\n    args: [\"kustomize version 1>&2 && exit 1\"]\n- name: kustomize-with-helm\n
-    \ generate:\n    command: [\"kustomize\"]\n    args: [\"build\", \"--enable-helm\"]\n- name:
-    helm-with-kustomize\n  init:\n    command: [\"/bin/sh\", \"-c\"]\n    args: [\"helm
-    dependency build\"]\n  generate:\n    command: [/bin/bash, -c]\n    args: [\"helm template . --name-template ${ARGOCD_APP_NAME:0:52}
-    -f https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml
-    -f https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml
-    --set global.repoURL=$ARGOCD_APP_SOURCE_REPO_URL
-    --set global.targetRevision=$ARGOCD_APP_SOURCE_TARGET_REVISION
-    --set global.namespace=$ARGOCD_APP_NAMESPACE
-    --set global.pattern=mypattern
-    --set global.hubClusterDomain=hub.example.com
-    --set global.localClusterDomain=region.example.com
-    --set global.valuesDirectoryURL=https://github.com/pattern-clone/mypattern/raw/main
-    --post-renderer ./kustomize\"]
-    \ \n"
+  configManagementPlugins: |
+    - name: kustomize-version
+      generate:
+        command: ["sh", "-c"]
+        args: ["kustomize version 1>&2 && exit 1"]
+    - name: kustomize-with-helm
+      generate:
+        command: ["kustomize"]
+        args: ["build", "--enable-helm"]
+    - name: helm-with-kustomize
+      init:
+        command: ["/bin/sh", "-c"]
+        args: ["helm dependency build"]
+      generate:
+        command: ["/bin/bash", "-c"]
+        args: ["helm template . --name-template ${ARGOCD_APP_NAME:0:52}
+            -f https://github.com/pattern-clone/mypattern/raw/main/values-global.yaml
+            -f https://github.com/pattern-clone/mypattern/raw/main/values-example.yaml
+            --set global.repoURL=$ARGOCD_APP_SOURCE_REPO_URL
+            --set global.targetRevision=$ARGOCD_APP_SOURCE_TARGET_REVISION
+            --set global.namespace=$ARGOCD_APP_NAMESPACE
+            --set global.pattern=mypattern
+            --set global.hubClusterDomain=hub.example.com
+            --set global.localClusterDomain=region.example.com
+            --set global.valuesDirectoryURL=https://github.com/pattern-clone/mypattern/raw/main
+            --post-renderer ./kustomize"]
   applicationSet:
     resources:
       limits:
