@@ -33,7 +33,7 @@ helmlint: ## run helm lint
 	@for t in $(CHARTS); do helm lint $(TEST_OPTS) $(PATTERN_OPTS) $$t; if [ $$? != 0 ]; then exit 1; fi; done
 
 API_URL ?= https://raw.githubusercontent.com/hybrid-cloud-patterns/ocp-schemas/main/openshift/4.10/
-KUBECONFORM_SKIP ?= -skip 'CustomResourceDefinition','Pattern'
+KUBECONFORM_SKIP ?= -skip 'CustomResourceDefinition'
 # We need to skip 'CustomResourceDefinition' as openapi2jsonschema seems to be unable to generate them ATM
 kubeconform: ## run helm kubeconform
 	@for t in $(CHARTS); do helm template $(TEST_OPTS) $(PATTERN_OPTS) $$t | kubeconform -strict $(KUBECONFORM_SKIP) -verbose -schema-location $(API_URL); if [ $$? != 0 ]; then exit 1; fi; done
@@ -44,17 +44,11 @@ validate-origin: ## verify the git origin is available
 		echo "$(TARGET_REPO) - $(TARGET_BRANCH) exists" || \
 		(echo "$(TARGET_BRANCH) not found in $(TARGET_REPO)"; exit 1)
 
-deploy: validate-origin ## deploys the pattern
-	helm install $(NAME) common/install/ $(HELM_OPTS)
+deploy upgrade: validate-origin ## deploys the pattern
+	helm upgrade --install $(NAME) common/install/ $(HELM_OPTS)
 
-upgrade: validate-origin
-	helm upgrade $(NAME) common/install/ $(HELM_OPTS)
-
-legacy-install: validate-origin ## runs helm upgrade
-	helm install $(NAME) common/legacy-install/ $(HELM_OPTS)
-
-legacy-upgrade: validate-origin ## runs helm upgrade
-	helm upgrade $(NAME) common/legacy-install/ $(HELM_OPTS)
+operator-deploy operator-upgrade: validate-origin ## runs helm install
+	helm upgrade --install $(NAME) common/operator-install/ $(HELM_OPTS)
 
 uninstall: ## runs helm uninstall
 	helm uninstall $(NAME)
