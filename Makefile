@@ -33,8 +33,7 @@ upgrade: operator-deploy
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 	echo "Upgraded"
 
-legacy-install legacy-upgrade: deploy
-	make -f common/Makefile legacy-install
+legacy-install legacy-upgrade: legacy-deploy
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
