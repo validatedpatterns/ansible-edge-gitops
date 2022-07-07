@@ -55,6 +55,7 @@ common-test:
 
 test:
 	make ansible-lint
+	make -f common/Makefile -C common test
 	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(CHART_OPTS)" test
 	echo Tests SUCCESSFUL
 
