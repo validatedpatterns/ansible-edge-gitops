@@ -11,12 +11,6 @@
     password: "{{ rhsm_password }}"
     auto_attach: true
 
-# Installing sssd first is a workaround for BZ#210960/RHELPLAN-126544
-- name: install sssd
-  ansible.builtin.package:
-    name:
-      - sssd
-
 - name: install Gnome Desktop Environment
   ansible.builtin.package:
     name:
