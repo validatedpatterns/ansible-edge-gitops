@@ -19,35 +19,27 @@ help:
 %:
 	make -f common/Makefile $*
 
-install: validate-origin deploy ## installs the pattern, inits the vault and loads the secrets
+install: operator-deploy ## installs the pattern, inits the vault and loads the secrets
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 	echo "Installed"
 
-upgrade: validate-origin
+upgrade: operator-deploy
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 	echo "Upgraded"
 
-legacy-install:
+legacy-install legacy-upgrade: deploy
 	make -f common/Makefile legacy-install
 	make vault-init
 	make load-secrets
 	./scripts/deploy_kubevirt_worker.sh
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
-	echo "Installed"
-
-legacy-upgrade:
-	make -f common/Makefile legacy-upgrade
-	make vault-init
-	make load-secrets
-	./scripts/deploy_kubevirt_worker.sh
-	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
-	echo "Upgraded"
+	echo "Installed/upgraded"
 
 common-test:
 	make -C common -f common/Makefile test
