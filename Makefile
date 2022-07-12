@@ -17,42 +17,29 @@ help:
 %:
 	make -f common/Makefile $*
 
-install: operator-deploy ## installs the pattern, inits the vault and loads the secrets
-	make vault-init
-	make load-secrets
-	./scripts/deploy_kubevirt_worker.sh
-	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
-	echo "Installed"
+install upgrade deploy: operator-deploy post-install ## Install or upgrade the pattern via the operator
+	echo "Installed/Upgraded"
 
-upgrade: operator-deploy
-	make vault-init
-	make load-secrets
-	./scripts/deploy_kubevirt_worker.sh
-	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
-	echo "Upgraded"
+legacy-install legacy-upgrade: legacy-deploy post-install ## Install or upgrade the pattern the "old" way
+	echo "Installed/upgraded (Legacy target)"
 
-legacy-install legacy-upgrade: legacy-deploy
-	make vault-init
-	make load-secrets
-	./scripts/deploy_kubevirt_worker.sh
-	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
-	echo "Installed/upgraded"
+post-install: vault-init deploy-kubevirt-worker configure-controller ## Post-install tasks - vault, kubevirt, controller config
+	echo "Post-deploy complete"
 
-common-test:
+deploy-kubevirt-worker: ## Deploy the metal node worker
+	./scripts/deploy_kubevirt_worker.sh
+
+configure-controller: ## Configure AAP operator
+	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
+
+common-test: ## Test common
 	make -C common -f common/Makefile test
 
-
-test:
+test: ## Run tests
 	make ansible-lint
 	make -f common/Makefile -C common test
 	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(CHART_OPTS)" test
 	echo Tests SUCCESSFUL
-
-validate-origin: ## verify the git origin is available
-	@echo Checking repo $(TARGET_REPO) - branch $(TARGET_BRANCH)
-	@git ls-remote --exit-code --heads $(TARGET_REPO) $(TARGET_BRANCH) >/dev/null && \
-		echo "$(TARGET_REPO) - $(TARGET_BRANCH) exists" || \
-		(echo "$(TARGET_BRANCH) not found in $(TARGET_REPO)"; exit 1)
 
 helmlint:
 	# no regional charts just yet: "$(wildcard charts/region/*)"
@@ -64,14 +51,6 @@ update-tests:
 uninstall: ## runs helm uninstall
 	helm uninstall $(NAME)
 
-vault-init: ## inits, unseals and configured the vault
-	common/scripts/vault-utils.sh vault_init common/pattern-vault.init
-	common/scripts/vault-utils.sh vault_unseal common/pattern-vault.init
-	common/scripts/vault-utils.sh vault_secrets_init common/pattern-vault.init
-
-vault-unseal: ## unseals the vault
-	common/scripts/vault-utils.sh vault_unseal common/pattern-vault.init
-
 super-linter: ## Runs super linter locally
 	podman run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true	\
 					-e VALIDATE_BASH=false \
@@ -81,8 +60,5 @@ super-linter: ## Runs super linter locally
 					-e VALIDATE_DOCKERFILE_HADOLINT=false \
 					-e VALIDATE_ANSIBLE=false \
 					-v $(PWD):/tmp/lint:rw,z docker.io/github/super-linter:slim-v4
-
-ansible-lint: ## run ansible lint on ansible/ folder
-	podman run -it -v $(PWD):/workspace:rw,z --workdir /workspace --entrypoint "/usr/local/bin/ansible-lint" quay.io/ansible/creator-ee:latest  "-vvv" "ansible/"
 
 .phony: install test
