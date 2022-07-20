@@ -35,6 +35,7 @@ clusterGroup:
   imperative:
     jobs:
       - name: deploy-kubevirt-worker
+        image: quay.io/hybridcloudpatterns/utility-container:latest
         playbook: ansible/deploy_kubvirt_worker.yml
         timeout: 300
 
