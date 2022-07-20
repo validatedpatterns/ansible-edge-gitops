@@ -36,9 +36,8 @@ clusterGroup:
     jobs:
       - name: test-inventory
         playbook: ansible/ping.yml
-      #- name: deploy-kubevirt-worker
-      #  playbook: ansible/deploy_kubevirt_worker.yml
-      #  timeout: 234
+      - name: deploy-kubevirt-worker
+        playbook: ansible/deploy_kubevirt_worker.yml
 
   applications:
     aap:
