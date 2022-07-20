@@ -36,7 +36,6 @@ clusterGroup:
     jobs:
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
-        timeout: 300
 
   applications:
     aap:
