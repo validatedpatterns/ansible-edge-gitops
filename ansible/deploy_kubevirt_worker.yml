@@ -21,6 +21,10 @@
     machineset_replicas: 1
     machineset_user_data_secret: worker-user-data
   tasks:
+    - name: pause
+      pause:
+        seconds: 60
+
     - name: Query Cluster Infrastructure Name
       kubernetes.core.k8s_info:
         api_version: config.openshift.io/v1
