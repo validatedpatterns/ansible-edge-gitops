@@ -39,7 +39,7 @@ clusterGroup:
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
         verbosity: "-vvv"
-    clusterRoleYaml: |-
+    clusterRoleYaml: |
       - apiGroups:
           - '*'
         resources:
