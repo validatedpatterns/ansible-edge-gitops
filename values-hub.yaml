@@ -38,6 +38,7 @@ clusterGroup:
         playbook: ansible/ping.yml
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
+        verbosity: "-vvv"
 
   applications:
     aap:
