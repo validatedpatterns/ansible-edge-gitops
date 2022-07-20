@@ -35,7 +35,7 @@ clusterGroup:
   imperative:
     jobs:
       - name: deploy-kubevirt-worker
-        playbook: ansible/deploy_kubvirt_worker.yml
+        playbook: ansible/deploy_kubevirt_worker.yml
         timeout: 300
 
   applications:
