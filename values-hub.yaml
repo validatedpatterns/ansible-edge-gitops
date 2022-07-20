@@ -32,6 +32,12 @@ clusterGroup:
   projects:
   - hub
 
+  imperative:
+    jobs:
+      - name: deploy-kubevirt-worker
+        playbook: ansible/deploy_kubvirt_worker.yml
+        timeout: 300
+
   applications:
     aap:
       name: ansible-automation-platform
