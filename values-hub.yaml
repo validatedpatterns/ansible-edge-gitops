@@ -34,11 +34,13 @@ clusterGroup:
 
   imperative:
     jobs:
-      - name: test-inventory
-        playbook: ansible/ping.yml
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
         verbosity: "-vvv"
+      - name: configure-aap-controller
+        playbook: ansible/imperative_configure_controller.yml
+        verbosity: "-vvv"
+        timeout: "900"
     clusterRoleYaml:
       - apiGroups:
           - '*'
