@@ -39,6 +39,7 @@ clusterGroup:
         verbosity: "-vvv"
       - name: configure-aap-controller
         playbook: ansible/imperative_configure_controller.yml
+        image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
         verbosity: "-vvv"
         timeout: "900"
     clusterRoleYaml:
