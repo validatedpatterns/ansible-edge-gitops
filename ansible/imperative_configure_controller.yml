@@ -1,11 +1,9 @@
 ---
-- name: Set parameters needed for configuring controller from values.yaml
-  ansible.builtin.set_fact:
-    aeg_project_repo: Values['main']['git']['repoURL']
-    aeg_project_branch: Values['main']['git']['revision']
-
 - name: Discover Ansible Controller Credentials
   ansible.builtin.import_playbook: ansible_get_credentials.yml
+
+- name: Set parameters needed for configuring controller from values.yaml
+  ansible.builtin.import_playbook: get_controller_values_overrides.yml
 
 - name: Configure controller using credentials
   ansible.builtin.import_playbook: ansible_configure_controller.yml

@@ -1,0 +1,10 @@
+---
+- name: "Copy controller overrides out of values.yml"
+  hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Copy needed values
+      ansible.builtin.set_fact:
+        aeg_project_repo: Values['main']['git']['repoURL']
+        aeg_project_branch: Values['main']['git']['revision']
