@@ -23,7 +23,7 @@ install upgrade deploy: operator-deploy post-install ## Install or upgrade the p
 legacy-install legacy-upgrade: legacy-deploy post-install ## Install or upgrade the pattern the "old" way
 	echo "Installed/upgraded (Legacy target)"
 
-post-install: vault-init load-secrets ## Post-install tasks - vault
+post-install: vault-init configure-controller load-secrets ## Post-install tasks - vault
 	echo "Post-deploy complete"
 
 deploy-kubevirt-worker: ## Deploy the metal node worker
