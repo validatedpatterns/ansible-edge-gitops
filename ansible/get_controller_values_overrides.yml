@@ -6,5 +6,5 @@
   tasks:
     - name: Copy needed values
       ansible.builtin.set_fact:
-        aeg_project_repo: Values['main']['git']['repoURL']
-        aeg_project_branch: Values['main']['git']['revision']
+        aeg_project_repo: global['repoURL']
+        aeg_project_branch: global['targetRevision']
