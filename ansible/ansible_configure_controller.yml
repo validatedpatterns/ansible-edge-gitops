@@ -33,7 +33,7 @@
       become: false
 
     - name: Wait for API to become available
-      retries: 120
+      retries: 300
       delay: 5
       register: api_status
       until: api_status.status == 200
