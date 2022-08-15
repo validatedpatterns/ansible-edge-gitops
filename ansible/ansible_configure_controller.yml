@@ -23,7 +23,7 @@
 
     - name: Set files fact
       ansible.builtin.set_fact:
-        manifest_file_ref: "{{ all_values['files']['ansible-automation-platform']['manifest'] }}"
+        manifest_file_ref: "{{ all_values['files']['aap-manifest'] }}"
 
     - name: Load manifest into variable
       delegate_to: localhost
