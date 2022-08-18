@@ -31,8 +31,8 @@ jobs:
           VALIDATE_JSCPD: false
           VALIDATE_KUBERNETES_KUBEVAL: false
           VALIDATE_YAML: false
-          VALIDATE_DOCKERFILE_HADOLINT: false
           VALIDATE_ANSIBLE: false
+          VALIDATE_DOCKERFILE_HADOLINT: false
           # VALIDATE_MARKDOWN: false
           # VALIDATE_NATURAL_LANGUAGE: false
-          # VALIDATE_TEKTON: false
+          #VALIDATE_TEKTON: false
