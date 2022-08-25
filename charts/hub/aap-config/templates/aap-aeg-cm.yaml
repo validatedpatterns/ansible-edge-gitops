@@ -1,0 +1,8 @@
+---
+kind: ConfigMap
+metadata:
+  namespace: ansible-automation-platform
+  name: aeg-aap-cm
+data:
+  aeg_project_repo: {{ .Values.global.repoURL }}
+  aeg_project_branch: {{ .Values.global.targetRevision }}

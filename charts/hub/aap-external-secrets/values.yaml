@@ -1,6 +1,0 @@
-secretStore:
-  name: vault-backend
-  kind: ClusterSecretStore
-
-aapManifest:
-  key: secret/data/hub/aap-manifest
