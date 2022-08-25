@@ -66,9 +66,9 @@ clusterGroup:
       path: charts/hub/ansible-automation-platform
 
     aap:
-      name: aap-external-secrets
+      name: aap-config
       project: hub
-      path: charts/hub/aap-external-secrets
+      path: charts/hub/aap-config
 
     vault:
       name: vault
