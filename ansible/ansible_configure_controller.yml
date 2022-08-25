@@ -8,6 +8,7 @@
   vars:
     ansible_host: ""
     admin_password: ""
+    manifest_file: ""
     values_secret: "{{ lookup('env', 'HOME') }}/values-secret.yaml"
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
     aap_org_name: "HMI Demo"
@@ -17,20 +18,33 @@
     aeg_project_repo: https://github.com/hybrid-cloud-patterns/ansible-edge-gitops.git
     aeg_project_branch: main
   tasks:
-    - name: Parse "{{ values_secret }}"
-      ansible.builtin.set_fact:
-        all_values: "{{ lookup('file', values_secret) | from_yaml }}"
+    - name: Check for "{{ values_secret }}" file
+      ansible.builtin.stat:
+      register: values_secret_stat
 
-    - name: Set files fact
-      ansible.builtin.set_fact:
-        manifest_file_ref: "{{ all_values['files']['aap-manifest'] }}"
+    - name: Local-file based secret processing
+      block:
+        - name: Parse "{{ values_secret }}"
+          ansible.builtin.set_fact:
+            all_values: "{{ lookup('file', values_secret) | from_yaml }}"
+          when: values_secret_stat.exists
 
-    - name: Load manifest into variable
-      delegate_to: localhost
-      ansible.builtin.slurp:
-        src: '{{ manifest_file_ref }}'
-      register: manifest_file
-      become: false
+        - name: Set files fact
+          ansible.builtin.set_fact:
+            manifest_file_ref: "{{ all_values['files']['aap-manifest'] }}"
+          when: values_secret_stat.exists
+
+        - name: Load manifest into variable
+          delegate_to: localhost
+          ansible.builtin.slurp:
+            src: '{{ manifest_file_ref }}'
+          register: manifest_file
+          become: false
+      when: values_secret_stat.exists
+
+    - name: In-cluster secret processing
+      block:
+      when: not values_secret_stat.exists
 
     - name: Wait for API to become available
       retries: 300
