@@ -37,7 +37,7 @@
         controller_host: '{{ ansible_host }}'
         controller_username: admin
         controller_password: '{{ admin_password }}'
-        manifest: '{{ secrets.manifest_file }}'
+        manifest: '{{ secrets.manifest_file_ref }}'
         validate_certs: false
       retries: 30
       delay: 10
