@@ -18,5 +18,5 @@
 
     - name: Store needed values
       ansible.builtin.set_fact:
-        aeg_project_repo: '{{ aap_cm_resources[0].data.aeg_project_repo }}'
-        aeg_project_branch: '{{ aap_cm_resources[0].data.aeg_project_branch }}'
+        aeg_project_repo: '{{ aap_cm.resources[0].data.aeg_project_repo }}'
+        aeg_project_branch: '{{ aap_cm.resources[0].data.aeg_project_branch }}'
