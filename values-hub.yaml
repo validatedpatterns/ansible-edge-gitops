@@ -1,7 +1,7 @@
 clusterGroup:
   name: hub
   isHubCluster: true
-  insecureUnsealVaultInsideCluster: true
+#  insecureUnsealVaultInsideCluster: true
 
   namespaces:
   - vault
