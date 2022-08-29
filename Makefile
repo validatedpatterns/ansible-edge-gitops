@@ -45,6 +45,9 @@ helmlint:
 	# no regional charts just yet: "$(wildcard charts/region/*)"
 	@for t in "$(wildcard charts/hub/*)"; do helm lint $$t; if [ $$? != 0 ]; then exit 1; fi; done
 
+super-linter: ## Runs super linter locally
+	make -f common/Makefile DISABLE_LINTERS="-e VALIDATE_ANSIBLE=false -e VALIDATE_DOCKERFILE_HADOLINT=false" super-linter
+
 update-tests:
 	./scripts/update-tests.sh $(CHART_OPTS)
 
