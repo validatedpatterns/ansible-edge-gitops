@@ -9,7 +9,6 @@
     ansible_host: ""
     admin_password: ""
     secrets: ""
-    kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
     aap_org_name: "HMI Demo"
     aap_execution_environment: "Ansible Edge Gitops EE"
     aap_execution_environment_image: "quay.io/hybridcloudpatterns/ansible-edge-gitops-ee"
@@ -192,7 +191,7 @@
             organization: "{{ aap_org_name }}"
             credential_type: "Kubeconfig"
             inputs:
-              kube_config: "{{ lookup('file', kubeconfig) }}"
+              kube_config: "{{ secrets['kubeconfig'] }}"
 
           - name: 'rhsm_credential'
             description: "RHSM credential registering RHEL VMs"
