@@ -53,9 +53,8 @@ common-test: ## Test common
 	make -C common -f common/Makefile test
 
 test: ## Run tests
-	make ansible-lint
-	make -f common/Makefile -C common test
 	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(CHART_OPTS)" test
+	make ansible-lint
 	echo Tests SUCCESSFUL
 
 helmlint:
