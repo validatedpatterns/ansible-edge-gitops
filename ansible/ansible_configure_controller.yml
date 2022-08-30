@@ -17,6 +17,9 @@
     aeg_project_repo: https://github.com/hybrid-cloud-patterns/ansible-edge-gitops.git
     aeg_project_branch: main
   tasks:
+    - name: Debug vars
+        var: vars
+
     - name: Wait for API to become available
       retries: 300
       delay: 5
