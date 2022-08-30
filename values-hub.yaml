@@ -27,7 +27,7 @@ clusterGroup:
     openshift-data-foundation:
       name: odf-operator
       namespace: openshift-storage
-      channel: stable-4.9
+      channel: stable-4.10
       csv: odf-operator.v4.9.5
 
   projects:
