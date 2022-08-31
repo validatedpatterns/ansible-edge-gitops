@@ -1,0 +1,20 @@
+global:
+  pattern: example
+  targetRevision: main
+  repoURL: https://github.com/hybridcloudpatterns/ansible-edge-gitops.git
+
+secretStore:
+  name: vault-backend
+  kind: ClusterSecretStore
+
+aapManifest:
+  key: secret/data/hub/aap-manifest
+
+kioskSsh:
+  key: secret/data/hub/kiosk-ssh
+
+rhsm:
+  key: secret/data/hub/rhsm
+
+kioskExtra:
+  key: secret/data/hub/kiosk-extra

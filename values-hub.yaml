@@ -1,6 +1,7 @@
 clusterGroup:
   name: hub
   isHubCluster: true
+  insecureUnsealVaultInsideCluster: true
 
   namespaces:
   - vault
@@ -26,8 +27,8 @@ clusterGroup:
     openshift-data-foundation:
       name: odf-operator
       namespace: openshift-storage
-      channel: stable-4.9
-      csv: odf-operator.v4.9.5
+      channel: stable-4.10
+      csv: odf-operator.v4.10.5
 
   projects:
   - hub
@@ -37,11 +38,11 @@ clusterGroup:
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
         verbosity: "-vvv"
-      #- name: configure-aap-controller
-      #  playbook: ansible/imperative_configure_controller.yml
-      #  image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
-      #  verbosity: "-vvv"
-      #  timeout: "900"
+      - name: configure-aap-controller
+        playbook: ansible/imperative_configure_controller.yml
+        image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
+        verbosity: "-vvv"
+        timeout: "900"
     clusterRoleYaml:
       - apiGroups:
           - '*'
@@ -64,6 +65,11 @@ clusterGroup:
       name: ansible-automation-platform
       project: hub
       path: charts/hub/ansible-automation-platform
+
+    aap-config:
+      name: aap-config
+      project: hub
+      path: charts/hub/aap-config
 
     vault:
       name: vault

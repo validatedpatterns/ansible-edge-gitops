@@ -1,0 +1,6 @@
+apiVersion: v2
+description: A Helm chart to build and deploy secrets using external-secrets for ansible-edge-gitops
+keywords:
+- pattern
+name: aap-external-secrets
+version: 0.0.1

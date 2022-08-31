@@ -3,8 +3,20 @@
   hosts: localhost
   gather_facts: false
   become: false
+  vars:
+    kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
   tasks:
-    - name: Copy needed values
+    - name: Retrieve configmap values
+      kubernetes.core.k8s_info:
+        kind: ConfigMap
+        namespace: ansible-automation-platform
+        name: aeg-aap-cm
+      register: aap_cm
+      until: aap_cm.resources | length == 1
+      retries: 20
+      delay: 5
+
+    - name: Store needed values
       ansible.builtin.set_fact:
-        aeg_project_repo: global['repoURL']
-        aeg_project_branch: global['targetRevision']
+        aeg_project_repo: '{{ aap_cm.resources[0].data.aeg_project_repo }}'
+        aeg_project_branch: '{{ aap_cm.resources[0].data.aeg_project_branch }}'

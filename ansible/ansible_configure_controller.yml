@@ -8,8 +8,7 @@
   vars:
     ansible_host: ""
     admin_password: ""
-    values_secret: "{{ lookup('env', 'HOME') }}/values-secret.yaml"
-    kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
+    secrets: ""
     aap_org_name: "HMI Demo"
     aap_execution_environment: "Ansible Edge Gitops EE"
     aap_execution_environment_image: "quay.io/hybridcloudpatterns/ansible-edge-gitops-ee"
@@ -17,21 +16,6 @@
     aeg_project_repo: https://github.com/hybrid-cloud-patterns/ansible-edge-gitops.git
     aeg_project_branch: main
   tasks:
-    - name: Parse "{{ values_secret }}"
-      ansible.builtin.set_fact:
-        all_values: "{{ lookup('file', values_secret) | from_yaml }}"
-
-    - name: Set files fact
-      ansible.builtin.set_fact:
-        manifest_file_ref: "{{ all_values['files']['aap-manifest'] }}"
-
-    - name: Load manifest into variable
-      delegate_to: localhost
-      ansible.builtin.slurp:
-        src: '{{ manifest_file_ref }}'
-      register: manifest_file
-      become: false
-
     - name: Wait for API to become available
       retries: 300
       delay: 5
@@ -52,7 +36,7 @@
         controller_host: '{{ ansible_host }}'
         controller_username: admin
         controller_password: '{{ admin_password }}'
-        manifest: '{{ manifest_file_ref }}'
+        manifest: '{{ secrets.manifest_file_ref }}'
         validate_certs: false
       retries: 30
       delay: 10
@@ -207,22 +191,22 @@
             organization: "{{ aap_org_name }}"
             credential_type: "Kubeconfig"
             inputs:
-              kube_config: "{{ lookup('file', kubeconfig) }}"
+              kube_config: "{{ secrets['kubeconfig'] }}"
 
           - name: 'rhsm_credential'
             description: "RHSM credential registering RHEL VMs"
             organization: "{{ aap_org_name }}"
             credential_type: RHSMcredential
             inputs:
-              username: "{{ all_values['secrets']['rhsm']['username']  }}"
-              password: "{{ all_values['secrets']['rhsm']['password']  }}"
+              username: "{{ secrets['rhsm']['username']  }}"
+              password: "{{ secrets['rhsm']['password']  }}"
 
           - name: 'kiosk_container_extra_params'
             description: "Kiosk Extra container parameters"
             organization: "{{ aap_org_name }}"
             credential_type: KioskExtraParams
             inputs:
-              container_extra_params: "{{ all_values['secrets']['kiosk-extra']['container_extra_params']  }}"
+              container_extra_params: "{{ secrets['kiosk-extra']['container_extra_params']  }}"
 
     - name: Configure Looped Credentials
       ansible.builtin.include_role:
@@ -241,8 +225,8 @@
             organization: "{{ aap_org_name }}"
             credential_type: Machine
             inputs:
-              username: "{{ all_values['secrets'][item ~ '-ssh']['username']  }}"
-              ssh_key_data: "{{ all_values['secrets'][item ~ '-ssh']['privatekey'] }}"
+              username: "{{ secrets[item ~ '-ssh']['username']  }}"
+              ssh_key_data: "{{ secrets[item ~ '-ssh']['privatekey'] }}"
 
 
     - name: Configure Credential Input Sources
@@ -332,7 +316,7 @@
             kind: smart
             host_filter: 'name__icontains=kiosk'
             variables:
-              ansible_user: "{{ all_values['secrets']['kiosk-ssh']['username'] }}"
+              ansible_user: "{{ secrets['kiosk-ssh']['username'] }}"
 
     - name: Configure Instance Groups
       ansible.builtin.include_role:
