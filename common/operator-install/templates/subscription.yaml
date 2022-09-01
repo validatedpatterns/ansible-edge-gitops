@@ -11,5 +11,3 @@ spec:
   name: patterns-operator
   source: community-operators
   sourceNamespace: openshift-marketplace
-  GitOpsConfig:
-    operatorChannel: {{ default "stable" .Values.main.gitops.channel }}
