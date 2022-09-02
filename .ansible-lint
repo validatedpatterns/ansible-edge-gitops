@@ -16,3 +16,4 @@ warn_list:
   - experimental
   - risky-file-permissions
   - var-spacing
+  - name[casing]
