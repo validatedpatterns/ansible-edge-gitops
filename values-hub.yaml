@@ -1,15 +1,16 @@
+---
 clusterGroup:
   name: hub
   isHubCluster: true
   insecureUnsealVaultInsideCluster: true
 
   namespaces:
-  - vault
-  - golang-external-secrets
-  - ansible-automation-platform
-  - openshift-cnv
-  - openshift-storage
-  - edge-gitops-vms
+    - vault
+    - golang-external-secrets
+    - ansible-automation-platform
+    - openshift-cnv
+    - openshift-storage
+    - edge-gitops-vms
 
   subscriptions:
     aap-operator:
@@ -31,34 +32,33 @@ clusterGroup:
       csv: odf-operator.v4.10.5
 
   projects:
-  - hub
+    - hub
 
   imperative:
     jobs:
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
-        verbosity: "-vvv"
+        verbosity: -vvv
       - name: configure-aap-controller
         playbook: ansible/imperative_configure_controller.yml
         image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
-        verbosity: "-vvv"
+        verbosity: -vvv
         timeout: "900"
     clusterRoleYaml:
       - apiGroups:
-          - '*'
+          - "*"
         resources:
-          - 'machinesets'
+          - machinesets
         verbs:
-          - '*'
+          - "*"
       - apiGroups:
-          - '*'
+          - "*"
         resources:
-          - '*'
+          - "*"
         verbs:
           - get
           - list
           - watch
-
 
   applications:
     aap:

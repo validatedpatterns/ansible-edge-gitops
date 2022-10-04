@@ -1,6 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- name: "Install a metal worker"
+- name: Install a metal worker
   become: false
   connection: local
   hosts: localhost
@@ -30,7 +30,7 @@
 
     - name: Assert Platform is AWS
       ansible.builtin.assert:
-        fail_msg: "Platform for OpenShift cluster must be AWS!"
+        fail_msg: Platform for OpenShift cluster must be AWS!
         that:
           - cluster_info.resources[0].status.platform == "AWS"
 
