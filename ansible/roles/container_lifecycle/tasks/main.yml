@@ -48,7 +48,7 @@
   rescue:
     - name: override container_tag for rollback
       ansible.builtin.set_fact:
-        container_tag: "{{ pre_install_container_info['containers'][0]['ImageName'] | split(':')[-1] }}"
+        container_tag: "{{ pre_install_container_info['containers'][0]['ImageName'] | split(':') | last }}"
 
     - name: template the systemd service unit file
       ansible.builtin.template:
