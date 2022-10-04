@@ -1,15 +1,16 @@
+---
 clusterGroup:
   name: hub
   isHubCluster: true
   insecureUnsealVaultInsideCluster: true
 
   namespaces:
-  - vault
-  - golang-external-secrets
-  - ansible-automation-platform
-  - openshift-cnv
-  - openshift-storage
-  - edge-gitops-vms
+    - vault
+    - golang-external-secrets
+    - ansible-automation-platform
+    - openshift-cnv
+    - openshift-storage
+    - edge-gitops-vms
 
   subscriptions:
     aap-operator:
@@ -31,34 +32,33 @@ clusterGroup:
       csv: odf-operator.v4.10.5
 
   projects:
-  - hub
+    - hub
 
   imperative:
     jobs:
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
-        verbosity: "-vvv"
+        verbosity: -vvv
       - name: configure-aap-controller
         playbook: ansible/imperative_configure_controller.yml
         image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
-        verbosity: "-vvv"
+        verbosity: -vvv
         timeout: "900"
     clusterRoleYaml:
       - apiGroups:
-          - '*'
+          - "*"
         resources:
-          - 'machinesets'
+          - machinesets
         verbs:
-          - '*'
+          - "*"
       - apiGroups:
-          - '*'
+          - "*"
         resources:
-          - '*'
+          - "*"
         verbs:
           - get
           - list
           - watch
-
 
   applications:
     aap:
@@ -75,28 +75,7 @@ clusterGroup:
       name: vault
       namespace: vault
       project: hub
-      chart: vault
-      repoURL: https://helm.releases.hashicorp.com
-      targetRevision: v0.20.1
-      overrides:
-      - name: global.openshift
-        value: "true"
-      - name: injector.enabled
-        value: "false"
-      - name: ui.enabled
-        value: "true"
-      - name: ui.serviceType
-        value: LoadBalancer
-      - name: server.route.enabled
-        value: "true"
-      - name: server.route.host
-        value: null
-      - name: server.route.tls.termination
-        value: edge
-      - name: server.image.repository
-        value: "registry.connect.redhat.com/hashicorp/vault"
-      - name: server.image.tag
-        value: "1.10.3-ubi"
+      path: common/hashicorp-vault
 
     golang-external-secrets:
       name: golang-external-secrets
