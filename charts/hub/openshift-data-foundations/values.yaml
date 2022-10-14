@@ -1,15 +1,12 @@
 global:
   xraylab:
-    namespace: "xraylab-1"
+    namespace: "openshift-storage"
   datacenter:
     storageClassName: gp2
     region: us-east-1
 
 odf:
   namespace: openshift-storage
-  serviceUrl: "http://rook-ceph-rgw-ocs-storagecluster-cephobjectstore.openshift-storage.svc.cluster.local"
-  externalUrl: "https://s3-rgw-openshift-storage"
-  targetBucket: com.redhat.jrickard.xray-source
   mon:
     requests:
        cpu: 1
@@ -39,14 +36,6 @@ odf:
   storageClass:
     name: ocs-storagecluster-ceph-rgw
     objectStoreName: ocs-storagecluster-cephobjectstore
-
-route:
-  name: s3-rgw
-  service:
-    name: rook-ceph-rgw-ocs-storagecluster-cephobjectstore
-    weight: 100
-  port:
-    targetPort: http
 
 toolbox:
   name: ocsinit
