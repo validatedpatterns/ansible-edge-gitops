@@ -17,19 +17,16 @@ clusterGroup:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
       channel: stable-2.2
-      csv: aap-operator.v2.2.0-0.1653444770
 
     openshift-virtualization:
       name: kubevirt-hyperconverged
       namespace: openshift-cnv
       channel: stable
-      csv: kubevirt-hyperconverged-operator.v4.10.0
 
     openshift-data-foundation:
       name: odf-operator
       namespace: openshift-storage
       channel: stable-4.10
-      csv: odf-operator.v4.10.5
 
   projects:
     - hub
@@ -93,7 +90,7 @@ clusterGroup:
       name: odf
       namespace: openshift-storage
       project: hub
-      path: charts/hub/odf
+      path: charts/hub/openshift-data-foundations
 
     edge-gitops-vms:
       name: edge-gitops-vms
