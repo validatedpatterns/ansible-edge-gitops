@@ -1,0 +1,249 @@
+---
+# Source: openshift-data-foundations/templates/rbac/serviceAccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: odf-node-label-sa
+  namespace: openshift-storage
+  annotations:
+    argocd.argoproj.io/sync-hook: "PreSync"
+    argocd.argoproj.io/sync-wave: "-10"
+---
+# Source: openshift-data-foundations/templates/cm-odf-servicePoint.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-point
+  namespace: "xraylab-1"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-4"
+data:
+  url: "http://rook-ceph-rgw-ocs-storagecluster-cephobjectstore.openshift-storage.svc.cluster.local"
+  url-external: "https://s3-rgw-openshift-storage.apps.."
+---
+# Source: openshift-data-foundations/templates/rgw-storageclass.yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: ocs-storagecluster-ceph-rgw
+  annotations:
+    description: Provides Object Bucket Claims (OBCs) using the RGW
+provisioner: openshift-storage.ceph.rook.io/bucket
+parameters:
+  objectStoreName: ocs-storagecluster-cephobjectstore
+  objectStoreNamespace: openshift-storage
+  region: us-east-1
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+# Source: openshift-data-foundations/templates/rbac/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: label-storage-nodes
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-15"
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+---
+# Source: openshift-data-foundations/templates/rbac/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: label-storage-nodes
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-15"
+subjects:
+- kind: ServiceAccount
+  name: odf-node-label-sa
+  namespace: openshift-storage
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: label-storage-nodes
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: openshift-data-foundations/templates/job-labelNodes.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  name: job-label-storage-nodes
+  namespace: openshift-storage
+spec:
+  template:
+    spec:
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+        command:
+        - /bin/bash
+        - -c
+        - |
+          oc label nodes -l node-role.kubernetes.io/worker= cluster.ocs.openshift.io/openshift-storage='' --overwrite
+        name: label-storage-nodes
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      serviceAccount: odf-node-label-sa
+      serviceAccountName: odf-node-label-sa
+      terminationGracePeriodSeconds: 400
+---
+# Source: openshift-data-foundations/templates/odf-cephobjectstore.yaml
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: ocs-storagecluster-cephobjectstore
+  namespace: openshift-storage
+spec:
+  dataPool:
+    crushRoot: ""
+    deviceClass: ""
+    erasureCoded:
+      algorithm: ""
+      codingChunks: 0
+      dataChunks: 0
+    failureDomain: zone
+    replicated:
+      size: 3
+  gateway:
+    #allNodes: false
+    instances: 2
+    placement:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: cluster.ocs.openshift.io/openshift-storage
+              operator: Exists
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - rook-ceph-rgw
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+      tolerations:
+      - effect: NoSchedule
+        key: node.ocs.openshift.io/storage
+        operator: Equal
+        value: "true"
+    port: 80
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 4Gi
+    securePort: 0
+    sslCertificateRef: ""
+  metadataPool:
+    crushRoot: ""
+    deviceClass: ""
+    erasureCoded:
+      algorithm: ""
+      codingChunks: 0
+      dataChunks: 0
+    failureDomain: zone
+    replicated:
+      size: 3
+---
+# Source: openshift-data-foundations/templates/cephtoolbox.yaml
+apiVersion: ocs.openshift.io/v1
+kind: OCSInitialization
+metadata:
+  name: ocsinit
+  namespace: openshift-storage
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  enableCephTools: true
+---
+# Source: openshift-data-foundations/templates/rgw-route.yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: s3-rgw
+  namespace: openshift-storage
+  labels:
+    app: rook-ceph-rgw
+    ceph_daemon_id: ocs-storagecluster-cephobjectstore
+    rgw: ocs-storagecluster-cephobjectstore
+    rook_cluster: openshift-storage
+    rook_object_store: ocs-storagecluster-cephobjectstore
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  to:
+    kind: Service
+    name: rook-ceph-rgw-ocs-storagecluster-cephobjectstore
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+  wildcardPolicy: None
+---
+# Source: openshift-data-foundations/templates/odf-storagecluster.yaml
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  namespace: openshift-storage
+  name: ocs-storagecluster
+spec:
+  manageNodes: false
+  resources:
+    mon:
+      requests:
+        cpu: 1
+        memory: 2Gi
+    mds:
+      requests:
+        cpu: 3
+        memory: 8Gi
+    mgr:
+      requests:
+        cpu: 1
+        memory: 3Gi
+    noobaa-core:
+      requests:
+        cpu: 1
+        memory: 4Gi
+    noobaa-db:
+      requests:
+        cpu: 1
+        memory: 4Gi
+  storageDeviceSets:
+  - name: ocs-deviceset
+    count: 1
+    replica: 3
+    resources:
+      requests:
+        cpu: 2
+        memory: 5Gi
+    placement: {}
+    dataPVCTemplate:
+      spec:
+        storageClassName: gp2
+        accessModes:
+        - ReadWriteOnce
+        volumeMode: Block
+        resources:
+          requests:
+            storage: 2Ti
+    portable: true
