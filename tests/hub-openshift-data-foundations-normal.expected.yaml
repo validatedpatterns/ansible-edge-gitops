@@ -14,27 +14,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: service-point
-  namespace: "xraylab-1"
+  namespace: "openshift-storage"
   annotations:
     argocd.argoproj.io/sync-wave: "-4"
 data:
-  url: "http://rook-ceph-rgw-ocs-storagecluster-cephobjectstore.openshift-storage.svc.cluster.local"
-  url-external: "https://s3-rgw-openshift-storage.apps.."
----
-# Source: openshift-data-foundations/templates/rgw-storageclass.yaml
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: ocs-storagecluster-ceph-rgw
-  annotations:
-    description: Provides Object Bucket Claims (OBCs) using the RGW
-provisioner: openshift-storage.ceph.rook.io/bucket
-parameters:
-  objectStoreName: ocs-storagecluster-cephobjectstore
-  objectStoreNamespace: openshift-storage
-  region: us-east-1
-reclaimPolicy: Delete
-volumeBindingMode: Immediate
+  url: ""
+  url-external: ".apps.."
 ---
 # Source: openshift-data-foundations/templates/rbac/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -172,32 +157,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "10"
 spec:
   enableCephTools: true
----
-# Source: openshift-data-foundations/templates/rgw-route.yaml
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: s3-rgw
-  namespace: openshift-storage
-  labels:
-    app: rook-ceph-rgw
-    ceph_daemon_id: ocs-storagecluster-cephobjectstore
-    rgw: ocs-storagecluster-cephobjectstore
-    rook_cluster: openshift-storage
-    rook_object_store: ocs-storagecluster-cephobjectstore
-  annotations:
-    argocd.argoproj.io/sync-wave: "10"
-spec:
-  to:
-    kind: Service
-    name: rook-ceph-rgw-ocs-storagecluster-cephobjectstore
-    weight: 100
-  port:
-    targetPort: http
-  tls:
-    termination: edge
-    insecureEdgeTerminationPolicy: Allow
-  wildcardPolicy: None
 ---
 # Source: openshift-data-foundations/templates/odf-storagecluster.yaml
 apiVersion: ocs.openshift.io/v1
