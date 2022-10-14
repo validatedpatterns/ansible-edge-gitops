@@ -1,0 +1,24 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.route.name }}
+  namespace: {{ .Values.odf.namespace }}
+  labels:
+    app: rook-ceph-rgw
+    ceph_daemon_id: {{ .Values.odf.storageClass.objectStoreName }}
+    rgw: {{ .Values.odf.storageClass.objectStoreName }}
+    rook_cluster: openshift-storage
+    rook_object_store: {{ .Values.odf.storageClass.objectStoreName }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  to:
+    kind: Service
+    name: {{ .Values.route.service.name }}
+    weight: {{ .Values.route.service.weight }}
+  port:
+    targetPort: {{ .Values.route.port.targetPort }}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+  wildcardPolicy: None

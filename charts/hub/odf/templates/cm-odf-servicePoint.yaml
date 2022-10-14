@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-point
+  namespace: "{{ .Values.global.xraylab.namespace }}"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-4"
+data:
+  url: "{{ .Values.odf.serviceUrl }}"
+  url-external: "{{ .Values.odf.externalUrl }}.apps.{{ .Values.global.datacenter.clustername }}.{{ .Values.global.datacenter.domain }}"

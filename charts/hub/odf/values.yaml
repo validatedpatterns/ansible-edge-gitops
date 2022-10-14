@@ -1,5 +1,15 @@
+global:
+  xraylab:
+    namespace: "xraylab-1"
+  datacenter:
+    storageClassName: gp2
+    region: us-east-1
+
 odf:
   namespace: openshift-storage
+  serviceUrl: "http://rook-ceph-rgw-ocs-storagecluster-cephobjectstore.openshift-storage.svc.cluster.local"
+  externalUrl: "https://s3-rgw-openshift-storage"
+  targetBucket: com.redhat.jrickard.xray-source
   mon:
     requests:
        cpu: 1
@@ -30,16 +40,13 @@ odf:
     name: ocs-storagecluster-ceph-rgw
     objectStoreName: ocs-storagecluster-cephobjectstore
 
-job:
-  image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
-
-rbac:
-  createRBAC: true
-  createRoleBinding: true
-  roles: [ ]
-  serviceAccount:
-    name: odf-sa
-    namespace: openshift-cnv
+route:
+  name: s3-rgw
+  service:
+    name: rook-ceph-rgw-ocs-storagecluster-cephobjectstore
+    weight: 100
+  port:
+    targetPort: http
 
 toolbox:
   name: ocsinit
@@ -47,7 +54,7 @@ toolbox:
 
 #Define the odf storageSystem parameters
 storageSystem:
-  deploy: true
+  deploy: false
   name: ocs-storagecluster-storagesystem
   namespace: openshift-storage
   spec:
@@ -55,7 +62,37 @@ storageSystem:
     name: ocs-storagecluster
     namespace: ""
 
-# Default to AWS storage class until others provide metal nodes
-global:
-  hub:
-    storageClassName: gp2
+#RoleBasedAccessControl
+serviceAccountName: odf-node-label-sa
+rbac:
+  roles:
+    - name: label-storage-nodes
+      createRole: true
+      apiGroups:
+        - '""'
+      scope:
+        cluster: true
+      resources:
+        - nodes
+      verbs:
+        - "get"
+        - "list"
+        - "patch"
+        - "update"
+  roleBindings:
+    - name: label-storage-nodes
+      createBinding: true
+      scope:
+        cluster: true
+        namespace: ""
+      subjects:
+        kind: ServiceAccount
+        name: odf-node-label-sa
+        namespace: openshift-storage
+        apiGroup: ""
+      roleRef:
+        kind: ClusterRole
+        name: label-storage-nodes
+
+job:
+  image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest

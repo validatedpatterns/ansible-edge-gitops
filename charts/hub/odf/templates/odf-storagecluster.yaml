@@ -37,7 +37,7 @@ spec:
     placement: {}
     dataPVCTemplate:
       spec:
-        storageClassName: {{ coalesce .Values.global.hub.storageClassName "gp2" }}
+        storageClassName: {{ .Values.global.datacenter.storageClassName }}
         accessModes:
         - ReadWriteOnce
         volumeMode: Block
