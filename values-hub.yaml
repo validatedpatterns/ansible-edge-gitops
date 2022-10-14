@@ -90,7 +90,7 @@ clusterGroup:
       name: odf
       namespace: openshift-storage
       project: hub
-      path: charts/hub/odf
+      path: charts/hub/openshift-data-foundations
 
     edge-gitops-vms:
       name: edge-gitops-vms
