@@ -34,7 +34,7 @@ odf:
     pvc:
       storage: 2Ti
   storageClass:
-    name: ocs-storagecluster-ceph-rgw
+    name: ocs-storagecluster-ceph-rbd
     objectStoreName: ocs-storagecluster-cephobjectstore
 
 toolbox:
