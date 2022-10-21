@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: PostSync
   name: job-annotate-storageclass
   namespace: {{ .Values.odf.namespace }}
 spec:
