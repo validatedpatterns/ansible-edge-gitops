@@ -24,6 +24,13 @@ rules:
 {{- range $value.resources }}
       - {{ . }}
 {{- end }}
+{{- if (($value.resourceNames)) }}
+    resourceNames:
+{{- range $value.resourceNames }}
+      - {{ . }}
+      - {{ $.Values.global.datacenter.storageClassName }}
+{{- end }}
+{{- end }}
     verbs:
 {{- range $value.verbs }}
       - {{ . }}
