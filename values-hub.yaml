@@ -23,10 +23,10 @@ clusterGroup:
       namespace: openshift-cnv
       channel: stable
 
-    openshift-data-foundation:
-      name: odf-operator
-      namespace: openshift-storage
-      channel: stable-4.10
+  # openshift-data-foundation:
+  #   name: odf-operator
+  #   namespace: openshift-storage
+  #   channel: stable-4.10
 
   projects:
     - hub
