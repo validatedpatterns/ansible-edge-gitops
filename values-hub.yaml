@@ -23,10 +23,10 @@ clusterGroup:
       namespace: openshift-cnv
       channel: stable
 
-  # openshift-data-foundation:
-  #   name: odf-operator
-  #   namespace: openshift-storage
-  #   channel: stable-4.10
+    openshift-data-foundation:
+      name: odf-operator
+      namespace: openshift-storage
+      channel: stable-4.10
 
   projects:
     - hub
@@ -86,11 +86,11 @@ clusterGroup:
       project: hub
       path: charts/hub/cnv
 
-  #  odf:
-  #    name: odf
-  #    namespace: openshift-storage
-  #    project: hub
-  #    path: charts/hub/openshift-data-foundations
+    odf:
+      name: odf
+      namespace: openshift-storage
+      project: hub
+      path: charts/hub/openshift-data-foundations
 
     edge-gitops-vms:
       name: edge-gitops-vms
