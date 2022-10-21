@@ -4,7 +4,6 @@ metadata:
   namespace: {{ .Values.odf.namespace }}
   name: ocs-storagecluster
 spec:
-  manageNodes: false
   resources:
     mon:
       requests:
