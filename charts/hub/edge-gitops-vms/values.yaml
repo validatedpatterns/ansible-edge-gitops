@@ -10,8 +10,9 @@ cloudInit:
   defaultUser: 'cloud-user'
   defaultPassword: '6toh-n1d5-9xpq'
 
+vmNamespace: edge-gitops-vms
+
 vms:
-  namespace: edge-gitops-vms
   kiosk:
     count: 2
     flavor: medium
