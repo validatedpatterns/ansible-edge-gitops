@@ -38,37 +38,3 @@ vms:
         port: 3389
         protocol: TCP
         targetPort: 3389
-
-#RoleBasedAccessControl
-serviceAccountName: ansible-edge-gitops-sa
-rbac:
-  roles:
-    - name: view-machine-api
-      createRole: true
-      apiGroups:
-        - machine.openshift.io
-      scope:
-        cluster: true
-      resources:
-        - machines
-      verbs:
-        - "get"
-        - "list"
-        - "watch"
-  roleBindings:
-    - name: view-machine-api
-      createBinding: true
-      scope:
-        cluster: false
-        namespace: "openshift-machine-api"
-      subjects:
-        kind: ServiceAccount
-        name: ansible-edge-gitops-sa
-        namespace: ansible-edge-gitops-hub
-        apiGroup: ""
-      roleRef:
-        kind: ClusterRole
-        name: view-machine-api
-
-job:
-  image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
