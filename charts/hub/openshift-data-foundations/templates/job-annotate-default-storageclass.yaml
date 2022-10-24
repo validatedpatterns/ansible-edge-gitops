@@ -15,6 +15,7 @@ spec:
         - -c
         - |
           oc annotate storageclass gp2 storageclass.kubernetes.io/is-default-class-
+          oc get storageclass ocs-storagecluster-ceph-rbd || sleep {{ .Values.odf.jobTerminationGracePeriod }}
           oc annotate storageclass ocs-storagecluster-ceph-rbd storageclass.kubernetes.io/is-default-class=true
         name: annotate-storageclass
       dnsPolicy: ClusterFirst
