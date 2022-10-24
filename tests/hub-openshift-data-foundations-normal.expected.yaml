@@ -110,7 +110,7 @@ spec:
       restartPolicy: Never
       serviceAccount: odf-node-label-sa
       serviceAccountName: odf-node-label-sa
-      terminationGracePeriodSeconds: 400
+      terminationGracePeriodSeconds: 600
 ---
 # Source: openshift-data-foundations/templates/job-labelNodes.yaml
 apiVersion: batch/v1
@@ -135,7 +135,7 @@ spec:
       restartPolicy: Never
       serviceAccount: odf-node-label-sa
       serviceAccountName: odf-node-label-sa
-      terminationGracePeriodSeconds: 400
+      terminationGracePeriodSeconds: 600
 ---
 # Source: openshift-data-foundations/templates/cephtoolbox.yaml
 apiVersion: ocs.openshift.io/v1

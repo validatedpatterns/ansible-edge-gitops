@@ -6,6 +6,7 @@ global:
     region: us-east-1
 
 odf:
+  jobTerminationGracePeriod: 600
   namespace: openshift-storage
   mon:
     requests:
