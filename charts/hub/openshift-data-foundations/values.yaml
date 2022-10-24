@@ -68,6 +68,21 @@ rbac:
         - "list"
         - "patch"
         - "update"
+    - name: edit-storageclass
+      createRole: true
+      apiGroups:
+        - 'storage.k8s.io'
+      scope:
+        cluster: true
+      resources:
+        - storageclasses 
+      resourceNames:
+        - ocs-storagecluster-ceph-rbd
+      verbs:
+        - "get"
+        - "list"
+        - "patch"
+        - "update"
   roleBindings:
     - name: label-storage-nodes
       createBinding: true
@@ -82,6 +97,19 @@ rbac:
       roleRef:
         kind: ClusterRole
         name: label-storage-nodes
+    - name: edit-storageclass
+      createBinding: true
+      scope:
+        cluster: true
+        namespace: ""
+      subjects:
+        kind: ServiceAccount
+        name: odf-node-label-sa
+        namespace: openshift-storage
+        apiGroup: ""
+      roleRef:
+        kind: ClusterRole
+        name: edit-storageclass
 
 job:
   image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest

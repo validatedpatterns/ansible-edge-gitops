@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+  name: job-annotate-storageclass
+  namespace: {{ .Values.odf.namespace }}
+spec:
+  template:
+    spec:
+      containers:
+      - image: {{ .Values.job.image }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          oc annotate storageclass gp2 storageclass.kubernetes.io/is-default-class-
+          oc annotate storageclass ocs-storagecluster-ceph-rbd storageclass.kubernetes.io/is-default-class=true
+        name: annotate-storageclass
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      serviceAccount: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      terminationGracePeriodSeconds: 400
