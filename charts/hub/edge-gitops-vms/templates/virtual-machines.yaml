@@ -56,10 +56,13 @@ items:
           kind: DataSource
           name: {{ $vmr.os }}
           namespace: openshift-virtualization-os-images
-        storage:
+        pvc:
+          accessModes:
+            - {{ coalesce $vmr.accessMode $.Values.defaultAccessMode "ReadWriteOnce" }}
           resources:
             requests:
               storage: {{ $vmr.storage }}
+          storageClassName: {{ coalesce $vmr.storageClassName $.Values.defaultStorageClassName "gp2" }}
     running: true
     template:
       metadata:

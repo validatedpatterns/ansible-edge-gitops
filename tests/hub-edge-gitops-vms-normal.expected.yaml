@@ -72,10 +72,13 @@ items:
           kind: DataSource
           name: rhel8
           namespace: openshift-virtualization-os-images
-        storage:
+        pvc:
+          accessModes:
+            - RWX
           resources:
             requests:
               storage: 30Gi
+          storageClassName: ocs-storagecluster-ceph-rbd
     running: true
     template:
       metadata:
@@ -205,10 +208,13 @@ items:
           kind: DataSource
           name: rhel8
           namespace: openshift-virtualization-os-images
-        storage:
+        pvc:
+          accessModes:
+            - RWX
           resources:
             requests:
               storage: 30Gi
+          storageClassName: ocs-storagecluster-ceph-rbd
     running: true
     template:
       metadata:

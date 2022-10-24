@@ -86,32 +86,6 @@ roleRef:
   name: edit-storageclass
   apiGroup: rbac.authorization.k8s.io
 ---
-# Source: openshift-data-foundations/templates/job-annotate-default-storageclass.yaml
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-  name: job-annotate-storageclass
-  namespace: openshift-storage
-spec:
-  template:
-    spec:
-      containers:
-      - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
-        command:
-        - /bin/bash
-        - -c
-        - |
-          oc annotate storageclass gp2 storageclass.kubernetes.io/is-default-class-
-          oc annotate storageclass ocs-storagecluster-ceph-rbd storageclass.kubernetes.io/is-default-class=true
-        name: annotate-storageclass
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      serviceAccount: odf-node-label-sa
-      serviceAccountName: odf-node-label-sa
-      terminationGracePeriodSeconds: 600
----
 # Source: openshift-data-foundations/templates/job-labelNodes.yaml
 apiVersion: batch/v1
 kind: Job
@@ -135,7 +109,7 @@ spec:
       restartPolicy: Never
       serviceAccount: odf-node-label-sa
       serviceAccountName: odf-node-label-sa
-      terminationGracePeriodSeconds: 600
+      terminationGracePeriodSeconds: 300
 ---
 # Source: openshift-data-foundations/templates/cephtoolbox.yaml
 apiVersion: ocs.openshift.io/v1

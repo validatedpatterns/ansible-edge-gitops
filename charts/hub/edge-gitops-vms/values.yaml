@@ -10,6 +10,11 @@ cloudInit:
   defaultUser: 'cloud-user'
   defaultPassword: '6toh-n1d5-9xpq'
 
+# Or "RWO" and "gp2"; other choices are possible too but
+# these are defaults for ODF which is included in the pattern
+defaultAccessMode: "RWX"
+defaultStorageClassName: "ocs-storagecluster-ceph-rbd"
+
 vmNamespace: edge-gitops-vms
 
 vms:
