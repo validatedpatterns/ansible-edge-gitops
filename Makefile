@@ -32,11 +32,8 @@ deploy-kubevirt-worker: ## Deploy the metal node worker
 configure-controller: ## Configure AAP operator
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 
-common-test: ## Test common
-	make -C common -f common/Makefile test
-
 test: ## Run tests
-	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(CHART_OPTS)" test
+	make -f common/Makefile PATTERN_OPTS="$(CHART_OPTS)" test
 	make ansible-lint
 	echo Tests SUCCESSFUL
 
