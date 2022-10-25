@@ -230,6 +230,7 @@ items:
   kind: Service
   metadata:
     name: rhel8-kiosk-001
+    argocd.argoproj.io/sync-wave: "2"
     labels:
       app: rhel8-kiosk-001
       edge-gitops-role: kiosk
@@ -368,6 +369,7 @@ items:
   kind: Service
   metadata:
     name: rhel8-kiosk-002
+    argocd.argoproj.io/sync-wave: "2"
     labels:
       app: rhel8-kiosk-002
       edge-gitops-role: kiosk

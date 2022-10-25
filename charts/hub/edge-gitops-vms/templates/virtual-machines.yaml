@@ -132,6 +132,7 @@ items:
   kind: Service
   metadata:
     name: {{ $identifier }}
+    argocd.argoproj.io/sync-wave: "2"
     labels:
       app: {{ $identifier }}
       edge-gitops-role: {{ $vmr.role }}
