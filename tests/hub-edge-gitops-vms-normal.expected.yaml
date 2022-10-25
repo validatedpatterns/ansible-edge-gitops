@@ -79,6 +79,7 @@ items:
             requests:
               storage: 30Gi
           storageClassName: ocs-storagecluster-ceph-rbd
+          volumeMode: Block
     running: true
     template:
       metadata:
@@ -215,6 +216,7 @@ items:
             requests:
               storage: 30Gi
           storageClassName: ocs-storagecluster-ceph-rbd
+          volumeMode: Block
     running: true
     template:
       metadata:
