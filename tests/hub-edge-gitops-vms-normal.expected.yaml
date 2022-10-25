@@ -7,7 +7,7 @@ metadata:
   namespace: 
   annotations:
     argocd.argoproj.io/sync-hook: "PreSync"
-    argocd.argoproj.io/sync-wave: "-10"
+    argocd.argoproj.io/sync-wave: "-15"
 ---
 # Source: edge-gitops-vms/templates/rbac/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -85,6 +85,7 @@ apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-rhel8-kiosk-001
+  argocd.argoproj.io/sync-wave: "2"
 spec:
   refreshInterval: 90s
   secretStoreRef:
@@ -104,6 +105,7 @@ apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-rhel8-kiosk-002
+  argocd.argoproj.io/sync-wave: "2"
 spec:
   refreshInterval: 90s
   secretStoreRef:
@@ -399,6 +401,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
   annotations:
+    argocd.argoproj.io/sync-wave: "2"
     defaults.template.kubevirt.io/disk: rootdisk
     description: Template for Red Hat Enterprise Linux 8 VM or newer. A PVC with the
       RHEL disk image must be available.
