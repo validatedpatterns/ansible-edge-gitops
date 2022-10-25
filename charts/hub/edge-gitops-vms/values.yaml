@@ -72,7 +72,7 @@ rbac:
       subjects:
         kind: ServiceAccount
         name: ansible-edge-gitops-sa
-        namespace: ansible-edge-gitops-hub
+        namespace: edge-gitops-vms
         apiGroup: ""
       roleRef:
         kind: ClusterRole
