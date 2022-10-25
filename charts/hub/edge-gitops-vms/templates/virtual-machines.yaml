@@ -8,7 +8,8 @@ apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-{{ $identifier }}
-  argocd.argoproj.io/sync-wave: "2"
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   refreshInterval: 90s
   secretStoreRef:
@@ -132,7 +133,8 @@ items:
   kind: Service
   metadata:
     name: {{ $identifier }}
-    argocd.argoproj.io/sync-wave: "2"
+    annotations:
+      argocd.argoproj.io/sync-wave: "2"
     labels:
       app: {{ $identifier }}
       edge-gitops-role: {{ $vmr.role }}
