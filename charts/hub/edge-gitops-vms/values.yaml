@@ -58,7 +58,7 @@ rbac:
       scope:
         cluster: true
       resources:
-        - machines
+        - machinesets
       verbs:
         - "get"
         - "list"
