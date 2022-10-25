@@ -32,17 +32,9 @@ deploy-kubevirt-worker: ## Deploy the metal node worker
 configure-controller: ## Configure AAP operator
 	ansible-playbook ./scripts/ansible_load_controller.sh -e "aeg_project_repo=$(TARGET_REPO) aeg_project_branch=$(TARGET_BRANCH)"
 
-common-test: ## Test common
-	make -C common -f common/Makefile test
-
 test: ## Run tests
-	make -f common/Makefile CHARTS="$(wildcard charts/hub/*)" PATTERN_OPTS="$(CHART_OPTS)" test
-	make ansible-lint
+	make -f common/Makefile PATTERN_OPTS="$(CHART_OPTS)" test
 	echo Tests SUCCESSFUL
-
-helmlint:
-	# no regional charts just yet: "$(wildcard charts/region/*)"
-	@for t in "$(wildcard charts/hub/*)"; do helm lint $$t; if [ $$? != 0 ]; then exit 1; fi; done
 
 super-linter: ## Runs super linter locally
 	make -f common/Makefile DISABLE_LINTERS="-e VALIDATE_ANSIBLE=false -e VALIDATE_DOCKERFILE_HADOLINT=false" super-linter
