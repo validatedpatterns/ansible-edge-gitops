@@ -21,7 +21,7 @@ rules:
   - apiGroups:
       - machine.openshift.io
     resources:
-      - machines
+      - machinesets
     verbs:
       - get
       - list
@@ -39,7 +39,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: ansible-edge-gitops-sa
-  namespace: ansible-edge-gitops-hub
+  namespace: edge-gitops-vms
   apiGroup: ""
 roleRef:
   kind: ClusterRole
@@ -65,7 +65,7 @@ spec:
         - |
           while [ 1 ];
           do
-            $nodes=$(oc get machineset -n openshift-machine-api -l 'edge-gitops-role=kubevirt-worker' -o jsonpath='{.items[*].status.availableReplicas}')
+            nodes=$(oc get machineset -n openshift-machine-api -l 'edge-gitops-role=kubevirt-worker' -o jsonpath='{.items[*].status.availableReplicas}')
             if [ "$nodes" -ge "1" ]; then
               echo "Node is ready, exiting"
               exit 0
