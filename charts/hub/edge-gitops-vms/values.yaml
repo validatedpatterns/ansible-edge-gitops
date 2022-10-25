@@ -12,7 +12,7 @@ cloudInit:
 
 # Or "RWO" and "gp2"; other choices are possible too but
 # these are defaults for ODF which is included in the pattern
-defaultAccessMode: "RWX"
+defaultAccessMode: "ReadWriteMany"
 defaultStorageClassName: "ocs-storagecluster-ceph-rbd"
 
 vmNamespace: edge-gitops-vms
