@@ -34,7 +34,6 @@ configure-controller: ## Configure AAP operator
 
 test: ## Run tests
 	make -f common/Makefile PATTERN_OPTS="$(CHART_OPTS)" test
-	make ansible-lint
 	echo Tests SUCCESSFUL
 
 super-linter: ## Runs super linter locally
