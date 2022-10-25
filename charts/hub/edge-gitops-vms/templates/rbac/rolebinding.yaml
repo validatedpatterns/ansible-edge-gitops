@@ -12,8 +12,7 @@ metadata:
   namespace: {{ $value.scope.namespace }}
 {{- end }}
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-15"
+    argocd.argoproj.io/sync-wave: "1"
 subjects:
 - kind: {{ $value.subjects.kind | default "ServiceAccount" }}
   name: {{ $value.subjects.name }}
