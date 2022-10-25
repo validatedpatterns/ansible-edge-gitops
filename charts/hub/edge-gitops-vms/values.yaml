@@ -19,7 +19,7 @@ defaultVolumeMode: "Block"
 vmNamespace: edge-gitops-vms
 
 waitForMetalNode: true
-terminationGracePeriod: 3600
+jobTerminationGracePeriod: 3600
 
 vms:
   kiosk:
