@@ -2,6 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
   annotations:
+    argocd.argoproj.io/sync-wave: "2"
     defaults.template.kubevirt.io/disk: rootdisk
     description: Template for Red Hat Enterprise Linux 8 VM or newer. A PVC with the
       RHEL disk image must be available.

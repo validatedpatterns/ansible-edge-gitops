@@ -1,0 +1,34 @@
+{{ if .Values.waitForMetalNode }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  name: job-wait-for-metal-node
+  namespace: {{ .Values.vmNamespace }}
+spec:
+  template:
+    spec:
+      containers:
+      - image: {{ .Values.job.image }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          while [ 1 ];
+          do
+            nodes=$(oc get machineset -n openshift-machine-api -l 'edge-gitops-role=kubevirt-worker' -o jsonpath='{.items[*].status.availableReplicas}')
+            if [ "$nodes" -ge "1" ]; then
+              echo "Node is ready, exiting"
+              exit 0
+            fi
+            echo "Node is not yet ready, waiting"
+            sleep 15
+          done
+        name: wait-for-metal-node
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      serviceAccount: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      terminationGracePeriodSeconds: {{ .Values.jobTerminationGracePeriod }}
+{{ end }}

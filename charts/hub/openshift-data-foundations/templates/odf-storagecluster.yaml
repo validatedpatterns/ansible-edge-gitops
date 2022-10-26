@@ -4,38 +4,40 @@ metadata:
   namespace: {{ .Values.odf.namespace }}
   name: ocs-storagecluster
 spec:
-  manageNodes: false
   resources:
     mon:
       requests:
-        cpu: {{ .Values.odf.mon.requests.cpu }}
+        cpu: {{ .Values.odf.mon.requests.cpu | squote }}
         memory: {{ .Values.odf.mon.requests.memory }}
     mds:
       requests:
-        cpu: {{ .Values.odf.mds.requests.cpu }}
+        cpu: {{ .Values.odf.mds.requests.cpu | squote }}
         memory: {{ .Values.odf.mds.requests.memory }}
     mgr:
       requests:
-        cpu: {{ .Values.odf.mgr.requests.cpu }}
+        cpu: {{ .Values.odf.mgr.requests.cpu | squote }}
         memory: {{ .Values.odf.mgr.requests.memory }}
     noobaa-core:
       requests:
-        cpu: {{ .Values.odf.noobaacore.requests.cpu }}
+        cpu: {{ .Values.odf.noobaacore.requests.cpu | squote }}
         memory: {{ .Values.odf.noobaacore.requests.memory }}
     noobaa-db:
       requests:
-        cpu: {{ .Values.odf.noobaadb.requests.cpu }}
+        cpu: {{ .Values.odf.noobaadb.requests.cpu | squote }}
         memory: {{ .Values.odf.noobaadb.requests.memory }}
   storageDeviceSets:
   - name: ocs-deviceset
+    config: {}
     count: 1
     replica: 3
     resources:
       requests:
-        cpu: {{ .Values.odf.osd.requests.cpu }}
+        cpu: {{ .Values.odf.osd.requests.cpu | squote }}
         memory: {{ .Values.odf.osd.requests.memory }}
     placement: {}
+    preparePlacement: {}
     dataPVCTemplate:
+      metadata: {}
       spec:
         storageClassName: {{ .Values.global.datacenter.storageClassName }}
         accessModes:
@@ -44,4 +46,5 @@ spec:
         resources:
           requests:
             storage: {{ .Values.odf.osd.pvc.storage }}
+      status: {}
     portable: true

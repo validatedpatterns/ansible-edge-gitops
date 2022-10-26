@@ -8,6 +8,8 @@ apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-{{ $identifier }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   refreshInterval: 90s
   secretStoreRef:
@@ -38,6 +40,7 @@ items:
             "min": 1610612736
           }
         ]
+      argocd.argoproj.io/sync-wave: "2"
     labels:
       app: {{ $identifier }}
       edge-gitops-role: {{ $vmr.role }}
@@ -56,10 +59,14 @@ items:
           kind: DataSource
           name: {{ $vmr.os }}
           namespace: openshift-virtualization-os-images
-        storage:
+        pvc:
+          accessModes:
+            - {{ coalesce $vmr.accessMode $.Values.defaultAccessMode "ReadWriteOnce" }}
           resources:
             requests:
               storage: {{ $vmr.storage }}
+          storageClassName: {{ coalesce $vmr.storageClassName $.Values.defaultStorageClassName "gp2" }}
+          volumeMode: {{ coalesce $vmr.volumeMode $.Values.defaultVolumeMode "Filesystem" }}
     running: true
     template:
       metadata:
@@ -126,6 +133,8 @@ items:
   kind: Service
   metadata:
     name: {{ $identifier }}
+    annotations:
+      argocd.argoproj.io/sync-wave: "2"
     labels:
       app: {{ $identifier }}
       edge-gitops-role: {{ $vmr.role }}

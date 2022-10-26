@@ -58,6 +58,7 @@
           metadata:
             labels:
               machine.openshift.io/cluster-api-cluster: "{{ infrastructure_name }}"
+              edge-gitops-role: kubevirt-worker
             name: "{{ infrastructure_name }}-{{ machineset_name }}-{{ machineset_zone }}"
             namespace: openshift-machine-api
           spec:

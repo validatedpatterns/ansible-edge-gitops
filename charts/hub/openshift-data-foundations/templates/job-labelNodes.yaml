@@ -20,4 +20,4 @@ spec:
       restartPolicy: Never
       serviceAccount: {{ .Values.serviceAccountName }}
       serviceAccountName: {{ .Values.serviceAccountName }}
-      terminationGracePeriodSeconds: 400
+      terminationGracePeriodSeconds: {{ .Values.odf.jobTerminationGracePeriod }}

@@ -1,9 +1,89 @@
 ---
+# Source: edge-gitops-vms/templates/rbac/serviceAccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ansible-edge-gitops-sa
+  namespace: 
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+---
+# Source: edge-gitops-vms/templates/rbac/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: view-machine-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+rules:
+  - apiGroups:
+      - machine.openshift.io
+    resources:
+      - machinesets
+    verbs:
+      - get
+      - list
+      - watch
+---
+# Source: edge-gitops-vms/templates/rbac/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: view-machine-api
+  namespace: openshift-machine-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+subjects:
+- kind: ServiceAccount
+  name: ansible-edge-gitops-sa
+  namespace: edge-gitops-vms
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: view-machine-api
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: edge-gitops-vms/templates/job-waitForMetalNode.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  name: job-wait-for-metal-node
+  namespace: edge-gitops-vms
+spec:
+  template:
+    spec:
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+        command:
+        - /bin/bash
+        - -c
+        - |
+          while [ 1 ];
+          do
+            nodes=$(oc get machineset -n openshift-machine-api -l 'edge-gitops-role=kubevirt-worker' -o jsonpath='{.items[*].status.availableReplicas}')
+            if [ "$nodes" -ge "1" ]; then
+              echo "Node is ready, exiting"
+              exit 0
+            fi
+            echo "Node is not yet ready, waiting"
+            sleep 15
+          done
+        name: wait-for-metal-node
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      serviceAccount: ansible-edge-gitops-sa
+      serviceAccountName: ansible-edge-gitops-sa
+      terminationGracePeriodSeconds: 3600
+---
 # Source: edge-gitops-vms/templates/virtual-machines.yaml
 apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-rhel8-kiosk-001
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   refreshInterval: 90s
   secretStoreRef:
@@ -23,6 +103,8 @@ apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
   name: es-authorizedsshkeys-rhel8-kiosk-002
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   refreshInterval: 90s
   secretStoreRef:
@@ -54,6 +136,7 @@ items:
             "min": 1610612736
           }
         ]
+      argocd.argoproj.io/sync-wave: "2"
     labels:
       app: rhel8-kiosk-001
       edge-gitops-role: kiosk
@@ -72,10 +155,14 @@ items:
           kind: DataSource
           name: rhel8
           namespace: openshift-virtualization-os-images
-        storage:
+        pvc:
+          accessModes:
+            - ReadWriteMany
           resources:
             requests:
               storage: 30Gi
+          storageClassName: ocs-storagecluster-ceph-rbd
+          volumeMode: Block
     running: true
     template:
       metadata:
@@ -142,6 +229,8 @@ items:
   kind: Service
   metadata:
     name: rhel8-kiosk-001
+    annotations:
+      argocd.argoproj.io/sync-wave: "2"
     labels:
       app: rhel8-kiosk-001
       edge-gitops-role: kiosk
@@ -187,6 +276,7 @@ items:
             "min": 1610612736
           }
         ]
+      argocd.argoproj.io/sync-wave: "2"
     labels:
       app: rhel8-kiosk-002
       edge-gitops-role: kiosk
@@ -205,10 +295,14 @@ items:
           kind: DataSource
           name: rhel8
           namespace: openshift-virtualization-os-images
-        storage:
+        pvc:
+          accessModes:
+            - ReadWriteMany
           resources:
             requests:
               storage: 30Gi
+          storageClassName: ocs-storagecluster-ceph-rbd
+          volumeMode: Block
     running: true
     template:
       metadata:
@@ -275,6 +369,8 @@ items:
   kind: Service
   metadata:
     name: rhel8-kiosk-002
+    annotations:
+      argocd.argoproj.io/sync-wave: "2"
     labels:
       app: rhel8-kiosk-002
       edge-gitops-role: kiosk
@@ -308,6 +404,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
   annotations:
+    argocd.argoproj.io/sync-wave: "2"
     defaults.template.kubevirt.io/disk: rootdisk
     description: Template for Red Hat Enterprise Linux 8 VM or newer. A PVC with the
       RHEL disk image must be available.

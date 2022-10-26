@@ -1,4 +1,7 @@
 ---
+global:
+  pattern: ansible-edge-gitops
+
 secretStore:
   name: vault-backend
   kind: ClusterSecretStore
@@ -6,6 +9,17 @@ secretStore:
 cloudInit:
   defaultUser: 'cloud-user'
   defaultPassword: '6toh-n1d5-9xpq'
+
+# Or "RWO" and "gp2"; other choices are possible too but
+# these are defaults for ODF which is included in the pattern
+defaultAccessMode: "ReadWriteMany"
+defaultStorageClassName: "ocs-storagecluster-ceph-rbd"
+defaultVolumeMode: "Block"
+
+vmNamespace: edge-gitops-vms
+
+waitForMetalNode: true
+jobTerminationGracePeriod: 3600
 
 vms:
   kiosk:
@@ -33,3 +47,36 @@ vms:
         port: 3389
         protocol: TCP
         targetPort: 3389
+
+serviceAccountName: ansible-edge-gitops-sa
+rbac:
+  roles:
+    - name: view-machine-api
+      createRole: true
+      apiGroups:
+        - machine.openshift.io
+      scope:
+        cluster: true
+      resources:
+        - machinesets
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+  roleBindings:
+    - name: view-machine-api
+      createBinding: true
+      scope:
+        cluster: false
+        namespace: "openshift-machine-api"
+      subjects:
+        kind: ServiceAccount
+        name: ansible-edge-gitops-sa
+        namespace: edge-gitops-vms
+        apiGroup: ""
+      roleRef:
+        kind: ClusterRole
+        name: view-machine-api
+
+job:
+  image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest

@@ -9,18 +9,6 @@ metadata:
     argocd.argoproj.io/sync-hook: "PreSync"
     argocd.argoproj.io/sync-wave: "-10"
 ---
-# Source: openshift-data-foundations/templates/cm-odf-servicePoint.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: service-point
-  namespace: "openshift-storage"
-  annotations:
-    argocd.argoproj.io/sync-wave: "-4"
-data:
-  url: ""
-  url-external: ".apps.."
----
 # Source: openshift-data-foundations/templates/rbac/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -34,6 +22,28 @@ rules:
       - ""
     resources:
       - nodes
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+---
+# Source: openshift-data-foundations/templates/rbac/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: edit-storageclass
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-15"
+rules:
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    resourceNames:
+      - ocs-storagecluster-ceph-rbd
+      - gp2
     verbs:
       - get
       - list
@@ -56,6 +66,24 @@ subjects:
 roleRef:
   kind: ClusterRole
   name: label-storage-nodes
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: openshift-data-foundations/templates/rbac/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: edit-storageclass
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-15"
+subjects:
+- kind: ServiceAccount
+  name: odf-node-label-sa
+  namespace: openshift-storage
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: edit-storageclass
   apiGroup: rbac.authorization.k8s.io
 ---
 # Source: openshift-data-foundations/templates/job-labelNodes.yaml
@@ -81,71 +109,7 @@ spec:
       restartPolicy: Never
       serviceAccount: odf-node-label-sa
       serviceAccountName: odf-node-label-sa
-      terminationGracePeriodSeconds: 400
----
-# Source: openshift-data-foundations/templates/odf-cephobjectstore.yaml
-apiVersion: ceph.rook.io/v1
-kind: CephObjectStore
-metadata:
-  name: ocs-storagecluster-cephobjectstore
-  namespace: openshift-storage
-spec:
-  dataPool:
-    crushRoot: ""
-    deviceClass: ""
-    erasureCoded:
-      algorithm: ""
-      codingChunks: 0
-      dataChunks: 0
-    failureDomain: zone
-    replicated:
-      size: 3
-  gateway:
-    #allNodes: false
-    instances: 2
-    placement:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: cluster.ocs.openshift.io/openshift-storage
-              operator: Exists
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - rook-ceph-rgw
-            topologyKey: kubernetes.io/hostname
-          weight: 100
-      tolerations:
-      - effect: NoSchedule
-        key: node.ocs.openshift.io/storage
-        operator: Equal
-        value: "true"
-    port: 80
-    resources:
-      limits:
-        cpu: "2"
-        memory: 4Gi
-      requests:
-        cpu: "1"
-        memory: 4Gi
-    securePort: 0
-    sslCertificateRef: ""
-  metadataPool:
-    crushRoot: ""
-    deviceClass: ""
-    erasureCoded:
-      algorithm: ""
-      codingChunks: 0
-      dataChunks: 0
-    failureDomain: zone
-    replicated:
-      size: 3
+      terminationGracePeriodSeconds: 300
 ---
 # Source: openshift-data-foundations/templates/cephtoolbox.yaml
 apiVersion: ocs.openshift.io/v1
@@ -165,38 +129,40 @@ metadata:
   namespace: openshift-storage
   name: ocs-storagecluster
 spec:
-  manageNodes: false
   resources:
     mon:
       requests:
-        cpu: 1
+        cpu: '1'
         memory: 2Gi
     mds:
       requests:
-        cpu: 3
+        cpu: '3'
         memory: 8Gi
     mgr:
       requests:
-        cpu: 1
+        cpu: '1'
         memory: 3Gi
     noobaa-core:
       requests:
-        cpu: 1
+        cpu: '1'
         memory: 4Gi
     noobaa-db:
       requests:
-        cpu: 1
+        cpu: '1'
         memory: 4Gi
   storageDeviceSets:
   - name: ocs-deviceset
+    config: {}
     count: 1
     replica: 3
     resources:
       requests:
-        cpu: 2
+        cpu: '2'
         memory: 5Gi
     placement: {}
+    preparePlacement: {}
     dataPVCTemplate:
+      metadata: {}
       spec:
         storageClassName: gp2
         accessModes:
@@ -205,4 +171,5 @@ spec:
         resources:
           requests:
             storage: 2Ti
+      status: {}
     portable: true

@@ -13,8 +13,7 @@ metadata:
   namespace: {{ $value.scope.namespace}}
 {{- end }}
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-15"
+    argocd.argoproj.io/sync-wave: "1"
 rules:
   - apiGroups:
 {{- range $value.apiGroups }}
@@ -28,7 +27,6 @@ rules:
     resourceNames:
 {{- range $value.resourceNames }}
       - {{ . }}
-      - {{ $.Values.global.datacenter.storageClassName }}
 {{- end }}
 {{- end }}
     verbs:
