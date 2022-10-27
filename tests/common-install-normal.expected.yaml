@@ -41,6 +41,8 @@ spec:
           value: common-install
         - name: global.hubClusterDomain
           value: example.com
+        - name: global.clusterVersion
+          value: ""
   syncPolicy:
     automated: {}
 ---

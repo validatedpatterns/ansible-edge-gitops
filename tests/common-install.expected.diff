@@ -32,10 +32,10 @@
          - name: global.hubClusterDomain
 -          value: 
 +          value: example.com
+         - name: global.clusterVersion
+           value: ""
    syncPolicy:
-     automated: {}
- ---
-@@ -53,7 +53,7 @@
+@@ -55,7 +55,7 @@
    labels:
      operators.coreos.com/openshift-gitops-operator.openshift-operators: ""
  spec:
@@ -44,7 +44,7 @@
    installPlanApproval: Automatic
    name: openshift-gitops-operator
    source: redhat-operators
-@@ -61,4 +61,4 @@
+@@ -63,4 +63,4 @@
    config:
      env:
        - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
