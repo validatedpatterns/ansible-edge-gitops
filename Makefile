@@ -36,9 +36,6 @@ test: ## Run tests
 	make -f common/Makefile PATTERN_OPTS="$(CHART_OPTS)" test
 	echo Tests SUCCESSFUL
 
-super-linter: ## Runs super linter locally
-	make -f common/Makefile DISABLE_LINTERS="-e VALIDATE_ANSIBLE=false -e VALIDATE_DOCKERFILE_HADOLINT=false" super-linter
-
 update-tests:
 	./scripts/update-tests.sh $(CHART_OPTS)
 
