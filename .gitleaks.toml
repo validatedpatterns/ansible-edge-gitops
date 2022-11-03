@@ -573,9 +573,10 @@ regex = '''\bYC[a-zA-Z0-9_\-]{38}['|\"|\n|\r|\s|\x60]'''
 
 [allowlist]
 description = "global allow lists"
-regexes = ['''219-09-9999''', '''078-05-1120''', '''(9[0-9]{2}|666)-\d{2}-\d{4}''', '''6toh-n1d5-9xpq''']
+regexes = ['''219-09-9999''', '''078-05-1120''', '''(9[0-9]{2}|666)-\d{2}-\d{4}''', '''6toh-n1d5-9xpq''' ]
 paths = [
     '''gitleaks.toml''',
     '''.gitleaks.toml''',
-    '''(.*?)(jpg|gif|doc|pdf|bin|svg|socket)$''',
+    '''test_vault_load_secrets.py''',
+    '''(.*?)(jpg|gif|doc|pdf|bin|svg|socket|md|adoc)$''',
 ]
