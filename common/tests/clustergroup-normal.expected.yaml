@@ -91,7 +91,6 @@ data:
         serviceAccountName: imperative-sa
         valuesConfigMap: helm-values-configmap
         verbosity: ""
-      insecureUnsealVaultInsideCluster: true
       isHubCluster: true
       managedClusterGroups:
       - acmlabels:
@@ -418,8 +417,6 @@ spec:
                 - ansible-playbook
                 - -e
                 - "@/values/values.yaml"
-                - -e
-                - '{"file_unseal": false}'
                 - -t
                 - 'vault_init,vault_unseal,vault_secrets_init'
                 - "common/ansible/playbooks/vault/vault.yaml"
@@ -528,6 +525,8 @@ spec:
           value: region.example.com
         - name: global.clusterVersion
           value: ""
+        - name: global.clusterPlatform
+          value: ""
         - name: global.hubClusterDomain
           value: apps.hub.example.com
         - name: global.localClusterDomain
@@ -580,6 +579,8 @@ spec:
         - name: global.clusterDomain
           value: region.example.com
         - name: global.clusterVersion
+          value: ""
+        - name: global.clusterPlatform
           value: ""
         - name: global.hubClusterDomain
           value: apps.hub.example.com
@@ -1008,6 +1009,5 @@ spec:
   name: openshift-pipelines-operator-rh
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  channel: stable
   installPlanApproval: Automatic
   startingCSV: redhat-openshift-pipelines.v1.5.2
