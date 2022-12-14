@@ -12,19 +12,11 @@ help:
 	make -f common/Makefile $*
 
 install upgrade deploy: operator-deploy post-install ## Install or upgrade the pattern via the operator
-	echo "Installed/Upgraded"
+	@echo "Installed/Upgraded"
 
-legacy-install legacy-upgrade: legacy-deploy post-install ## Install or upgrade the pattern the "old" way
-	echo "Installed/upgraded (Legacy target)"
-
-post-install: ## Post-install tasks - vault, configure_controller
-	@if grep -v -e '^\s\+#' "values-hub.yaml" | grep -q -e "insecureUnsealVaultInsideCluster:\s\+true"; then \
-      echo "Skipping 'make vault-init' as we're unsealing the vault from inside the cluster"; \
-    else \
-      make vault-init; \
-    fi
+post-install: ## Post-install tasks - vault
 	make load-secrets
-	echo "Post-deploy complete"
+	@echo "Post-deploy complete"
 
 deploy-kubevirt-worker: ## Deploy the metal node worker
 	./scripts/deploy_kubevirt_worker.sh
@@ -34,7 +26,7 @@ configure-controller: ## Configure AAP operator
 
 test: ## Run tests
 	make -f common/Makefile PATTERN_OPTS="$(CHART_OPTS)" test
-	echo Tests SUCCESSFUL
+	@echo Tests SUCCESSFUL
 
 update-tests:
 	./scripts/update-tests.sh $(CHART_OPTS)
