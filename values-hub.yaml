@@ -15,17 +15,14 @@ clusterGroup:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
-      channel: stable-2.2
 
     openshift-virtualization:
       name: kubevirt-hyperconverged
       namespace: openshift-cnv
-      channel: stable
 
     openshift-data-foundation:
       name: odf-operator
       namespace: openshift-storage
-      channel: stable-4.10
 
   projects:
     - hub
