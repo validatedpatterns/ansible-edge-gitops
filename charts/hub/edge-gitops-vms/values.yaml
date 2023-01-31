@@ -7,8 +7,8 @@ secretStore:
   kind: ClusterSecretStore
 
 cloudInit:
-  defaultUser: 'cloud-user'
-  defaultPassword: '6toh-n1d5-9xpq'
+  enableCloudInit: false
+  cloudInitSecretName: cloud-init-secret
 
 # Or "RWO" and "gp2"; other choices are possible too but
 # these are defaults for ODF which is included in the pattern
@@ -33,8 +33,6 @@ vms:
     cores: 1
     sockets: 1
     threads: 1
-    cloudInitUser: cloud-user
-    cloudInitPassword: 6toh-n1d5-9xpq
     template: rhel8-desktop-medium
     sshsecret: secret/data/hub/kiosk-ssh
     sshpubkeyfield: publickey

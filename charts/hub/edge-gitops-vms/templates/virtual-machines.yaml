@@ -1,3 +1,23 @@
+{{- if .Values.cloudInit.enableCloudInit }}
+---
+apiVersion: "external-secrets.io/v1beta1"
+kind: ExternalSecret
+metadata:
+  name: es-cloudinit-default
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  refreshInterval: 90s
+  secretStoreRef:
+    name: {{ $.Values.secretStore.name }}
+    kind: {{ $.Values.secretStore.kind }}
+  target:
+    name: cloudinit-default
+    template:
+  dataFrom:
+    - extract:
+        key: {{ .Values.cloudInit.cloudInitSecretName }}
+{{- end }}
 {{- range $vm, $vmr := .Values.vms }}
 {{- $ctr := int (coalesce $vmr.count 1) }}
 {{- range $i := until $ctr }}
@@ -96,9 +116,11 @@ items:
             - disk:
                 bus: virtio
               name: {{ $identifier }}
+{{- if .Values.cloudInit.enableCloudInit }}
             - disk:
                 bus: virtio
               name: cloudinitdisk
+{{- end }}
             inputs:
             - bus: virtio
               name: tablet
@@ -122,13 +144,12 @@ items:
         - dataVolume:
             name: {{ $identifier }}
           name: {{ $identifier }}
-        - cloudInitConfigDrive:
-            userData: |-
-              #cloud-config
-              user: {{ coalesce $vmr.cloudInitUser $.Values.cloudInit.defaultUser "cloud-user" }}
-              password: {{ coalesce $vmr.cloudInitPassword $.Values.cloudInit.defaultPassword "6toh-n1d5-9xpq"  }}
-              chpasswd: { expire: False }
-          name: cloudinitdisk
+{{- if .Values.cloudInit.enableCloudInit }}
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            secretRef:
+              name: cloudinit-default
+{{- end }}
 - apiVersion: v1
   kind: Service
   metadata:
