@@ -8,7 +8,7 @@ secretStore:
 
 cloudInit:
   enableCloudInit: true
-  cloudInitSecretName: cloud-init
+  cloudInitSecretName: secret/data/hub/cloud-init
 
 # Or "RWO" and "gp2"; other choices are possible too but
 # these are defaults for ODF which is included in the pattern
