@@ -142,12 +142,10 @@ items:
         - dataVolume:
             name: {{ $identifier }}
           name: {{ $identifier }}
-{{- if $.Values.cloudInit.enableCloudInit }}
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
               name: cloudinit-default
-{{- end }}
 - apiVersion: v1
   kind: Service
   metadata:
