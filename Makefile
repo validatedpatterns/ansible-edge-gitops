@@ -18,11 +18,6 @@ legacy-install legacy-upgrade: legacy-deploy post-install ## Install or upgrade 
 	echo "Installed/upgraded (Legacy target)"
 
 post-install: ## Post-install tasks - vault, configure_controller
-	@if grep -v -e '^\s\+#' "values-hub.yaml" | grep -q -e "insecureUnsealVaultInsideCluster:\s\+true"; then \
-      echo "Skipping 'make vault-init' as we're unsealing the vault from inside the cluster"; \
-    else \
-      make vault-init; \
-    fi
 	make load-secrets
 	echo "Post-deploy complete"
 
