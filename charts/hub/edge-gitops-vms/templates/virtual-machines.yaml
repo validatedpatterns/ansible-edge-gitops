@@ -1,4 +1,4 @@
-{{- if .Values.cloudInit.enableCloudInit }}
+{{- if $.Values.cloudInit.enableCloudInit }}
 ---
 apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
@@ -16,7 +16,7 @@ spec:
     template:
   dataFrom:
     - extract:
-        key: {{ .Values.cloudInit.cloudInitSecretName }}
+        key: {{ $.Values.cloudInit.cloudInitSecretName }}
 {{- end }}
 {{- range $vm, $vmr := .Values.vms }}
 {{- $ctr := int (coalesce $vmr.count 1) }}
@@ -116,7 +116,7 @@ items:
             - disk:
                 bus: virtio
               name: {{ $identifier }}
-{{- if .Values.cloudInit.enableCloudInit }}
+{{- if $.Values.cloudInit.enableCloudInit }}
             - disk:
                 bus: virtio
               name: cloudinitdisk
@@ -144,7 +144,7 @@ items:
         - dataVolume:
             name: {{ $identifier }}
           name: {{ $identifier }}
-{{- if .Values.cloudInit.enableCloudInit }}
+{{- if $.Values.cloudInit.enableCloudInit }}
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
