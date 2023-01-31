@@ -7,7 +7,7 @@ secretStore:
   kind: ClusterSecretStore
 
 cloudInit:
-  enableCloudInit: false
+  enableCloudInit: true
   cloudInitSecretName: cloud-init
 
 # Or "RWO" and "gp2"; other choices are possible too but
