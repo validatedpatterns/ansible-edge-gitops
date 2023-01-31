@@ -116,11 +116,9 @@ items:
             - disk:
                 bus: virtio
               name: {{ $identifier }}
-{{- if $.Values.cloudInit.enableCloudInit }}
             - disk:
                 bus: virtio
               name: cloudinitdisk
-{{- end }}
             inputs:
             - bus: virtio
               name: tablet
