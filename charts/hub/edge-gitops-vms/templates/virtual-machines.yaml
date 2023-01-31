@@ -146,7 +146,6 @@ items:
           cloudInitConfigDrive:
             secretRef:
               name: cloudinit-default
-              optional: true
 - apiVersion: v1
   kind: Service
   metadata:
