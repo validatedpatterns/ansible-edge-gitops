@@ -81,7 +81,7 @@ spec:
 apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
-  name: es-cloudinit-default
+  name: es-cloudinit-kiosk
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
@@ -90,7 +90,7 @@ spec:
     name: vault-backend
     kind: ClusterSecretStore
   target:
-    name: cloudinit-default
+    name: cloudinit-kiosk
     template:
   dataFrom:
     - extract:
@@ -240,7 +240,7 @@ items:
         - name: cloudinitdisk
           cloudInitConfigDrive:
             secretRef:
-              name: cloudinit-default
+              name: cloudinit-kiosk
 - apiVersion: v1
   kind: Service
   metadata:
@@ -377,7 +377,7 @@ items:
         - name: cloudinitdisk
           cloudInitConfigDrive:
             secretRef:
-              name: cloudinit-default
+              name: cloudinit-kiosk
 - apiVersion: v1
   kind: Service
   metadata:

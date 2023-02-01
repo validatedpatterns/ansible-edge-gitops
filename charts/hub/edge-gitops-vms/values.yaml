@@ -6,9 +6,7 @@ secretStore:
   name: vault-backend
   kind: ClusterSecretStore
 
-cloudInit:
-  enableCloudInit: true
-  cloudInitSecretName: secret/data/hub/cloud-init
+cloudInitDefaultSecretName: secret/data/hub/cloud-init
 
 # Or "RWO" and "gp2"; other choices are possible too but
 # these are defaults for ODF which is included in the pattern
@@ -35,6 +33,7 @@ vms:
     threads: 1
     template: rhel8-desktop-medium
     sshsecret: secret/data/hub/kiosk-ssh
+    # cloudinitsecret: 'may also be specified, same format as sshsecret'
     sshpubkeyfield: publickey
     ports:
       - name: ssh
