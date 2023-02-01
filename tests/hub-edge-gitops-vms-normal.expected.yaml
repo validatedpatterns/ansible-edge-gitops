@@ -81,6 +81,25 @@ spec:
 apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
 metadata:
+  name: es-cloudinit-kiosk
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  refreshInterval: 90s
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: cloudinit-kiosk
+    template:
+  dataFrom:
+    - extract:
+        key: secret/data/hub/cloud-init
+---
+# Source: edge-gitops-vms/templates/virtual-machines.yaml
+apiVersion: "external-secrets.io/v1beta1"
+kind: ExternalSecret
+metadata:
   name: es-authorizedsshkeys-rhel8-kiosk-001
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -218,13 +237,10 @@ items:
         - dataVolume:
             name: rhel8-kiosk-001
           name: rhel8-kiosk-001
-        - cloudInitConfigDrive:
-            userData: |-
-              #cloud-config
-              user: cloud-user
-              password: 6toh-n1d5-9xpq
-              chpasswd: { expire: False }
-          name: cloudinitdisk
+        - name: cloudinitdisk
+          cloudInitConfigDrive:
+            secretRef:
+              name: cloudinit-kiosk
 - apiVersion: v1
   kind: Service
   metadata:
@@ -358,13 +374,10 @@ items:
         - dataVolume:
             name: rhel8-kiosk-002
           name: rhel8-kiosk-002
-        - cloudInitConfigDrive:
-            userData: |-
-              #cloud-config
-              user: cloud-user
-              password: 6toh-n1d5-9xpq
-              chpasswd: { expire: False }
-          name: cloudinitdisk
+        - name: cloudinitdisk
+          cloudInitConfigDrive:
+            secretRef:
+              name: cloudinit-kiosk
 - apiVersion: v1
   kind: Service
   metadata:

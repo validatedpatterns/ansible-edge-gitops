@@ -1,4 +1,22 @@
 {{- range $vm, $vmr := .Values.vms }}
+---
+apiVersion: "external-secrets.io/v1beta1"
+kind: ExternalSecret
+metadata:
+  name: es-cloudinit-{{ $vmr.role }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  refreshInterval: 90s
+  secretStoreRef:
+    name: {{ $.Values.secretStore.name }}
+    kind: {{ $.Values.secretStore.kind }}
+  target:
+    name: cloudinit-{{ $vmr.role }}
+    template:
+  dataFrom:
+    - extract:
+        key: {{ coalesce $vmr.cloudinitsecret $.Values.cloudInitDefaultSecretName }}
 {{- $ctr := int (coalesce $vmr.count 1) }}
 {{- range $i := until $ctr }}
 {{- $idx := printf "%03d" (add $i 1) }}
@@ -122,13 +140,10 @@ items:
         - dataVolume:
             name: {{ $identifier }}
           name: {{ $identifier }}
-        - cloudInitConfigDrive:
-            userData: |-
-              #cloud-config
-              user: {{ coalesce $vmr.cloudInitUser $.Values.cloudInit.defaultUser "cloud-user" }}
-              password: {{ coalesce $vmr.cloudInitPassword $.Values.cloudInit.defaultPassword "6toh-n1d5-9xpq"  }}
-              chpasswd: { expire: False }
-          name: cloudinitdisk
+        - name: cloudinitdisk
+          cloudInitConfigDrive:
+            secretRef:
+              name: cloudinit-{{ $vmr.role }}
 - apiVersion: v1
   kind: Service
   metadata:
