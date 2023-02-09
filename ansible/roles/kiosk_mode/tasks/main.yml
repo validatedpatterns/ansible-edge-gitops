@@ -97,7 +97,7 @@
     group: users
 
 - name: create shell script to start firefox
-  ansible.builtin.copy:
+  ansible.builtin.template:
     dest: /home/kiosk/.local/bin/redhat-kiosk
     src: files/redhat-kiosk.j2
     mode: "0755"
