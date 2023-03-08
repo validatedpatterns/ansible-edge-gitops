@@ -4,3 +4,4 @@ cnv:
     useEmulation: false
 
 namespaceOverride: openshift-cnv
+sriovLiveMigration: false

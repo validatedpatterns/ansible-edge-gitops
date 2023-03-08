@@ -23,7 +23,9 @@ spec:
       renewBefore: 12h0m0s
   featureGates:
     enableCommonBootImageImport: true
+{{- if .Values.sriovLiveMigration }}
     sriovLiveMigration: true
+{{- end }}
     withHostPassthroughCPU: false
   infra: {}
   liveMigrationConfig:
