@@ -1,0 +1,4 @@
+---
+global:
+  datacenter:
+    storageClassName: gp3-csi
