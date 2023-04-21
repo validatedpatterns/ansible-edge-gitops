@@ -9,9 +9,6 @@
     inventory_target_group: VMs
     inventory_label_selectors:
       - edge-gitops-role=kiosk
-  collections:
-    - kubernetes.core
-    - community.general
 
   tasks:
     - name: Get {{ inventory_kind }}
