@@ -11,7 +11,7 @@
     password: "{{ rhsm_password }}"
     auto_attach: true
 
-- name: install Gnome Desktop Environment
+- name: Install Gnome Desktop Environment
   ansible.builtin.package:
     name:
       - "@Server With GUI"
@@ -21,7 +21,7 @@
   ansible.builtin.template:
     src: custom.conf
     dest: /etc/gdm/custom.conf
-    mode: 0644
+    mode: "0644"
   notify: reboot
 
 - name: Add the user 'kiosk'
@@ -36,11 +36,11 @@
     skeleton: true
   notify: reboot
 
-- name: configure session for kiosk username /var/lib/AccountsService/users/kiosk
+- name: Configure session for kiosk username /var/lib/AccountsService/users/kiosk
   ansible.builtin.copy:
     src: files/kiosk.conf.j2
     dest: /var/lib/AccountsService/users/kiosk
-    mode: 0600
+    mode: "0600"
 
 - name: Change default target to graphical.target
   ansible.builtin.file:
@@ -49,19 +49,19 @@
     state: link
   notify: reboot
 
-- name: permit traffic in default zone for https service
+- name: Permit traffic in default zone for https service
   ansible.posix.firewalld:
     service: https
     permanent: true
     state: enabled
 
-- name: install yum install gnome-session-kiosk-session
+- name: Install yum install gnome-session-kiosk-session
   ansible.builtin.yum:
     name: gnome-session-kiosk-session
     state: present
   notify: reboot
 
-- name: create directory local bin for kiosk mode
+- name: Create directory local bin for kiosk mode
   ansible.builtin.file:
     path: /home/kiosk/.local/bin
     state: directory
@@ -70,7 +70,7 @@
     group: users
   notify: reboot
 
-- name: create directory local bin for kiosk mode
+- name: Create directory local bin for kiosk mode
   ansible.builtin.file:
     path: /home/kiosk/Desktop
     state: directory
@@ -79,7 +79,7 @@
     group: users
   notify: reboot
 
-- name: create config directory to disable welcome screen
+- name: Create config directory to disable welcome screen
   ansible.builtin.file:
     path: /home/kiosk/.config/
     state: directory
@@ -88,7 +88,7 @@
     group: users
   notify: reboot
 
-- name: create file to disable setup screens
+- name: Create file to disable setup screens
   ansible.builtin.file:
     path: /home/kiosk/.config/gnome-initial-setup-done
     state: touch
@@ -96,7 +96,7 @@
     owner: kiosk
     group: users
 
-- name: create shell script to start firefox
+- name: Create shell script to start firefox
   ansible.builtin.template:
     dest: /home/kiosk/.local/bin/redhat-kiosk
     src: files/redhat-kiosk.j2

@@ -29,11 +29,11 @@
         msg: "{{ metal_machinesets }}"
 
     - name: End play early if found
-      meta: end_play
+      ansible.builtin.meta: end_play
       when: metal_machinesets.resources | length > 0
 
     - name: End play
-      meta: end_play
+      ansible.builtin.meta: end_play
 
     - name: Display infrastructure values
       ansible.builtin.debug:

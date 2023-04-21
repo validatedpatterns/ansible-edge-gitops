@@ -16,6 +16,6 @@
     #        username: "{{ podman_username }}"
     #        password: "{{ podman_password }}"
     #        registry: quay.io
-    - name: import container_lifecycle role
+    - name: Import container_lifecycle role
       ansible.builtin.import_role:
         name: container_lifecycle
