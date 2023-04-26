@@ -9,12 +9,9 @@
     inventory_target_group: VMs
     inventory_label_selectors:
       - edge-gitops-role=kiosk
-  collections:
-    - kubernetes.core
-    - community.general
 
   tasks:
-    - name: Get {{ inventory_kind }}'s
+    - name: Get {{ inventory_kind }}
       kubernetes.core.k8s_info:
         api_version: v1
         kind: "{{ inventory_kind }}"
@@ -22,7 +19,7 @@
         label_selectors: "{{ inventory_label_selectors }}"
       register: nodes
 
-    - name: add hosts
+    - name: Add hosts
       ansible.builtin.add_host:
         hostname: "{{ item }}.{{ inventory_namespace }}.svc"
         groups:

@@ -1,7 +1,7 @@
 ---
 # handlers file for container_lifecycle
 
-- name: restart container service
+- name: Restart container service
   ansible.builtin.systemd:
     name: afiot-{{ service_name }}
     state: restarted

@@ -14,6 +14,6 @@
     - name: Configure kiosk mode on hmi devices
       ansible.builtin.import_role:
         name: kiosk_mode
-    - name: import container_lifecycle role
+    - name: Import container_lifecycle role
       ansible.builtin.import_role:
         name: container_lifecycle

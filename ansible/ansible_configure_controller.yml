@@ -21,7 +21,7 @@
       delay: 5
       register: api_status
       until: api_status.status == 200
-      uri:
+      ansible.builtin.uri:
         url: https://{{ ansible_host }}/api/v2/config/
         method: GET
         user: admin
@@ -44,15 +44,15 @@
       until: result is not failed
 
     - name: Report AAP Endpoint
-      debug:
+      ansible.builtin.debug:
         msg: "AAP Endpoint: https://{{ ansible_host }}"
 
     - name: Report AAP User
-      debug:
+      ansible.builtin.debug:
         msg: "AAP Admin User: admin"
 
     - name: Report AAP Admin Password
-      debug:
+      ansible.builtin.debug:
         msg: "AAP Admin Password: {{ admin_password }}"
 
     # Controller is ready, time to start configuring it
@@ -194,15 +194,15 @@
             organization: "{{ aap_org_name }}"
             credential_type: RHSMcredential
             inputs:
-              username: "{{ secrets['rhsm']['username']  }}"
-              password: "{{ secrets['rhsm']['password']  }}"
+              username: "{{ secrets['rhsm']['username'] }}"
+              password: "{{ secrets['rhsm']['password'] }}"
 
           - name: kiosk_container_extra_params
             description: Kiosk Extra container parameters
             organization: "{{ aap_org_name }}"
             credential_type: KioskExtraParams
             inputs:
-              container_extra_params: "{{ secrets['kiosk-extra']['container_extra_params']  }}"
+              container_extra_params: "{{ secrets['kiosk-extra']['container_extra_params'] }}"
 
     - name: Configure Looped Credentials
       ansible.builtin.include_role:
@@ -221,7 +221,7 @@
             organization: "{{ aap_org_name }}"
             credential_type: Machine
             inputs:
-              username: "{{ secrets[item ~ '-ssh']['username']  }}"
+              username: "{{ secrets[item ~ '-ssh']['username'] }}"
               ssh_key_data: "{{ secrets[item ~ '-ssh']['privatekey'] }}"
 
     - name: Configure Credential Input Sources
