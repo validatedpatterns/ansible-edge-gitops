@@ -31,3 +31,5 @@
 * Updated edge-gitops-vms chart to add SkipDryRunOnMissingResource annotations to prevent errors occuring due to race conditions with OpenShift Virtualization
 
 * Updated wait-for-metal-nodes machinery to also skip RBAC creation since the only reason for it in e-g-v is for the job, which should only be needed when provisioning a separate metal node as is needed by AWS
+
+* Updated common to refresh vault and external-secrets and pick up default features for gitops-1.8

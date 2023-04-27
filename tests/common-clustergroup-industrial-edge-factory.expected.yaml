@@ -88,7 +88,7 @@ data:
         clusterRoleName: imperative-cluster-role
         clusterRoleYaml: ""
         cronJobName: imperative-cronjob
-        image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+        image: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8:latest
         imagePullPolicy: Always
         insecureUnsealVaultInsideClusterSchedule: '*/5 * * * *'
         jobName: imperative-job
@@ -282,7 +282,7 @@ spec:
             # git init happens in /git/repo so that we can set the folder to 0770 permissions
             # reason for that is ansible refuses to create temporary folders in there            
             - name: git-init
-              image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+              image: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8:latest
               imagePullPolicy: Always
               env:
                 - name: HOME
@@ -295,7 +295,7 @@ spec:
               - name: git
                 mountPath: "/git"
             - name: test
-              image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+              image: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8:latest
               imagePullPolicy: Always
               env:
                 - name: HOME
@@ -318,7 +318,7 @@ spec:
                   subPath: values.yaml
           containers:            
             - name: "done"
-              image: registry.redhat.io/ansible-automation-platform-22/ee-supported-rhel8:latest
+              image: registry.redhat.io/ansible-automation-platform-23/ee-supported-rhel8:latest
               imagePullPolicy: Always
               command:
                 - 'sh'
@@ -441,6 +441,28 @@ metadata:
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
+# Adding health checks to argocd to prevent pvc resources
+# that aren't bound state from blocking deployments
+  resourceCustomizations: |
+    PersistentVolumeClaim:
+      health.lua: |
+        hs = {}
+        if obj.status ~= nil then
+          if obj.status.phase ~= nil then
+            if obj.status.phase == "Pending" then
+              hs.status = "Healthy"
+              hs.message = obj.status.phase
+              return hs
+            elseif obj.status.phase == "Bound" then
+              hs.status = "Healthy"
+              hs.message = obj.status.phase
+              return hs
+            end
+          end
+        end
+        hs.status = "Progressing"
+        hs.message = "Waiting for PVC"
+        return hs
   applicationInstanceLabelKey: argocd.argoproj.io/instance
   # Not the greatest way to pass git/quay info to sub-applications, but it will do until
   # we can support helmChart with kustomize
