@@ -26,21 +26,21 @@
         src: templates/systemd_unit.j2
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}.service"
         mode: "0644"
-      notify: restart container service
+      notify: Restart container service
 
     - name: Template the systemd health check timer unit file
       ansible.builtin.template:
         src: templates/systemd_timer.j2
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}-healthcheck.timer"
         mode: "0644"
-      notify: restart container service
+      notify: Restart container service
 
     - name: Template the systemd health check service unit file
       ansible.builtin.template:
         src: templates/systemd_timer.j2
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}-healthcheck.service"
         mode: "0644"
-      notify: restart container service
+      notify: Restart container service
 
     - name: Deamon reload systemd and start our service
       ansible.builtin.systemd:
