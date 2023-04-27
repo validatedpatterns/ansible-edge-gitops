@@ -22,7 +22,7 @@
     src: custom.conf
     dest: /etc/gdm/custom.conf
     mode: "0644"
-  notify: reboot
+  notify: Reboot
 
 - name: Add the user 'kiosk'
   ansible.builtin.user:
@@ -34,7 +34,7 @@
     group: users
     create_home: true
     skeleton: true
-  notify: reboot
+  notify: Reboot
 
 - name: Configure session for kiosk username /var/lib/AccountsService/users/kiosk
   ansible.builtin.copy:
@@ -47,7 +47,7 @@
     src: /usr/lib/systemd/system/graphical.target
     dest: /etc/systemd/system/default.target
     state: link
-  notify: reboot
+  notify: Reboot
 
 - name: Permit traffic in default zone for https service
   ansible.posix.firewalld:
@@ -59,7 +59,7 @@
   ansible.builtin.yum:
     name: gnome-session-kiosk-session
     state: present
-  notify: reboot
+  notify: Reboot
 
 - name: Create directory local bin for kiosk mode
   ansible.builtin.file:
@@ -68,7 +68,7 @@
     mode: "0755"
     owner: kiosk
     group: users
-  notify: reboot
+  notify: Reboot
 
 - name: Create directory local bin for kiosk mode
   ansible.builtin.file:
@@ -77,7 +77,7 @@
     mode: "0755"
     owner: kiosk
     group: users
-  notify: reboot
+  notify: Reboot
 
 - name: Create config directory to disable welcome screen
   ansible.builtin.file:
@@ -86,7 +86,7 @@
     mode: "0755"
     owner: kiosk
     group: users
-  notify: reboot
+  notify: Reboot
 
 - name: Create file to disable setup screens
   ansible.builtin.file:
@@ -103,7 +103,7 @@
     mode: "0755"
     owner: kiosk
     group: users
-  notify: reboot
+  notify: Reboot
 
 - name: Flush handlers (will reboot if needed)
   ansible.builtin.meta: flush_handlers
