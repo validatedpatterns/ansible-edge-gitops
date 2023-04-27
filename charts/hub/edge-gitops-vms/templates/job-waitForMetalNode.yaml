@@ -1,4 +1,3 @@
-{{ if .Values.waitForMetalNode }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -11,6 +10,7 @@ spec:
     spec:
       containers:
       - image: {{ .Values.job.image }}
+{{- if .Values.waitForMetalNode }}
         command:
         - /bin/bash
         - -c
@@ -25,10 +25,15 @@ spec:
             echo "Node is not yet ready, waiting"
             sleep 15
           done
+{{- else }}
+        command:
+        - /bin/bash
+        - -c
+        - echo "Not waiting, exiting successfully" && exit 0
+{{- end }}
         name: wait-for-metal-node
       dnsPolicy: ClusterFirst
       restartPolicy: Never
       serviceAccount: {{ .Values.serviceAccountName }}
       serviceAccountName: {{ .Values.serviceAccountName }}
       terminationGracePeriodSeconds: {{ .Values.jobTerminationGracePeriod }}
-{{ end }}
