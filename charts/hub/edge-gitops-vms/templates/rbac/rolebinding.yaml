@@ -1,3 +1,4 @@
+{{ if .Values.waitForMetalNode }}
 {{- range $key, $value := .Values.rbac.roleBindings }}
 {{- if $value.createBinding }}
 apiVersion: rbac.authorization.k8s.io/v1
@@ -23,5 +24,6 @@ roleRef:
   name: {{ $value.roleRef.name }}
   apiGroup: rbac.authorization.k8s.io
 ---
+{{- end }}
 {{- end }}
 {{- end }}

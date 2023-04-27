@@ -6,41 +6,41 @@
 - name: Gather information about the current running container
   containers.podman.podman_container_info:
     name: afiot-{{ service_name }}
-  register: pre_all_container_info
+  register: pre_install_container_info
 
 - name: Install Transaction
   when:
-    - container_state in ["present", "alled"]
+    - container_state in ["present", "installed"]
   block:
     - name: Pull down container image
       containers.podman.podman_image:
         name: "{{ container_image }}"
         tag: "{{ container_tag }}"
       when: >
-        (not pre_all_container_info['containers']) or
-        ((pre_all_container_info['containers'][0]['Name'] == "afiot-" + service_name) and
-        pre_all_container_info['containers'][0]['ImageName'] != container_image + ":" + container_tag)
+        (not pre_install_container_info['containers']) or
+        ((pre_install_container_info['containers'][0]['Name'] == "afiot-" + service_name) and
+        pre_install_container_info['containers'][0]['ImageName'] != container_image + ":" + container_tag)
 
     - name: Template the systemd service unit file
       ansible.builtin.template:
         src: templates/systemd_unit.j2
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}.service"
         mode: "0644"
-      notify: restart container service
+      notify: Restart container service
 
     - name: Template the systemd health check timer unit file
       ansible.builtin.template:
         src: templates/systemd_timer.j2
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}-healthcheck.timer"
         mode: "0644"
-      notify: restart container service
+      notify: Restart container service
 
     - name: Template the systemd health check service unit file
       ansible.builtin.template:
         src: templates/systemd_timer.j2
         dest: "{{ systemd_units_dir }}/afiot-{{ service_name }}-healthcheck.service"
         mode: "0644"
-      notify: restart container service
+      notify: Restart container service
 
     - name: Deamon reload systemd and start our service
       ansible.builtin.systemd:
@@ -52,7 +52,7 @@
   rescue:
     - name: Override container_tag for rollback
       ansible.builtin.set_fact:
-        container_tag: "{{ pre_all_container_info['containers'][0]['ImageName'] | split(':') | last }}"
+        container_tag: "{{ pre_install_container_info['containers'][0]['ImageName'] | split(':') | last }}"
 
     - name: Template the systemd service unit file
       ansible.builtin.template:
@@ -79,10 +79,10 @@
         enabled: true
         daemon_reload: true
 
-- name: Unall Transaction
+- name: Uninstall Transaction
   when:
-    - container_state in ["absent", "unalled"]
-    - pre_all_container_info['containers']
+    - container_state in ["absent", "uninstalled"]
+    - pre_install_container_info['containers']
   block:
     - name: Stop service
       ansible.builtin.systemd:

@@ -156,6 +156,7 @@ items:
           }
         ]
       argocd.argoproj.io/sync-wave: "2"
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     labels:
       app: rhel8-kiosk-001
       edge-gitops-role: kiosk
@@ -293,6 +294,7 @@ items:
           }
         ]
       argocd.argoproj.io/sync-wave: "2"
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     labels:
       app: rhel8-kiosk-002
       edge-gitops-role: kiosk
