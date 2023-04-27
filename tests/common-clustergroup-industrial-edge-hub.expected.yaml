@@ -315,8 +315,6 @@ data:
       git:
         repoURL: https://github.com/pattern-clone/mypattern
         revision: main
-      gitops:
-        channel: latest
     secretStore:
       kind: ClusterSecretStore
       name: vault-backend
