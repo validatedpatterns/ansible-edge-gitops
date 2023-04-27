@@ -3,6 +3,10 @@ ifneq ($(origin TARGET_SITE), undefined)
   TARGET_SITE_OPT=--set main.clusterGroupName=$(TARGET_SITE)
 endif
 
+# INDEX_IMAGES=registry-proxy.engineering.redhat.com/rh-osbs/iib:394248
+INDEX_IMAGES ?= 
+INDEX_OPTIONS=$(shell echo $(INDEX_IMAGES) | tr ',' '\n' | awk -F: 'match($$1,"/"){print "--set main.extraParameters."NR".name=clusterGroup.indexImages."NR".image --set main.extraParameters."NR".value="$$1":"$$2}')
+
 TARGET_ORIGIN ?= origin
 # This is to ensure that whether we start with a git@ or https:// URL, we end up with an https:// URL
 # This is because we expect to use tokens for repo authentication as opposed to SSH keys
@@ -11,7 +15,7 @@ TARGET_REPO=$(shell git ls-remote --get-url --symref $(TARGET_ORIGIN) | sed -e '
 TARGET_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
 # --set values always take precedence over the contents of -f
-HELM_OPTS=-f values-global.yaml --set main.git.repoURL="$(TARGET_REPO)" --set main.git.revision=$(TARGET_BRANCH) $(TARGET_SITE_OPT)
+HELM_OPTS=-f values-global.yaml --set main.git.repoURL="$(TARGET_REPO)" --set main.git.revision=$(TARGET_BRANCH) $(TARGET_SITE_OPT) $(INDEX_OPTIONS)
 
 ##@ Pattern Common Tasks
 
@@ -25,10 +29,21 @@ help: ## This help message
 show: ## show the starting template without installing it
 	helm template common/operator-install/ --name-template $(NAME) $(HELM_OPTS)
 
+# Only call helm install if the CRD is missing. If it already exists just
+# push the templated files.
+# The reason we have two helm template calls in the else branch is to avoid
+# warnings when the chart gets applied the first time, but the resources were
+# created first via the VP operator's UI
 .PHONY: operator-deploy
 operator-deploy operator-upgrade: validate-prereq validate-origin ## runs helm install
-	@echo "Running helm:"
-	helm upgrade --install $(NAME) common/operator-install/ $(HELM_OPTS)
+	@set -e; if ! oc get crds patterns.gitops.hybrid-cloud-patterns.io >/dev/null 2>&1; then \
+	  echo "Running helm:"; \
+	  helm upgrade --install $(NAME) common/operator-install/ $(HELM_OPTS); \
+	else \
+	  echo "Reapplying helm chart:"; \
+	  helm template --name-template $(NAME) common/operator-install/ $(HELM_OPTS) | oc apply set-last-applied --create-annotation -f-; \
+	  helm template --name-template $(NAME) common/operator-install/ $(HELM_OPTS) | oc apply -f-; \
+	fi
 
 .PHONY: uninstall
 uninstall: ## runs helm uninstall
@@ -95,7 +110,7 @@ helmlint: ## run helm lint
 	@for t in $(CHARTS); do common/scripts/lint.sh $$t $(TEST_OPTS); if [ $$? != 0 ]; then exit 1; fi; done
 
 API_URL ?= https://raw.githubusercontent.com/hybrid-cloud-patterns/ocp-schemas/main/openshift/4.10/
-KUBECONFORM_SKIP ?= -skip 'CustomResourceDefinition'
+KUBECONFORM_SKIP ?= -skip 'CustomResourceDefinition,ClusterIssuer,CertManager,Certificate'
 # We need to skip 'CustomResourceDefinition' as openapi2jsonschema seems to be unable to generate them ATM
 .PHONY: kubeconform
 kubeconform: ## run helm kubeconform
@@ -107,17 +122,20 @@ super-linter: ## Runs super linter locally
 	podman run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true	\
 					-e VALIDATE_BASH=false \
 					-e VALIDATE_JSCPD=false \
-					-e VALIDATE_KUBERNETES_KUBEVAL=false \
+					-e VALIDATE_KUBERNETES_KUBECONFORM=false \
 					-e VALIDATE_YAML=false \
 					-e VALIDATE_ANSIBLE=false \
 					-e VALIDATE_DOCKERFILE_HADOLINT=false \
 					-e VALIDATE_TEKTON=false \
 					$(DISABLE_LINTERS) \
-					-v $(PWD):/tmp/lint:rw,z docker.io/github/super-linter:slim-v4
+					-v $(PWD):/tmp/lint:rw,z \
+					-w /tmp/lint \
+					docker.io/github/super-linter:slim-v5
 
 .PHONY: ansible-lint
 ansible-lint: ## run ansible lint on ansible/ folder
-	podman run -it -v $(PWD):/workspace:rw,z --workdir /workspace --entrypoint "/usr/local/bin/ansible-lint" quay.io/ansible/creator-ee:latest  "-vvv" "ansible/"
+	podman run -it -v $(PWD):/workspace:rw,z --workdir /workspace --env ANSIBLE_CONFIG=./ansible/ansible.cfg \
+		--entrypoint "/usr/local/bin/ansible-lint" quay.io/ansible/creator-ee:latest  "-vvv" "ansible/"
 
 .PHONY: ansible-unittest
 ansible-unittest: ## run ansible unit tests
@@ -126,4 +144,3 @@ ansible-unittest: ## run ansible unit tests
 .PHONY: deploy upgrade legacy-deploy legacy-upgrade
 deploy upgrade legacy-deploy legacy-upgrade:
 	@echo "UNSUPPORTED TARGET: please switch to 'operator-deploy'"; exit 1
-
