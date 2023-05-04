@@ -43,7 +43,7 @@ rules:
       - storageclasses
     resourceNames:
       - ocs-storagecluster-ceph-rbd
-      - gp2
+      - gp3-csi
     verbs:
       - get
       - list
@@ -164,7 +164,7 @@ spec:
     dataPVCTemplate:
       metadata: {}
       spec:
-        storageClassName: gp2
+        storageClassName: gp3-csi
         accessModes:
         - ReadWriteOnce
         volumeMode: Block
