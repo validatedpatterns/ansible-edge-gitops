@@ -2,7 +2,7 @@ global:
   xraylab:
     namespace: "openshift-storage"
   datacenter:
-    storageClassName: gp2
+    storageClassName: gp3-csi
     region: us-east-1
 
 odf:
