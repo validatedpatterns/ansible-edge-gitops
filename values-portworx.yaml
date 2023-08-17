@@ -1,5 +1,5 @@
 ---
-defaultStorageClassName: 'px-csi-db'
+defaultStorageClassName: 'px-csi-db-shared'
 
 global:
   extraValueFiles:
