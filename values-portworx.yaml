@@ -1,7 +1,7 @@
 ---
 defaultStorageClassName: 'px-replicated'
 
-main:
+global:
   extraValueFiles:
     - '/values-portworx.yaml'
 
