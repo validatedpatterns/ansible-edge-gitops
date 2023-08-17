@@ -7,7 +7,7 @@ main:
 
 # This is for the portworx cluster to be able to come up if only 2 AZs are available
 storage:
-  maxStorageNodesPerZone: "2"
+  maxStorageNodesPerZone: "3"
 
 clusterGroup:
   namespaces:
