@@ -1,4 +1,5 @@
 ---
+defaultVolumeMode: "Filesystem"
 defaultStorageClassName: 'px-csi-db-shared'
 
 global:
