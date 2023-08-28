@@ -11,6 +11,11 @@ storage:
   maxStorageNodesPerZone: "3"
   drives: "type=gp2,size=100"
 
+# Filesystem mode seems to want the volume to be bigger
+vms:
+  kiosk:
+    storage: 40Gi
+
 clusterGroup:
   namespaces:
     - portworx
