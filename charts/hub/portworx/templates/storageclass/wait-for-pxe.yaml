@@ -12,6 +12,7 @@ spec:
       - image: quay.io/hybridcloudpatterns/utility-container
         command:
         - /bin/bash
+        - -x
         - -c
         - |
           stc_status=$(oc get stc -n {{ .Values.pxnamespace }} | grep Online | wc -l)
