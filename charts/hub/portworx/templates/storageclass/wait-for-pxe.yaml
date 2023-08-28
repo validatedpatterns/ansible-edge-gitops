@@ -15,12 +15,12 @@ spec:
         - -x
         - -c
         - |
-          stc_status=$(oc get stc -n {{ .Values.pxnamespace }} | grep -e "Online|Running" | wc -l)
+          stc_status=$(oc get stc -n {{ .Values.pxnamespace }} | grep -E "Online|Running" | wc -l)
           until [ "$stc_status" -eq "1" ];
           do
             echo "Portworx storagecluster not yet online"
             sleep 10
-            stc_status=$(oc get stc -n {{ .Values.pxnamespace }} | grep -e "Online|Running" | wc -l)
+            stc_status=$(oc get stc -n {{ .Values.pxnamespace }} | grep -E "Online|Running" | wc -l)
           done
           echo "Portworx storagecluster online, waiting for all containers to start"
           num_px_pods=$(oc get pod -l name=portworx -n {{ .Values.pxnamespace }} --no-headers | wc -l)
