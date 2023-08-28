@@ -5,6 +5,7 @@ cloudProvider:
   storageClass: default-rwo
 
 namespace: portworx              # Recommended namespace for install is 'portworx', change to desired namespace if default is unacceptable
+pxnamespace: portworx              # Recommended namespace for install is 'portworx', change to desired namespace if default is unacceptable
 
 storage:
   usefileSystemDrive: false         # true/false Instructs PX to use an unmounted Drive even if it has a filesystem.
