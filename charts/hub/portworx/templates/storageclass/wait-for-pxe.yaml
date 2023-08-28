@@ -15,7 +15,7 @@ spec:
         - -x
         - -c
         - |
-          stc_status=$(oc get stc -n {{ .Values.pxnamespace }} | grep Online | wc -l)
+          stc_status=$(oc get stc -n {{ .Values.pxnamespace }} | grep -e "Online|Running" | wc -l)
           until [ "$stc_status" -eq "1" ];
           do
             echo "Portworx storagecluster not yet online"
