@@ -1,3 +1,6 @@
+global:
+  extraValueFiles: []
+
 main:
   git:
     repoURL: https://github.com/pattern-clone/mypattern
@@ -5,5 +8,13 @@ main:
 
   gitops:
     channel: "gitops-1.8"
+    operatorSource: redhat-operators
+
+  multiSourceConfig:
+    enabled: false
+
+  patternsOperator:
+    channel: fast
+    source: community-operators
 
   clusterGroupName: default

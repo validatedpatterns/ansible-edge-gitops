@@ -43,14 +43,10 @@ spec:
                     helm:
                       ignoreMissingValueFiles: true
                       valueFiles:
-                      - "/values-global.yaml"
-                      - "/values-{{ .name }}.yaml"
-                      - '/values-{{ `{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}` }}.yaml'
-                      - '/values-{{ `{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}` }}-{{ `{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}` }}.yaml'
-                      - '/values-{{ `{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}` }}-{{ .name }}.yaml'
-                      # We cannot use $.Values.global.clusterVersion because that gets resolved to the
-                      # hub's cluster version, whereas we want to include the spoke cluster version
-                      - '/values-{{ `{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}` }}-{{ .name }}.yaml'
+                      {{- include "acm.app.policies.valuefiles" . | nindent 24 }}
+                      {{- range $valueFile := $.Values.global.extraValueFiles }}
+                      - {{ $valueFile | quote }}
+                      {{- end }}
                       {{- range $valueFile := .extraValueFiles }}
                       - {{ $valueFile | quote }}
                       {{- end }}
@@ -95,6 +91,8 @@ spec:
                     automated:
                       prune: false
                       selfHeal: true
+                    retry:
+                      limit: {{ default 20 $.Values.global.options.applicationRetryLimit }}
                   ignoreDifferences:
                   - group: apps
                     kind: Deployment

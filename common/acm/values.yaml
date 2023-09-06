@@ -3,12 +3,17 @@ main:
     channel: "gitops-1.8"
 
 global:
+  extraValueFiles: []
   pattern: none
   repoURL: none
   targetRevision: main
-
+  options:
+    applicationRetryLimit: 20
 
 clusterGroup:
+  subscriptions:
+    acm:
+      source: redhat-operators
   managedClusterGroups:
 #    testRegion:
 #      name: region-one
