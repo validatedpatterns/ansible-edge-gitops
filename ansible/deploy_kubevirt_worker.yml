@@ -12,7 +12,7 @@
           iops: 0
           volumeSize: 120
           volumeType: gp2
-    machineset_instance_type: c5n.metal
+    machineset_instance_type: m5.metal
     machineset_machine_role: worker
     machineset_machine_type: worker
     machineset_name: metal-worker
