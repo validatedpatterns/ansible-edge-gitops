@@ -1,14 +1,4 @@
 ---
-# Source: portworx/templates/aws-prereqs/rbac/serviceAccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: portworx-prereq-sa
-  namespace: portworx
-  annotations:
-    argocd.argoproj.io/sync-hook: "PreSync"
-    argocd.argoproj.io/sync-wave: "-10"
----
 # Source: portworx/templates/storageclass/rbac/serviceAccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -18,212 +8,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-hook: "PreSync"
     argocd.argoproj.io/sync-wave: "-10"
----
-# Source: portworx/templates/aws-prereqs/px-aws-prereqs-cm.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
-  name: px-aws-prereqs-configmap
-  namespace: portworx
-data:
-  px_aws_pre-reqs.sh: |	
-    #!/bin/bash
-
-    export AWS_CONFIG_FILE=/pattern-home/credentials/.aws/config
-    export AWS_SHARED_CREDENTIALS_FILE=/pattern-home/credentials/.aws/credentials
-
-    mkdir /pattern-home/credentials/.aws
-
-    # Ensure we can access the secret for AWS credentials
-    oc get secret aws-creds -n kube-system -o json
-    if [ $? != 0 ];
-    then
-      echo "Cannot access aws-creds secret in kube-system namespace, please check rbac for portworx-prereq-sa serviceAccount."
-    else
-      echo "Found AWS credential secret, building credentials file."
-      AWS_ACCESS_KEY=$(curl -sSk -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/kube-system/secrets/aws-creds | jq -r '.data.aws_access_key_id' | base64 -d)
-      AWS_SECRET_KEY=$(curl -sSk -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/kube-system/secrets/aws-creds | jq -r '.data.aws_secret_access_key' | base64 -d)
-      NODE_REG=$(oc get node -l 'node-role.kubernetes.io/worker=' -o=jsonpath='{.items[0].metadata.name}')
-      AWS_REGION=$(oc get node $NODE_REG -o jsonpath='{.metadata.labels.topology\.kubernetes\.io/region}')
-    cat << EOF >> /pattern-home/credentials/.aws/credentials
-    [default]
-    aws_access_key_id = $AWS_ACCESS_KEY
-    aws_secret_access_key = $AWS_SECRET_KEY
-    EOF
-
-    cat << EOF >> /pattern-home/credentials/.aws/config
-    [default]
-    region = $AWS_REGION
-    output = json
-    EOF
-
-    fi
-
-
-    # Ensure we have AWS credentials to use
-    echo "Checking for AWS credentials."
-    aws sts get-caller-identity
-
-    if [ $? != 0 ];
-    then
-      echo "AWS credentials not found, exiting."
-      exit 1
-    else
-      echo "Found AWS credentials."
-    fi
-
-    # Ensure oc is functional and we can get node info from OCP cluster via serviceAccount
-    oc get node
-    if [ $? != 0 ];
-    then
-      echo "Cannot list nodes, please check rbac for portworx-prereq-sa serviceAccount."
-      exit 1
-    else
-      echo "Configuring for Portworx/Red Hat Multicloud GitOps Pattern."
-    fi
-    
-    # Ensure there are a minimum of three worker nodes in the cluster
-    NUM_WORKERS=$(oc get node -l 'node-role.kubernetes.io/worker=' -o name | wc -l)
-    if [ $NUM_WORKERS -lt 3 ];
-    then
-      echo "Only $NUM_WORKERS worker nodes detected - minimum required is three."
-      exit 1
-    else
-      echo "Found $NUM_WORKERS worker nodes - configuring..."
-    fi
-    
-    # Get the list of worker nodes in the cluster
-    WORKERS=$(oc get node -l 'node-role.kubernetes.io/worker=' -o name)
-
-    # Modify the SG created by OpenShift Installer to allow ports necessary for Portworx
-    for NODE in $WORKERS; do
-      unset AWS_INSTANCE
-      unset AWS_REGION
-      unset AWS_SG
-      AWS_INSTANCE=$(oc get $NODE -o jsonpath='{.spec.providerID}' | sed 's|.*/||')
-      AWS_REGION=$(oc get $NODE -o jsonpath='{.metadata.labels.topology\.kubernetes\.io/region}')
-      AWS_SG=$(aws ec2 describe-instances --instance-id $AWS_INSTANCE --region=$AWS_REGION --query "Reservations[].Instances[].SecurityGroups[].GroupId[]" --output text)
-      for GROUP in $AWS_SG; do
-        OCP_SG=$(aws ec2 describe-security-groups --group-ids $GROUP --query SecurityGroups[*].Description | grep -w "Created By OpenShift Installer" | wc -l)
-        if [ $OCP_SG -eq 1 ];
-        then
-          echo "Found OpenShift created security group assigned to $AWS_INSTANCE, opening Portworx ports."
-
-          # Check to see if security group already allows TCP 17001-17022
-          RULE_EXISTS_SG=$(aws ec2 describe-security-groups --region $AWS_REGION --filters Name=ip-permission.from-port,Values=17001 Name=ip-permission.to-port,Values=17022 Name=ip-permission.group-id,Values=$AWS_SG  --output text)
-          if [ -z "$RULE_EXISTS_SG" ]
-          then
-            unset RULE_EXISTS_SG
-            echo "Adding rule for TCP 17001-17022"
-            aws ec2 authorize-security-group-ingress --group-id $GROUP --protocol tcp --port 17001-17022 --region $AWS_REGION --source-group $GROUP
-          else
-            unset RULE_EXISTS_SG
-            echo "Ports TCP 17001-17022 already allowed in security group $AWS_SG for $AWS_INSTANCE."
-          fi
-
-           # Check to see if security group already allows TCP 20048
-          RULE_EXISTS_SG=$(aws ec2 describe-security-groups --region $AWS_REGION --filters Name=ip-permission.from-port,Values=20048 Name=ip-permission.to-port,Values=20048 Name=ip-permission.group-id,Values=$AWS_SG  --output text)
-          if [ -z "$RULE_EXISTS_SG" ]
-          then
-            unset RULE_EXISTS_SG
-            echo "Adding rule for TCP 20048"
-            aws ec2 authorize-security-group-ingress --group-id $GROUP --protocol tcp --port 20048 --region $AWS_REGION --source-group $GROUP
-          else
-            unset RULE_EXISTS_SG
-            echo "Port TCP 20048 already allowed in security group $AWS_SG for $AWS_INSTANCE."
-          fi
-
-           # Check to see if security group already allows TCP 111
-          RULE_EXISTS_SG=$(aws ec2 describe-security-groups --region $AWS_REGION --filters Name=ip-permission.from-port,Values=111 Name=ip-permission.to-port,Values=111 Name=ip-permission.group-id,Values=$AWS_SG  --output text)
-          if [ -z "$RULE_EXISTS_SG" ]
-          then
-            unset RULE_EXISTS_SG
-            echo "Adding rule for TCP 111"
-            aws ec2 authorize-security-group-ingress --group-id $GROUP --protocol tcp --port 111 --region $AWS_REGION --source-group $GROUP
-          else
-            unset RULE_EXISTS_SG
-            echo "Port TCP 111 already allowed in security group $AWS_SG for $AWS_INSTANCE."
-          fi
-
-           # Check to see if security group already allows UDP 17002
-          RULE_EXISTS_SG=$(aws ec2 describe-security-groups --region $AWS_REGION --filters Name=ip-permission.from-port,Values=17002 Name=ip-permission.to-port,Values=111 Name=ip-permission.group-id,Values=$AWS_SG  --output text)
-          if [ -z "$RULE_EXISTS_SG" ]
-          then
-            unset RULE_EXISTS_SG
-            echo "Adding rule for UDP 17002"
-            aws ec2 authorize-security-group-ingress --group-id $GROUP --protocol udp --port 17002 --region $AWS_REGION --source-group $GROUP
-          else
-            unset RULE_EXISTS_SG
-            echo "Port UDP 17002 already allowed in security group $AWS_SG for $AWS_INSTANCE."
-          fi
-
-           # Check to see if security group already allows TCP 2049
-          RULE_EXISTS_SG=$(aws ec2 describe-security-groups --region $AWS_REGION --filters Name=ip-permission.from-port,Values=2049 Name=ip-permission.to-port,Values=2049 Name=ip-permission.group-id,Values=$AWS_SG  --output text)
-          if [ -z "$RULE_EXISTS_SG" ]
-          then
-            unset RULE_EXISTS_SG
-            echo "Adding rule for TCP 2049"
-            aws ec2 authorize-security-group-ingress --group-id $GROUP --protocol tcp --port 2049 --region $AWS_REGION --source-group $GROUP
-          else
-            unset RULE_EXISTS_SG
-            echo "Port UDP 2049 already allowed in security group $AWS_SG for $AWS_INSTANCE."
-          fi
-
-        else
-          echo "Could not find security group created by OpenShift installer, exiting."
-          exit 1
-        fi
-      echo ""
-      done
-
-      # Get the IAM instance profile for the next step
-      AWS_IAM_IP=$(aws ec2 describe-instances --instance-id $AWS_INSTANCE --region $AWS_REGION --query "Reservations[].Instances[].IamInstanceProfile[].Arn" --output text | sed 's|.*/||')
-    done
-
-    # Create the JSON for the necessary IAM permissions for Cloud Drives
-    cat << EOF >> /pattern-home/credentials/px-clouddrives.json
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "",
-                "Effect": "Allow",
-                "Action": [
-                  "ec2:AttachVolume",
-                  "ec2:ModifyVolume",
-                  "ec2:DetachVolume",
-                  "ec2:CreateTags",
-                  "ec2:CreateVolume",
-                  "ec2:DeleteTags",
-                  "ec2:DeleteVolume",
-                  "ec2:DescribeTags",
-                  "ec2:DescribeVolumeAttribute",
-                  "ec2:DescribeVolumesModifications",
-                  "ec2:DescribeVolumeStatus",
-                  "ec2:DescribeVolumes",
-                  "ec2:DescribeInstances",
-                  "autoscaling:DescribeAutoScalingGroups"
-                ],
-                "Resource": [
-                  "*"
-                ]
-            }
-        ]
-    }
-    EOF
-
-    # Get the IAM role being used
-    AWS_IAM_ROLE=$(aws iam get-instance-profile --instance-profile-name $AWS_IAM_IP --region $AWS_REGION --query "InstanceProfile.Roles[].RoleName" --output text)
-
-    echo "Creating inline policy within IAM role $AWS_IAM_ROLE for Portworx CloudDrive permissions."
-
-    # Attach the cloud drive permission policy to the IAM role
-    aws iam put-role-policy --region $AWS_REGION --role-name $AWS_IAM_ROLE --policy-name Portworx-CloudDrive --policy-document file:///pattern-home/credentials/px-clouddrives.json
-    rm /pattern-home/credentials/px-clouddrives.json
-
-    echo "Portworx pre-reqs for AWS complete."
 ---
 # Source: portworx/templates/storageclass/portworx-rwx.yaml
 apiVersion: storage.k8s.io/v1
@@ -242,19 +26,6 @@ reclaimPolicy: Delete
 volumeBindingMode: Immediate
 allowVolumeExpansion: true
 ---
-# Source: portworx/templates/aws-prereqs/rbac/role.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: portworx-prereq-clusterrole
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-15"
-rules:
-  - apiGroups: ['']
-    resources: ['secrets','nodes','services']
-    verbs: ['get', 'list']
----
 # Source: portworx/templates/storageclass/rbac/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -267,24 +38,6 @@ rules:
 - apiGroups: ["*"]
   resources: ['pods','storageclusters']
   verbs: ['get','list']
----
-# Source: portworx/templates/aws-prereqs/rbac/rolebinding.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: portworx-prereq-clusterrolebinding
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-15"
-subjects:
-- kind: ServiceAccount
-  name: portworx-prereq-sa
-  namespace: portworx
-  apiGroup: ""
-roleRef:
-  kind: ClusterRole
-  name: portworx-prereq-clusterrole
-  apiGroup: rbac.authorization.k8s.io
 ---
 # Source: portworx/templates/storageclass/rbac/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -335,41 +88,6 @@ roleRef:
   kind: Role
   name: portworx-sc-ns-role
   apiGroup: rbac.authorization.k8s.io
----
-# Source: portworx/templates/aws-prereqs/px-aws-prereqs-job.yaml
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "2"
-  name: px-aws-prereqs
-  namespace: portworx
-spec:
-  parallelism: 1
-  completions: 1
-  activeDeadlineSeconds: 120
-  backoffLimit: 1
-  template:
-    spec:
-      serviceAccountName: portworx-prereq-sa
-      containers:
-        - name: px-aws-prereqs-utility
-          image: quay.io/hybridcloudpatterns/utility-container
-          command: ['sh', '-c', 'sh /pattern-home/scripts/px_aws_pre-reqs.sh']
-          volumeMounts:
-            - name: pattern-home-prereqs
-              mountPath: "/pattern-home/scripts"
-            - name: credentials
-              mountPath: "/pattern-home/credentials"
-      volumes:
-        - name: pattern-home-prereqs
-          configMap:
-            name: px-aws-prereqs-configmap
-            defaultMode: 0755
-        - name: credentials
-          emptyDir:
-            sizeLimit: 1Mi
-      restartPolicy: Never
 ---
 # Source: portworx/templates/storageclass/wait-for-pxe.yaml
 apiVersion: batch/v1
@@ -423,10 +141,9 @@ metadata:
   namespace: portworx
   annotations:
     argocd.argoproj.io/sync-wave: "3"
-    portworx.io/is-eks: "true"
     portworx.io/is-openshift: "true"
     portworx.com/install-source: helm-rhmcgo
-    portworx.com/helm-vars: chart="portworx-0.0.1",cloudProvider="map[storageClass:default-rwo]" ,clusterGroup="map[applications:map[acm:map[ignoreDifferences:[map[group:internal.open-cluster-management.io jsonPointers:[/spec/loggingCA] kind:ManagedClusterInfo]] name:acm namespace:open-cluster-management path:common/acm project:datacenter] odh:map[name:odh namespace:manuela-ml-workspace path:charts/datacenter/opendatahub project:datacenter] pipelines:map[name:pipelines namespace:manuela-ci path:charts/datacenter/pipelines project:datacenter] production-data-lake:map[ignoreDifferences:[map[group:apps jsonPointers:[/spec/replicas] kind:Deployment] map[group:route.openshift.io jsonPointers:[/status] kind:Route] map[group:image.openshift.io jsonPointers:[/spec/tags] kind:ImageStream] map[group:apps.openshift.io jsonPointers:[/spec/template/spec/containers/0/image] kind:DeploymentConfig]] name:production-data-lake namespace:manuela-data-lake path:charts/datacenter/manuela-data-lake project:production-datalake] secrets:map[name:external-secrets namespace:external-secrets path:charts/datacenter/external-secrets project:golang-external-secrets] secrets-operator:map[name:golang-external-secrets namespace:golang-external-secrets path:common/golang-external-secrets project:golang-external-secrets] test:map[name:manuela-test namespace:manuela-tst-all path:charts/datacenter/manuela-tst plugin:map[name:helm-with-kustomize] project:datacenter] vault:map[chart:vault name:vault namespace:vault overrides:[map[name:global.openshift value:true] map[name:injector.enabled value:false] map[name:ui.enabled value:true] map[name:ui.serviceType value:LoadBalancer] map[name:server.route.enabled value:true] map[name:server.route.host value:<nil>] map[name:server.route.tls.termination value:edge] map[name:server.image.repository value:registry.connect.redhat.com/hashicorp/vault] map[name:server.image.tag value:1.10.3-ubi]] project:datacenter repoURL:https://helm.releases.hashicorp.com targetRevision:v0.20.1]] imperative:map[jobs:[map[name:test playbook:ansible/test.yml]]] isHubCluster:true managedClusterGroups:map[factory:map[clusterSelector:map[matchExpressions:[map[key:vendor operator:In values:[OpenShift]]] matchLabels:map[clusterGroup:factory]] helmOverrides:[map[name:clusterGroup.isHubCluster value:false]] name:factory]] name:datacenter namespaces:[golang-external-secrets external-secrets open-cluster-management manuela-ml-workspace manuela-tst-all manuela-ci manuela-data-lake staging vault] operatorgroupExcludes:[manuela-ml-workspace] projects:[datacenter production-datalake golang-external-secrets vault] subscriptions:map[acm:map[channel:release-2.6 name:advanced-cluster-management namespace:open-cluster-management] amqbroker-prod:map[channel:7.x name:amq-broker-rhel8 namespace:manuela-tst-all] amqstreams-prod-dev:map[channel:stable name:amq-streams namespaces:[manuela-data-lake manuela-tst-all]] camelk-prod-dev:map[channel:stable name:red-hat-camel-k namespaces:[manuela-data-lake manuela-tst-all]] odh:map[channel:stable name:opendatahub-operator source:community-operators] pipelines:map[channel:latest name:openshift-pipelines-operator-rh source:redhat-operators] seldon-prod-dev:map[channel:stable name:seldon-operator namespaces:[manuela-ml-workspace manuela-tst-all] source:community-operators]]]" ,csi="true" ,deleteStrategy="UninstallAndWipe" ,envVars="none" ,global="map[clusterDomain:region.example.com clusterPlatform:AWS hub:map[provider:aws storageClassName:gp2] hubClusterDomain:apps.hub.example.com localClusterDomain:apps.region.example.com namespace:pattern-namespace options:map[installPlanApproval:Automatic syncPolicy:Automatic useCSV:false] pattern:mypattern repoURL:https://github.com/pattern-clone/mypattern]" ,internalKVDB="true" ,main="map[clusterGroupName:hub git:map[repoURL:https://github.com/pattern-clone/mypattern revision:main]]" ,namespace="portworx" ,network="map[dataInterface:none managementInterface:none]" ,pxnamespace="portworx" ,repo="map[dr:docker.io/portworx enterprise:docker.io/portworx]" ,secretType="k8s" ,storage="map[drives:type=gp2,size=20 journalDevice:<nil> kvdbDrives:type=gp2,size=150 maxStorageNodesPerZone:1 usedrivesAndPartitions:false usefileSystemDrive:false]" ,versions="map[autoPilot:1.3.7 enterprise:2.13.4 ociMon:2.13.4 stork:23.4.0]" 
+    portworx.com/helm-vars: chart="portworx-0.0.1",cloudProvider="map[storageClass:default-rwo]" ,clusterGroup="map[applications:map[acm:map[ignoreDifferences:[map[group:internal.open-cluster-management.io jsonPointers:[/spec/loggingCA] kind:ManagedClusterInfo]] name:acm namespace:open-cluster-management path:common/acm project:datacenter] odh:map[name:odh namespace:manuela-ml-workspace path:charts/datacenter/opendatahub project:datacenter] pipelines:map[name:pipelines namespace:manuela-ci path:charts/datacenter/pipelines project:datacenter] production-data-lake:map[ignoreDifferences:[map[group:apps jsonPointers:[/spec/replicas] kind:Deployment] map[group:route.openshift.io jsonPointers:[/status] kind:Route] map[group:image.openshift.io jsonPointers:[/spec/tags] kind:ImageStream] map[group:apps.openshift.io jsonPointers:[/spec/template/spec/containers/0/image] kind:DeploymentConfig]] name:production-data-lake namespace:manuela-data-lake path:charts/datacenter/manuela-data-lake project:production-datalake] secrets:map[name:external-secrets namespace:external-secrets path:charts/datacenter/external-secrets project:golang-external-secrets] secrets-operator:map[name:golang-external-secrets namespace:golang-external-secrets path:common/golang-external-secrets project:golang-external-secrets] test:map[name:manuela-test namespace:manuela-tst-all path:charts/datacenter/manuela-tst plugin:map[name:helm-with-kustomize] project:datacenter] vault:map[chart:vault name:vault namespace:vault overrides:[map[name:global.openshift value:true] map[name:injector.enabled value:false] map[name:ui.enabled value:true] map[name:ui.serviceType value:LoadBalancer] map[name:server.route.enabled value:true] map[name:server.route.host value:<nil>] map[name:server.route.tls.termination value:edge] map[name:server.image.repository value:registry.connect.redhat.com/hashicorp/vault] map[name:server.image.tag value:1.10.3-ubi]] project:datacenter repoURL:https://helm.releases.hashicorp.com targetRevision:v0.20.1]] imperative:map[jobs:[map[name:test playbook:ansible/test.yml]]] isHubCluster:true managedClusterGroups:map[factory:map[clusterSelector:map[matchExpressions:[map[key:vendor operator:In values:[OpenShift]]] matchLabels:map[clusterGroup:factory]] helmOverrides:[map[name:clusterGroup.isHubCluster value:false]] name:factory]] name:datacenter namespaces:[golang-external-secrets external-secrets open-cluster-management manuela-ml-workspace manuela-tst-all manuela-ci manuela-data-lake staging vault] operatorgroupExcludes:[manuela-ml-workspace] projects:[datacenter production-datalake golang-external-secrets vault] subscriptions:map[acm:map[channel:release-2.6 name:advanced-cluster-management namespace:open-cluster-management] amqbroker-prod:map[channel:7.x name:amq-broker-rhel8 namespace:manuela-tst-all] amqstreams-prod-dev:map[channel:stable name:amq-streams namespaces:[manuela-data-lake manuela-tst-all]] camelk-prod-dev:map[channel:stable name:red-hat-camel-k namespaces:[manuela-data-lake manuela-tst-all]] odh:map[channel:stable name:opendatahub-operator source:community-operators] pipelines:map[channel:latest name:openshift-pipelines-operator-rh source:redhat-operators] seldon-prod-dev:map[channel:stable name:seldon-operator namespaces:[manuela-ml-workspace manuela-tst-all] source:community-operators]]]" ,csi="true" ,deleteStrategy="UninstallAndWipe" ,envVars="none" ,global="map[clusterDomain:region.example.com clusterPlatform:aws clusterVersion:4.12 hub:map[provider:aws storageClassName:gp2] hubClusterDomain:apps.hub.example.com localClusterDomain:apps.region.example.com namespace:pattern-namespace options:map[installPlanApproval:Automatic syncPolicy:Automatic useCSV:false] pattern:mypattern repoURL:https://github.com/pattern-clone/mypattern]" ,internalKVDB="true" ,main="map[clusterGroupName:hub git:map[repoURL:https://github.com/pattern-clone/mypattern revision:main]]" ,namespace="portworx" ,network="map[dataInterface:none managementInterface:none]" ,pxnamespace="portworx" ,repo="map[dr:docker.io/portworx enterprise:docker.io/portworx]" ,secretType="k8s" ,storage="map[drives:type=gp2,size=20 journalDevice:<nil> kvdbDrives:type=gp2,size=150 maxStorageNodesPerZone:1 usedrivesAndPartitions:false usefileSystemDrive:false]" ,versions="map[autoPilot:1.3.7 enterprise:2.13.4 ociMon:2.13.4 stork:23.4.0]" 
 spec:
   deleteStrategy:
     type: UninstallAndWipe
