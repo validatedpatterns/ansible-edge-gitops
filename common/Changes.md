@@ -1,9 +1,5 @@
 # Changes
 
-## Sep 25, 2023
-
-* Upgraded ESO to v0.9.5
-
 ## Aug 17, 2023
 
 * Introduced support for multisource applications via .chart + .chartVersion

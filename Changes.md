@@ -33,3 +33,9 @@
 * Updated wait-for-metal-nodes machinery to also skip RBAC creation since the only reason for it in e-g-v is for the job, which should only be needed when provisioning a separate metal node as is needed by AWS
 
 * Updated common to refresh vault and external-secrets and pick up default features for gitops-1.8
+
+## Changes for v1.3 (October 2, 2023)
+
+* Introduce Portworx Enterprise as an alternative resilient storage solution for the VMs
+* Update common for feature/functionality upgrades
+* Update default metal node type from c5n.metal to m5.metal to better accommodate different AWS Zones

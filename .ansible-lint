@@ -16,4 +16,6 @@ warn_list:
   - risky-file-permissions
   - var-spacing
   - name[casing]
+
+skip_list:
   - var-naming[no-role-prefix]
