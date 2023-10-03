@@ -198,6 +198,8 @@ data:
     enabled: all
     global:
       clusterDomain: region.example.com
+      clusterPlatform: aws
+      clusterVersion: "4.12"
       extraValueFiles: []
       hub:
         provider: aws
@@ -543,7 +545,13 @@ spec:
       ignoreMissingValueFiles: true
       valueFiles:
       - "/values-global.yaml"
-      - "/values-example.yaml" 
+      - "/values-example.yaml"
+      - "/values-aws.yaml"
+      - "/values-aws-4.12.yaml"
+      - "/values-aws-example.yaml"
+      - "/values-4.12-example.yaml" 
+      - "/values/aws.yaml"
+      - "/values/4.12.yaml"
       parameters:
         - name: global.repoURL
           value: $ARGOCD_APP_SOURCE_REPO_URL
@@ -600,7 +608,14 @@ spec:
       ignoreMissingValueFiles: true
       valueFiles:
       - "/values-global.yaml"
-      - "/values-example.yaml" 
+      - "/values-example.yaml"
+      - "/values-aws.yaml"
+      - "/values-aws-4.12.yaml"
+      - "/values-aws-example.yaml"
+      - "/values-4.12-example.yaml" 
+      - "/values/aws.yaml"
+      - "/values/4.12.yaml"
+      - "/values/4.12/aws.yaml"
       parameters:
         - name: global.repoURL
           value: $ARGOCD_APP_SOURCE_REPO_URL
