@@ -1,11 +1,16 @@
-NAME=$(shell basename "`pwd`")
+NAME ?= $(shell basename "`pwd`")
 ifneq ($(origin TARGET_SITE), undefined)
   TARGET_SITE_OPT=--set main.clusterGroupName=$(TARGET_SITE)
 endif
 
+# This variable can be set in order to pass additional helm arguments from the
+# the command line. I.e. we can set things without having to tweak values files
+EXTRA_HELM_OPTS ?=
+
 # INDEX_IMAGES=registry-proxy.engineering.redhat.com/rh-osbs/iib:394248
-INDEX_IMAGES ?= 
-INDEX_OPTIONS=$(shell echo $(INDEX_IMAGES) | tr ',' '\n' | awk -F: 'match($$1,"/"){print "--set main.extraParameters."NR".name=clusterGroup.indexImages."NR".image --set main.extraParameters."NR".value="$$1":"$$2}')
+# or
+# INDEX_IMAGES=registry-proxy.engineering.redhat.com/rh-osbs/iib:394248,registry-proxy.engineering.redhat.com/rh-osbs/iib:394249
+INDEX_IMAGES ?=
 
 TARGET_ORIGIN ?= origin
 # This is to ensure that whether we start with a git@ or https:// URL, we end up with an https:// URL
@@ -14,13 +19,23 @@ TARGET_REPO=$(shell git ls-remote --get-url --symref $(TARGET_ORIGIN) | sed -e '
 # git branch --show-current is also available as of git 2.22, but we will use this for compatibility
 TARGET_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
+UUID_FILE ?= ~/.config/validated-patterns/pattern-uuid
+UUID_HELM_OPTS ?=
+
 # --set values always take precedence over the contents of -f
-HELM_OPTS=-f values-global.yaml --set main.git.repoURL="$(TARGET_REPO)" --set main.git.revision=$(TARGET_BRANCH) $(TARGET_SITE_OPT) $(INDEX_OPTIONS)
+ifneq ("$(wildcard $(UUID_FILE))","")
+	UUID := $(shell cat $(UUID_FILE))
+	UUID_HELM_OPTS := --set main.analyticsUUID=$(UUID)
+endif
+
+HELM_OPTS=-f values-global.yaml --set main.git.repoURL="$(TARGET_REPO)" --set main.git.revision=$(TARGET_BRANCH) $(TARGET_SITE_OPT) $(UUID_HELM_OPTS) $(EXTRA_HELM_OPTS)
+
 
 ##@ Pattern Common Tasks
 
 .PHONY: help
 help: ## This help message
+	@echo "Pattern: $(NAME)"
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^(\s|[a-zA-Z_0-9-])+:.*?##/ { printf "  \033[36m%-35s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 #  Makefiles in the individual patterns should call these targets explicitly
@@ -29,21 +44,13 @@ help: ## This help message
 show: ## show the starting template without installing it
 	helm template common/operator-install/ --name-template $(NAME) $(HELM_OPTS)
 
-# Only call helm install if the CRD is missing. If it already exists just
-# push the templated files.
-# The reason we have two helm template calls in the else branch is to avoid
-# warnings when the chart gets applied the first time, but the resources were
-# created first via the VP operator's UI
 .PHONY: operator-deploy
-operator-deploy operator-upgrade: validate-prereq validate-origin ## runs helm install
-	@set -e; if ! oc get crds patterns.gitops.hybrid-cloud-patterns.io >/dev/null 2>&1; then \
-	  echo "Running helm:"; \
-	  helm upgrade --install $(NAME) common/operator-install/ $(HELM_OPTS); \
-	else \
-	  echo "Reapplying helm chart:"; \
-	  helm template --name-template $(NAME) common/operator-install/ $(HELM_OPTS) | oc apply set-last-applied --create-annotation -f-; \
-	  helm template --name-template $(NAME) common/operator-install/ $(HELM_OPTS) | oc apply -f-; \
-	fi
+operator-deploy operator-upgrade: validate-prereq validate-origin validate-cluster ## runs helm install
+	@set -e -o pipefail
+	# Retry five times because the CRD might not be fully installed yet
+	for i in {1..5}; do \
+		helm template --include-crds --name-template $(NAME) common/operator-install/ $(HELM_OPTS) | oc apply -f- && break || sleep 10; \
+	done
 
 .PHONY: uninstall
 uninstall: ## runs helm uninstall
@@ -54,6 +61,18 @@ uninstall: ## runs helm uninstall
 .PHONY: load-secrets
 load-secrets: ## loads the secrets into the vault
 	common/scripts/vault-utils.sh push_secrets $(NAME)
+
+.PHONY: load-iib
+load-iib: ## CI target to install Index Image Bundles
+	@set -e; if [ x$(INDEX_IMAGES) != x ]; then \
+		for IIB in $(shell echo $(INDEX_IMAGES) | tr ',' '\n'); do \
+			INDEX_IMAGE="$${IIB}" ansible-playbook common/ansible/playbooks/iib-ci/iib-ci.yaml; \
+		done; \
+	else \
+		echo "No INDEX_IMAGES defined. Bailing out"; \
+		exit 1; \
+	fi
+
 
 ##@ Validation Tasks
 
@@ -70,6 +89,19 @@ validate-origin: ## verify the git origin is available
 	else\
 		echo "Running inside a container: Skipping git ssh checks";\
 	fi
+
+.PHONY: validate-cluster
+validate-cluster: ## Do some cluster validations before installing
+	@echo "Checking cluster:"
+	@echo -n "  cluster-info: "
+	@oc cluster-info >/dev/null && echo "OK" || (echo "Error"; exit 1)
+	@echo -n "  storageclass: "
+	@if [ `oc get storageclass -o go-template='{{printf "%d\n" (len .items)}}'` -eq 0 ]; then\
+		echo "None Found"; exit 1;\
+	else\
+		echo "OK";\
+	fi
+
 
 .PHONY: validate-schema
 validate-schema: ## validates values files against schema in common/clustergroup
@@ -90,14 +122,46 @@ validate-prereq: ## verify pre-requisites
 	@if ! ansible-galaxy collection list | grep kubernetes.core > /dev/null 2>&1; then echo "Not found"; exit 1; fi
 	@echo "OK"
 
+.PHONY: argo-healthcheck
+argo-healthcheck: ## Checks if all argo applications are synced
+	@echo "Checking argo applications"
+	$(eval APPS := $(shell oc get applications -A -o jsonpath='{range .items[*]}{@.metadata.namespace}{","}{@.metadata.name}{"\n"}{end}'))
+	@NOTOK=0; \
+	for i in $(APPS); do\
+		n=`echo "$${i}" | cut -f1 -d,`;\
+		a=`echo "$${i}" | cut -f2 -d,`;\
+		STATUS=`oc get -n "$${n}" application/"$${a}" -o jsonpath='{.status.sync.status}'`;\
+		if [[ $$STATUS != "Synced" ]]; then\
+			NOTOK=$$(( $${NOTOK} + 1));\
+		fi;\
+		HEALTH=`oc get -n "$${n}" application/"$${a}" -o jsonpath='{.status.health.status}'`;\
+		if [[ $$HEALTH != "Healthy" ]]; then\
+			NOTOK=$$(( $${NOTOK} + 1));\
+		fi;\
+		echo "$${n} $${a} -> Sync: $${STATUS} - Health: $${HEALTH}";\
+	done;\
+	if [ $${NOTOK} -gt 0 ]; then\
+	    echo "Some applications are not synced or are unhealthy";\
+	    exit 1;\
+	fi
+
+
 ##@ Test and Linters Tasks
 
 CHARTS=$(shell find . -type f -iname 'Chart.yaml' -exec dirname "{}"  \; | grep -v examples | sed -e 's/.\///')
 # Section related to tests and linting
-TEST_OPTS= -f values-global.yaml --set global.repoURL="https://github.com/pattern-clone/mypattern" \
-	--set main.git.repoURL="https://github.com/pattern-clone/mypattern" --set main.git.revision=main --set global.pattern="mypattern" \
-	--set global.namespace="pattern-namespace" --set global.hubClusterDomain=apps.hub.example.com --set global.localClusterDomain=apps.region.example.com --set global.clusterDomain=region.example.com\
-	--set "clusterGroup.imperative.jobs[0].name"="test" --set "clusterGroup.imperative.jobs[0].playbook"="ansible/test.yml"
+TEST_OPTS= -f values-global.yaml \
+	--set global.repoURL="https://github.com/pattern-clone/mypattern" \
+	--set main.git.repoURL="https://github.com/pattern-clone/mypattern" \
+	--set main.git.revision=main --set global.pattern="mypattern" \
+	--set global.namespace="pattern-namespace" \
+	--set global.hubClusterDomain=apps.hub.example.com \
+	--set global.localClusterDomain=apps.region.example.com \
+	--set global.clusterDomain=region.example.com \
+	--set global.clusterVersion="4.12" \
+	--set global.clusterPlatform=aws \
+	--set "clusterGroup.imperative.jobs[0].name"="test" \
+	--set "clusterGroup.imperative.jobs[0].playbook"="ansible/test.yml"
 PATTERN_OPTS=-f common/examples/values-example.yaml
 EXECUTABLES=git helm oc ansible
 
@@ -110,7 +174,8 @@ helmlint: ## run helm lint
 	@for t in $(CHARTS); do common/scripts/lint.sh $$t $(TEST_OPTS); if [ $$? != 0 ]; then exit 1; fi; done
 
 API_URL ?= https://raw.githubusercontent.com/hybrid-cloud-patterns/ocp-schemas/main/openshift/4.10/
-KUBECONFORM_SKIP ?= -skip 'CustomResourceDefinition,ClusterIssuer,CertManager,Certificate'
+KUBECONFORM_SKIP ?= -skip 'CustomResourceDefinition,ClusterIssuer,CertManager,Certificate,ArgoCD'
+
 # We need to skip 'CustomResourceDefinition' as openapi2jsonschema seems to be unable to generate them ATM
 .PHONY: kubeconform
 kubeconform: ## run helm kubeconform

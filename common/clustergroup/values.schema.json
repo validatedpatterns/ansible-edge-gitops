@@ -92,6 +92,20 @@
               "description": "The channel from which to install the gitops operator"
             }
           }
+        },
+        "multiSourceConfig": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable the experimental support for multi source"
+            }
+          }
+        },
+        "analyticsUUID": {
+          "type": "string",
+          "description": "UUID used to generate analytics"
         }
       }
     },
@@ -192,6 +206,10 @@
           "type": "string",
           "deprecated": true,
           "description": "This is used to approval strategy for the subscriptions of OpenShift Operators being installed. You can choose Automatic or Manual updates. NOTE: This setting is now available in the subcriptions description in the values file."
+        },
+        "applicationRetryLimit": {
+          "type": "integer",
+          "description": "Number of failed sync attempt retries; unlimited number of attempts if less than 0"
         }
       },
       "required": [
@@ -216,11 +234,15 @@
           "type": "boolean",
           "description": "If set to true the values is used to identify whether this is the hub cluster or an edge/spoke cluster configuration."
         },
+        "sharedValueFiles": {
+            "type": "array",
+            "description": "Templated value file paths."
+	},
         "namespaces": {
           "type": "array",
           "description": "This is the array of namespaces that the VP framework will create.  In addition, operator groups will also be created for each namespace.",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Namespaces"
           }
         },
         "indexImages": {
@@ -318,6 +340,51 @@
       ],
       "title": "ClusterGroup"
     },
+    "Namespaces": {
+      "anyOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "string"
+        }
+      ],
+	  "description": "Description of the applications that will be created in the ArgoCD instances. The Application CRD is the Kubernetes resource object representing a deployed application instance in an environment. Two ways of defining applications: Using a list or using a dictionary.",
+	  "additionalProperties": true,
+	  "properties": {
+         "name": {
+		    "type": "string",
+		    "description": "Name of the namespace."
+          },
+	      "labels": {
+		    "type": "array",
+		    "items": {
+		      "$ref": "#/definitions/NameValue"
+		    }
+	      },
+	      "annotations": {
+		    "type": "array",
+		    "items": {
+		      "$ref": "#/definitions/NameValue"
+		    }
+	      }
+	  }
+    },
+	"NameValue": {
+      "type": "object",
+      "description": "Description of the applications that will be created in the ArgoCD instances. The Application CRD is the Kubernetes resource object representing a deployed application instance in an environment. Two ways of defining applications: Using a list or using a dictionary.",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the namespace."
+        },
+        "value": {
+          "type": "string",
+          "description": "Name of the namespace."
+        }
+	  }
+	},
     "Applications": {
       "type": "object",
       "description": "Description of the applications that will be created in the ArgoCD instances. The Application CRD is the Kubernetes resource object representing a deployed application instance in an environment. Two ways of defining applications: Using a list or using a dictionary.",
@@ -338,6 +405,10 @@
         "chart": {
           "type": "string",
           "description": "Chart is a Helm chart name, and must be specified for applications sourced from a Helm repo."
+        },
+        "chartVersion": {
+          "type": "string",
+          "description": "The version of the helm chart to be used. Can be a regex like '0.0.*'."
         },
         "kustomize": {
           "type": "boolean",

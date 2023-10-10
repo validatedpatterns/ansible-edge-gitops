@@ -1,10 +1,13 @@
 global:
+  extraValueFiles: []
   pattern: common
   targetRevision: main
   options:
     useCSV: True
     syncPolicy: Automatic
     installPlanApproval: Automatic
+    applicationRetryLimit: 20
+
 
 enabled: "all"
 
@@ -13,6 +16,7 @@ clusterGroup:
   name: example
   isHubCluster: true
   targetCluster: in-cluster
+  sharedValueFiles: []
 
   imperative:
     jobs: []

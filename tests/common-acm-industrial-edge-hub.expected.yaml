@@ -10,6 +10,7 @@ metadata:
   namespace: open-cluster-management
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
+    installer.open-cluster-management.io/mce-subscription-spec: '{"source": "redhat-operators" }'
 spec: {}
 ---
 # Source: acm/templates/policies/acm-hub-ca-policy.yaml
@@ -205,14 +206,14 @@ spec:
                     helm:
                       ignoreMissingValueFiles: true
                       valueFiles:
-                      - "/values-global.yaml"
-                      - "/values-factory.yaml"
-                      - '/values-{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}.yaml'
-                      - '/values-{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}-{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}.yaml'
-                      - '/values-{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}-factory.yaml'
-                      # We cannot use $.Values.global.clusterVersion because that gets resolved to the
-                      # hub's cluster version, whereas we want to include the spoke cluster version
-                      - '/values-{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}-factory.yaml'
+                        - "/values-global.yaml"
+                        - "/values-factory.yaml"
+                        - '/values-{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}.yaml'
+                        - '/values-{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}-{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}.yaml'
+                        - '/values-{{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type }}-factory.yaml'
+                        # We cannot use $.Values.global.clusterVersion because that gets resolved to the
+                        # hub's cluster version, whereas we want to include the spoke cluster version
+                        - '/values-{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}-factory.yaml'
                       parameters:
                       - name: global.repoURL
                         value: $ARGOCD_APP_SOURCE_REPO_URL
@@ -233,7 +234,7 @@ spec:
                       - name: global.clusterVersion
                         value: '{{ printf "%d.%d" ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Major) ((semver (lookup "operator.openshift.io/v1" "OpenShiftControllerManager" "" "cluster").status.version).Minor) }}'
                       - name: global.clusterPlatform
-                        value: 
+                        value: aws
                       - name: clusterGroup.name
                         value: factory
                       - name: clusterGroup.isHubCluster
@@ -245,6 +246,8 @@ spec:
                     automated:
                       prune: false
                       selfHeal: true
+                    retry:
+                      limit: 20
                   ignoreDifferences:
                   - group: apps
                     kind: Deployment
