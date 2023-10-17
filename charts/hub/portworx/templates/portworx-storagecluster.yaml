@@ -113,6 +113,6 @@ spec:
     image: "{{template "px.getStorkImage" . }}"
   autopilot:
     enabled: true
-    image: "{{template "px.getAutopilotImage" . }}"
+    image: "{{ template "px.getAutopilotImage" . }}"
   csi:
     enabled: {{ .Values.csi  | default "true" }}
