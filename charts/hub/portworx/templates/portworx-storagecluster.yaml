@@ -110,7 +110,7 @@ spec:
     enabled: true
     args:
       webhook-controller: "true"
-    image: "{{template "px.getStorkImage" . }}"
+    image: "{{ template "px.getStorkImage" . }}"
   autopilot:
     enabled: true
     image: "{{ template "px.getAutopilotImage" . }}"
