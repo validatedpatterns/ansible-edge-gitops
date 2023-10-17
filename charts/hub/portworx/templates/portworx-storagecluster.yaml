@@ -36,10 +36,10 @@ spec:
   env:
     {{- if eq $.Values.global.clusterPlatform "Azure" }}
     - name: AZURE_CLIENT_SECRET
-    valueFrom:
-      secretKeyRef:
-        name: px-azure
-        key: AZURE_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: px-azure
+          key: AZURE_CLIENT_SECRET
     - name: AZURE_CLIENT_ID
       valueFrom:
         secretKeyRef:
