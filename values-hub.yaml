@@ -88,7 +88,7 @@ clusterGroup:
       project: hub
       path: charts/hub/openshift-data-foundations
       extraValueFiles:
-        - '/cluster-overrides/values-{{ $.Values.global.clusterPlatform }}-{{ $.Values.global.clusterVersion }}.yaml'
+        - '/cluster-overrides/values-odf-{{ $.Values.global.clusterPlatform }}-{{ $.Values.global.clusterVersion }}.yaml'
 
     edge-gitops-vms:
       name: edge-gitops-vms

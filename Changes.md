@@ -34,8 +34,10 @@
 
 * Updated common to refresh vault and external-secrets and pick up default features for gitops-1.8
 
-## Changes for v1.3 (October 2, 2023)
+## Changes for v1.3 (October 17, 2023)
 
 * Introduce Portworx Enterprise as an alternative resilient storage solution for the VMs
 * Update common for feature/functionality upgrades
 * Update default metal node type from c5n.metal to m5.metal to better accommodate different AWS Zones
+* Remove support for 4.10 (since it is out of support)
+* Update platform level override using new templated valuefile name feature in common
