@@ -16,13 +16,6 @@ vms:
   kiosk:
     storage: 40Gi
 
-awsCreds:
-  inject: true
-
-secrets:
-  AWSsecretName: aws-creds
-  AWSsecretNamespace: ansible-automation-platform
-
 clusterGroup:
   namespaces:
     - portworx
