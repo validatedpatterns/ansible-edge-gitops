@@ -18,3 +18,7 @@ rhsm:
 
 kioskExtra:
   key: secret/data/hub/kiosk-extra
+
+awsCreds:
+  inject: false
+  key: secret/data/hub/aws-creds
