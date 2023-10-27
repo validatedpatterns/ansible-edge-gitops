@@ -6,6 +6,8 @@ global:
     region: us-east-1
 
 odf:
+  useMultiCloudGateway: false
+
   jobTerminationGracePeriod: 300
   namespace: openshift-storage
   mon:

@@ -4,6 +4,10 @@ metadata:
   namespace: {{ .Values.odf.namespace }}
   name: ocs-storagecluster
 spec:
+{{- if not .Values.odf.useMultiCloudGateway }}
+  multiCloudGateway:
+    reconcileStrategy: ignore
+{{- end }}
   resources:
     mon:
       requests:
