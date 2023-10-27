@@ -16,14 +16,14 @@ data:
     mkdir /pattern-home/credentials/.aws
 
     # Ensure we can access the secret for AWS credentials
-    oc get secret aws-creds -n kube-system -o json
+    oc get secret {{ .Values.secrets.AWSsecretNamespace }} -n {{ .Values.secrets.AWSsecretName }} -o json
     if [ $? != 0 ];
     then
-      echo "Cannot access aws-creds secret in kube-system namespace, please check rbac for portworx-prereq-sa serviceAccount."
+      echo "Cannot access {{ .Values.secrets.AWSsecretName }} secret in {{ .Values.secrets.AWSSsecretNamespace }} namespace, please check rbac for portworx-prereq-sa serviceAccount."
     else
       echo "Found AWS credential secret, building credentials file."
-      AWS_ACCESS_KEY=$(curl -sSk -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/kube-system/secrets/aws-creds | jq -r '.data.aws_access_key_id' | base64 -d)
-      AWS_SECRET_KEY=$(curl -sSk -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/kube-system/secrets/aws-creds | jq -r '.data.aws_secret_access_key' | base64 -d)
+      AWS_ACCESS_KEY=$(curl -sSk -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/{{ .Values.secrets.AWSsecretNamespace }}/secrets/{{ .Values.secrets.AWSsecretName }} | jq -r '.data.aws_access_key_id' | base64 -d)
+      AWS_SECRET_KEY=$(curl -sSk -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/{{ .Values.secrets.AWSsecretNamespace }}/secrets/{{ .Values.secrets.AWSsecretName }} | jq -r '.data.aws_secret_access_key' | base64 -d)
       NODE_REG=$(oc get node -l 'node-role.kubernetes.io/worker=' -o=jsonpath='{.items[0].metadata.name}')
       AWS_REGION=$(oc get node $NODE_REG -o jsonpath='{.metadata.labels.topology\.kubernetes\.io/region}')
     cat << EOF >> /pattern-home/credentials/.aws/credentials

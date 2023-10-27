@@ -7,6 +7,10 @@ cloudProvider:
 namespace: portworx              # Recommended namespace for install is 'portworx', change to desired namespace if default is unacceptable
 pxnamespace: portworx              # Recommended namespace for install is 'portworx', change to desired namespace if default is unacceptable
 
+secrets:
+  AWSsecretName: aws-creds
+  AWSsecretNamespace: kube-system
+
 storage:
   usefileSystemDrive: false         # true/false Instructs PX to use an unmounted Drive even if it has a filesystem.
   usedrivesAndPartitions: false     # Defaults to false. Change to true and PX will use unmounted drives and partitions.
