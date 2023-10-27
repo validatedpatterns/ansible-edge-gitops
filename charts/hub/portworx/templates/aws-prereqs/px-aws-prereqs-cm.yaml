@@ -16,7 +16,7 @@ data:
     mkdir /pattern-home/credentials/.aws
 
     # Ensure we can access the secret for AWS credentials
-    oc get secret {{ .Values.secrets.AWSsecretNamespace }} -n {{ .Values.secrets.AWSsecretName }} -o json
+    oc get secret {{ .Values.secrets.AWSsecretName }} -n {{ .Values.secrets.AWSsecretNamespace }} -o json
     if [ $? != 0 ];
     then
       echo "Cannot access {{ .Values.secrets.AWSsecretName }} secret in {{ .Values.secrets.AWSSsecretNamespace }} namespace, please check rbac for portworx-prereq-sa serviceAccount."

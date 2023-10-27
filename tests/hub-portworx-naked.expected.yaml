@@ -40,7 +40,7 @@ data:
     oc get secret aws-creds -n kube-system -o json
     if [ $? != 0 ];
     then
-      echo "Cannot access aws-creds secret in kube-system namespace, please check rbac for portworx-prereq-sa serviceAccount."
+      echo "Cannot access aws-creds secret in  namespace, please check rbac for portworx-prereq-sa serviceAccount."
     else
       echo "Found AWS credential secret, building credentials file."
       AWS_ACCESS_KEY=$(curl -sSk -H "Authorization: Bearer $(cat /run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/kube-system/secrets/aws-creds | jq -r '.data.aws_access_key_id' | base64 -d)
@@ -426,7 +426,7 @@ metadata:
     portworx.io/is-eks: "true"
     portworx.io/is-openshift: "true"
     portworx.com/install-source: helm-rhmcgo
-    portworx.com/helm-vars: chart="portworx-0.0.1",cloudProvider="map[storageClass:default-rwo]" ,csi="true" ,deleteStrategy="UninstallAndWipe" ,envVars="none" ,global="map[clusterPlatform:AWS]" ,internalKVDB="true" ,namespace="portworx" ,network="map[dataInterface:none managementInterface:none]" ,pxnamespace="portworx" ,repo="map[dr:docker.io/portworx enterprise:docker.io/portworx]" ,secretType="k8s" ,storage="map[drives:type=gp2,size=20 journalDevice:<nil> kvdbDrives:type=gp2,size=150 maxStorageNodesPerZone:1 usedrivesAndPartitions:false usefileSystemDrive:false]" ,versions="map[autoPilot:1.3.7 enterprise:2.13.4 ociMon:2.13.4 stork:23.4.0]" 
+    portworx.com/helm-vars: chart="portworx-0.0.1",cloudProvider="map[storageClass:default-rwo]" ,csi="true" ,deleteStrategy="UninstallAndWipe" ,envVars="none" ,global="map[clusterPlatform:AWS]" ,internalKVDB="true" ,namespace="portworx" ,network="map[dataInterface:none managementInterface:none]" ,pxnamespace="portworx" ,repo="map[dr:docker.io/portworx enterprise:docker.io/portworx]" ,secretType="k8s" ,secrets="map[AWSsecretName:aws-creds AWSsecretNamespace:kube-system]" ,storage="map[drives:type=gp2,size=20 journalDevice:<nil> kvdbDrives:type=gp2,size=150 maxStorageNodesPerZone:1 usedrivesAndPartitions:false usefileSystemDrive:false]" ,versions="map[autoPilot:1.3.7 enterprise:2.13.4 ociMon:2.13.4 stork:23.4.0]" 
 spec:
   deleteStrategy:
     type: UninstallAndWipe
