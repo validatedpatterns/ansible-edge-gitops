@@ -27,7 +27,7 @@ metadata:
     {{- end }}
     portworx.io/is-openshift: "true"
     portworx.com/install-source: helm-rhmcgo
-    portworx.com/helm-vars: chart="{{.Chart.Name}}-{{.Chart.Version}}"{{range $k, $v := .Values }}{{if $v}},{{ $k }}="{{ $v }}" {{end}}{{end}}
+    portworx.com/helm-vars: chart="{{.Chart.Name}}-{{.Chart.Version}}"{{range $k, $v := .Values }}{{if and ($v) (ne "clusterGroup" $k) }},{{ $k }}="{{ $v }}" {{end}}{{end}}
 spec:
   {{- if not (eq $deleteStrategy "none") }}
   deleteStrategy:
