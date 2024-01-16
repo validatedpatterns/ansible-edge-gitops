@@ -20,6 +20,7 @@
       node-role.kubernetes.io/worker: ""
     machineset_replicas: 1
     machineset_user_data_secret: worker-user-data
+    machineset_user_data_namespace: openshift-machine-api
   tasks:
     - name: Query Cluster Infrastructure Name
       kubernetes.core.k8s_info:
@@ -109,7 +110,7 @@
                     tags: {{ machineset_tags }}
                     userDataSecret:
                       name: "{{ machineset_user_data_secret }}"
-                      namespace: openshift-machine-api
+                      namespace: "{{ machineset_user_data_namespace }}"
 
     - name: Create MachineSet
       kubernetes.core.k8s:

@@ -129,6 +129,8 @@ metadata:
   namespace: openshift-storage
   name: ocs-storagecluster
 spec:
+  multiCloudGateway:
+    reconcileStrategy: ignore
   resources:
     mon:
       requests:
