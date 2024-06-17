@@ -120,7 +120,7 @@
 +          namespace: openshift-storage
 +          path: charts/hub/openshift-data-foundations
 +          project: hub
-+        openshit-cnv:
++        openshift-cnv:
 +          name: openshift-cnv
 +          namespace: openshift-cnv
 +          path: charts/hub/cnv
