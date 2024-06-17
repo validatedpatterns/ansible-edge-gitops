@@ -76,7 +76,7 @@ clusterGroup:
       project: hub
       path: common/golang-external-secrets
 
-    openshit-cnv:
+    openshift-cnv:
       name: openshift-cnv
       namespace: openshift-cnv
       project: hub
