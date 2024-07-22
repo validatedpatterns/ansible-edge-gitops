@@ -9,7 +9,6 @@ global:
 
   hub:
     provider: aws
-    storageClassName: gp2
 
 main:
   clusterGroupName: hub
