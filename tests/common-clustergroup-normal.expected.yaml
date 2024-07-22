@@ -254,7 +254,6 @@ data:
       extraValueFiles: []
       hub:
         provider: aws
-        storageClassName: gp2
       hubClusterDomain: apps.hub.example.com
       localClusterDomain: apps.region.example.com
       multiClusterTarget: all
