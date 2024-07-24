@@ -51,9 +51,12 @@ clusterGroup:
       - apiGroups:
           - "*"
         resources:
-          - pvcs
+          - pvc
         verbs:
-          - "*"
+          - get
+          - list
+          - watch
+          - delete
       - apiGroups:
           - "*"
         resources:
