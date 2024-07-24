@@ -24,7 +24,6 @@
 
     - name: Trap errors
       block:
-
         - name: Parse results
           ansible.builtin.set_fact:
             default_sc: '{{ default_sc_output.stdout | from_json }}'
