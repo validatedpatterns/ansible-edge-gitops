@@ -41,7 +41,8 @@
             kind: pvc
             namespace: '{{ image_cleanup_namespace }}'
           register: pvc_cleanup_list
-          when: pvc_cleanup
+          when:
+            - pvc_cleanup
 
         - name: Remove stray PVCs
           kubernetes.core.k8s:
@@ -50,17 +51,10 @@
             name: '{{ item.metadata.name }}'
             state: absent
           loop: "{{ pvc_cleanup_list.resources }}"
-          when: pvc_cleanup
+          when:
+            - pvc_cleanup
+            - item.spec.storageClassName != default_virt_sc.metadata.name
       rescue:
         - name: Note that we exited
           ansible.builtin.debug:
             msg: "Caught an error, exiting"
-
-    #    - name: Perform the PVC cleanup
-    #      when: pvc_cleanup
-    #      block:
-    #        - name: Remove PVCs
-    #          ansible.builtin.k8s:
-    #            kind: PVC
-    #            namespace: openshift-virtualization-os-images
-    #            state: absent
