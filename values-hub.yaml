@@ -51,7 +51,7 @@ clusterGroup:
       - apiGroups:
           - "*"
         resources:
-          - pvc
+          - persistentvolumeclaims
         verbs:
           - get
           - list
