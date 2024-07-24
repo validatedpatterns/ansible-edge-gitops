@@ -33,7 +33,9 @@
         - name: Commit to PVC cleanup
           ansible.builtin.set_fact:
             pvc_cleanup: true
-          when: default_sc.metadata.name != default_virt_sc.metadata.name
+          when:
+            - default_virt_sc.metadata.name == "ocs-storagecluster-ceph-rbd-virtualization"
+            - default_sc.metadata.name != default_virt_sc.metadata.name
 
         - name: Find PVCs
           kubernetes.core.k8s_info:
