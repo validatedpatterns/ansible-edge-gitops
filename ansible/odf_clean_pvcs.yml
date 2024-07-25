@@ -11,7 +11,7 @@
     image_cleanup_namespace: "openshift-virtualization-os-images"
     dv_namespace: edge-gitops-vms
     dv_remove_timeout: 1800
-    dv_remove_states: [ "Pending" ]
+    dv_remove_status: ["Pending"]
     ts_fmt: '%Y-%m-%dT%H:%M:%S.%fZ'
   tasks:
     - name: Find default storageclass
