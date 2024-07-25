@@ -42,3 +42,9 @@
 * Remove support for 4.10 (since it is out of support)
 * Update platform level override using new templated valuefile name feature in common
 * Skip multicloud gateway (noobaa) installation in ODF by default
+
+## Changes in main (July 25, 2024)
+
+* Introduce clean-golden-images job to imperative. This is a workaround for a bug in CNV 4.15/ODF 4.15 where if the default StorageClass is not the same as the default virtualization storage class, CNV cannot properly provision datavolumes.
+* Default storageclass for edge-gitops-vms to "ocs-storagecluster-ceph-rbd-virtualization", available since ODF 4.14.
+* Use api_version for Route queries when discovering credentials for AAP instance.
