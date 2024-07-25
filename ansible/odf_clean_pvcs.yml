@@ -16,12 +16,14 @@
   tasks:
     - name: Find default storageclass
       ansible.builtin.shell: |
+        set -o pipefail
         oc get storageclass -o json | jq -r '.items[] | select(.metadata.annotations."storageclass.kubernetes.io/is-default-class")'
       register: default_sc_output
       changed_when: false
 
     - name: Find virtualization default storageclass
       ansible.builtin.shell: |
+        set -o pipefail
         oc get storageclass -o json | jq -r '.items[] | select(.metadata.annotations."storageclass.kubevirt.io/is-default-virt-class")'
       register: default_virt_sc_output
       changed_when: false
