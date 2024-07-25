@@ -3,9 +3,9 @@ import os
 import time
 
 import pytest
+from validatedpatterns_tests.interop.crd import ArgoCD
 
 from . import __loggername__
-from .crd import ArgoCD
 
 logger = logging.getLogger(__loggername__)
 
