@@ -79,7 +79,7 @@
             api_version: "{{ item.apiVersion }}"
             state: absent
           when:
-            - item.status.phase in dv_remove_stats
+            - item.status.phase in dv_remove_status
             - (now(utc=true) - (item.metadata.creationTimestamp|to_datetime(ts_fmt))).seconds >= dv_remote_timeout
           loop: '{{ vm_ds.resources }}'
 
