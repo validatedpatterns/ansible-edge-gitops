@@ -46,17 +46,10 @@ clusterGroup:
           - "*"
         resources:
           - machinesets
-        verbs:
-          - "*"
-      - apiGroups:
-          - "*"
-        resources:
           - persistentvolumeclaims
+          - routes
         verbs:
-          - get
-          - list
-          - watch
-          - delete
+          - "*"
       - apiGroups:
           - "*"
         resources:
