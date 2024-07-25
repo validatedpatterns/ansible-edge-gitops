@@ -11,7 +11,7 @@ cloudInitDefaultSecretName: secret/data/hub/cloud-init
 # Or "RWO" and "gp2"; other choices are possible too but
 # these are defaults for ODF which is included in the pattern
 defaultAccessMode: "ReadWriteMany"
-defaultStorageClassName: "ocs-storagecluster-ceph-rbd"
+defaultStorageClassName: "ocs-storagecluster-ceph-rbd-virtualization"
 defaultVolumeMode: "Block"
 
 vmNamespace: edge-gitops-vms

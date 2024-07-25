@@ -32,6 +32,10 @@ clusterGroup:
       - name: deploy-kubevirt-worker
         playbook: ansible/deploy_kubevirt_worker.yml
         verbosity: -vvv
+      - name: clean-golden-images
+        playbook: ansible/odf_clean_pvcs.yml
+        image: quay.io/hybridcloudpatterns/utility-container:latest
+        verbosity: -vvv
       - name: configure-aap-controller
         playbook: ansible/imperative_configure_controller.yml
         image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
@@ -42,6 +46,8 @@ clusterGroup:
           - "*"
         resources:
           - machinesets
+          - persistentvolumeclaims
+          - datavolumes
         verbs:
           - "*"
       - apiGroups:
@@ -95,6 +101,8 @@ clusterGroup:
       namespace: edge-gitops-vms
       project: hub
       path: charts/hub/edge-gitops-vms
+      extraValueFiles:
+        - '/overrides/values-egv-{{ $.Values.global.clusterVersion }}.yaml'
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
