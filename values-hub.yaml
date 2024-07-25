@@ -47,7 +47,7 @@ clusterGroup:
         resources:
           - machinesets
           - persistentvolumeclaims
-          - routes
+          - datavolumes
         verbs:
           - "*"
       - apiGroups:
