@@ -12,7 +12,7 @@
     dv_namespace: edge-gitops-vms
     dv_remove_timeout: 1800
     dv_remove_status: ["Pending"]
-    ts_fmt: '%Y-%m-%dT%H:%M:%S.%fZ'
+    ts_fmt: '%Y-%m-%dT%H:%M:%SZ'
   tasks:
     - name: Find default storageclass
       ansible.builtin.shell: |
