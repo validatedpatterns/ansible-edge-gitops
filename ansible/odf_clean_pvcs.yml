@@ -82,7 +82,7 @@
             state: absent
           when:
             - item.status.phase in dv_remove_status
-            - (now(utc=true) - (item.metadata.creationTimestamp|to_datetime(ts_fmt))).seconds >= dv_remote_timeout
+            - (now(utc=true) - (item.metadata.creationTimestamp|to_datetime(ts_fmt))).seconds >= dv_remove_timeout
           loop: '{{ vm_ds.resources }}'
 
       rescue:
