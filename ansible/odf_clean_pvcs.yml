@@ -9,6 +9,10 @@
     kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
     pvc_cleanup: false
     image_cleanup_namespace: "openshift-virtualization-os-images"
+    dv_namespace: edge-gitops-vms
+    dv_remove_timeout: 1800
+    dv_remove_states: [ "Pending" ]
+    ts_fmt: '%Y-%m-%dT%H:%M:%S.%fZ'
   tasks:
     - name: Find default storageclass
       ansible.builtin.shell: |
@@ -22,7 +26,7 @@
       register: default_virt_sc_output
       changed_when: false
 
-    - name: Trap errors
+    - name: Compare default virtualization storageclass and default storageclass to determine whether to clean PVCs
       block:
         - name: Parse results
           ansible.builtin.set_fact:
@@ -35,16 +39,22 @@
           when:
             - default_virt_sc.metadata.name == "ocs-storagecluster-ceph-rbd-virtualization"
             - default_sc.metadata.name != default_virt_sc.metadata.name
+      rescue:
+        - name: Note that we exited
+          ansible.builtin.debug:
+            msg: "Caught an error before we could determine to clean up PVCs, exiting"
 
+    - name: Cleanup incorrect datasourceimport images (PVCs)
+      when:
+        - pvc_cleanup
+      block:
         - name: Find PVCs
           kubernetes.core.k8s_info:
             kind: pvc
             namespace: '{{ image_cleanup_namespace }}'
           register: pvc_cleanup_list
-          when:
-            - pvc_cleanup
 
-        - name: Remove stray PVCs
+        - name: Remove stray datasource PVCs
           kubernetes.core.k8s:
             kind: pvc
             namespace: '{{ image_cleanup_namespace }}'
@@ -52,9 +62,28 @@
             state: absent
           loop: "{{ pvc_cleanup_list.resources }}"
           when:
-            - pvc_cleanup
             - item.spec.storageClassName != default_virt_sc.metadata.name
+
+        - name: Check for stuck datavolumes
+          kubernetes.core.k8s_info:
+            namespace: '{{ dv_namespace }}'
+            kind: DataVolume
+            api_version: cdi.kubevirt.io/v1beta1
+          register: vm_ds
+
+        - name: Remove stuck datavolume if needed
+          kubernetes.core.k8s:
+            name: "{{ item.metadata.name }}"
+            namespace: "{{ item.metadata.namespace }}"
+            kind: "{{ item.kind }}"
+            api_version: "{{ item.apiVersion }}"
+            state: absent
+          when:
+            - item.status.phase in dv_remove_stats
+            - (now(utc=true) - (item.metadata.creationTimestamp|to_datetime(ts_fmt))).seconds >= dv_remote_timeout
+          loop: '{{ vm_ds.resources }}'
+
       rescue:
         - name: Note that we exited
           ansible.builtin.debug:
-            msg: "Caught an error, exiting"
+            msg: "Caught an error while cleaning up PVCs, exiting"
