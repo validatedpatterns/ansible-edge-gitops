@@ -1,4 +1,0 @@
----
-global:
-  datacenter:
-    storageClassName: gp2
