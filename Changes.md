@@ -43,8 +43,10 @@
 * Update platform level override using new templated valuefile name feature in common
 * Skip multicloud gateway (noobaa) installation in ODF by default
 
-## Changes in main (July 25, 2024)
+## Changes for v1.4 (July 29, 2024)
 
 * Introduce clean-golden-images job to imperative. This is a workaround for a bug in CNV 4.15/ODF 4.15 where if the default StorageClass is not the same as the default virtualization storage class, CNV cannot properly provision datavolumes.
 * Default storageclass for edge-gitops-vms to "ocs-storagecluster-ceph-rbd-virtualization", available since ODF 4.14.
 * Use api_version for Route queries when discovering credentials for AAP instance.
+* Update common.
+* Update deploy_kubevirt_worker.yml Ansible playbook to copy securityGroups and blockDevices config from first machineSet. Tag naming schemes changed from OCP 4.15 to 4.16; this method ensures forward and backward compatibility.
