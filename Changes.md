@@ -14,7 +14,7 @@
 
 ## Changes for v1.2 (February 9, 2023)
 
-* Kiosk_mode improvements: kiosk_mode role now has a variable `kiosk_port` which influences the kiosk-mode script and controls which port firefox connects to. (Previously this was hard-coded to port 8088; the var defaults to 8088 so existing setups will continue to work. This will make it easier to tailor or customize the pattern to work with containers other than Ignition.
+* Kiosk_mode improvements: kiosk_mode role now has a variable `kiosk_port` which influences the kiosk-mode script and controls which port firefox connects to. (Previously this was hardcoded to port 8088; the var defaults to 8088 so existing setups will continue to work. This will make it easier to tailor or customize the pattern to work with containers other than Ignition.
 
 * cloud-init changes: move the cloud-init configuration file, user, and password to secrets from edge-gitops-vms values. This was a regrettable oversight in v1.0 and v1.1.
 
@@ -26,7 +26,7 @@
 
 * No "visible" changes so not updating the branch pointer
 
-* Updated ansible code to follow best practices and silent many linter warnings
+* Updated ansible code to follow best practices and silent many linting warnings
 
 * Updated edge-gitops-vms chart to add SkipDryRunOnMissingResource annotations to prevent errors occuring due to race conditions with OpenShift Virtualization
 
@@ -58,4 +58,3 @@
 * Split HMI Demo out to separate [repository](https://github.com/validatedpatterns-demos/rhvp.ansible_edge_hmi)
 * Switch to modular common
 * Use the Validated Patterns ODF Chart
-
