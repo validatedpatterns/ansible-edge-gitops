@@ -96,6 +96,8 @@ clusterGroup:
       project: hub
       chart: openshift-data-foundations
       chartVersion: 0.1.*
+      extraValueFiles:
+        - '/overrides/values-odf-chart.yaml'
 
     edge-gitops-vms:
       name: edge-gitops-vms
@@ -107,9 +109,3 @@ clusterGroup:
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
-
-  # Params for the ODF chart
-  storageSystem:
-    deploy: true
-    inventory:
-      useSpecificNodes: false

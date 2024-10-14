@@ -1,0 +1,5 @@
+---
+storageSystem:
+  deploy: true
+  inventory:
+    useSpecificNodes: false
