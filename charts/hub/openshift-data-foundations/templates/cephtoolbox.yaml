@@ -1,9 +1,0 @@
-apiVersion: ocs.openshift.io/v1
-kind: OCSInitialization
-metadata:
-  name: {{ .Values.toolbox.name }}
-  namespace: {{ .Values.odf.namespace }}
-  annotations:
-    argocd.argoproj.io/sync-wave: "10"
-spec:
-  enableCephTools: {{ .Values.toolbox.enableCephTools }}
