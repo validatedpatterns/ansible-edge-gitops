@@ -3,3 +3,6 @@ storageSystem:
   deploy: true
   inventory:
     useSpecificNodes: false
+
+objectstorage:
+  enable: false
