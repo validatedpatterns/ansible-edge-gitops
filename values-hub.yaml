@@ -74,13 +74,15 @@ clusterGroup:
       name: vault
       namespace: vault
       project: hub
-      path: common/hashicorp-vault
+      chart: hashicorp-vault
+      chartVersion: 0.1.*
 
     golang-external-secrets:
       name: golang-external-secrets
       namespace: golang-external-secrets
       project: hub
-      path: common/golang-external-secrets
+      chart: golang-external-secrets
+      chartVersion: 0.1.*
 
     openshift-cnv:
       name: openshift-cnv
@@ -92,7 +94,8 @@ clusterGroup:
       name: odf
       namespace: openshift-storage
       project: hub
-      path: charts/hub/openshift-data-foundations
+      chart: openshift-data-foundations
+      chartVersion: 0.1.*
 
     edge-gitops-vms:
       name: edge-gitops-vms
@@ -104,3 +107,9 @@ clusterGroup:
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
+
+  # Params for the ODF chart
+  storageSystem:
+    deploy: true
+    inventory:
+      useSpecificNodes: false
