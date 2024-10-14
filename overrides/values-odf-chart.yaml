@@ -4,5 +4,5 @@ storageSystem:
   inventory:
     useSpecificNodes: false
 
-objectstorage:
+objectStorage:
   enable: false
