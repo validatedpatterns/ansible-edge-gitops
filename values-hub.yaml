@@ -97,7 +97,7 @@ clusterGroup:
       chart: openshift-data-foundations
       chartVersion: 0.1.*
       extraValueFiles:
-        - '/overrides/values-odf-chart.yaml'
+        - '$patternref/overrides/values-odf-chart.yaml'
 
     edge-gitops-vms:
       name: edge-gitops-vms
@@ -105,7 +105,7 @@ clusterGroup:
       project: hub
       path: charts/hub/edge-gitops-vms
       extraValueFiles:
-        - '/overrides/values-egv-{{ $.Values.global.clusterVersion }}.yaml'
+        - '$patternref/overrides/values-egv-{{ $.Values.global.clusterVersion }}.yaml'
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []
