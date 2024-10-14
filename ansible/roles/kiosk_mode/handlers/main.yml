@@ -1,4 +1,0 @@
----
-# handlers file for kiosk_mode
-- name: Reboot
-  ansible.builtin.reboot:

@@ -52,3 +52,10 @@
 * Update deploy_kubevirt_worker.yml Ansible playbook to copy securityGroups and blockDevices config from first machineSet. Tag naming schemes changed from OCP 4.15 to 4.16; this method ensures forward and backward compatibility.
 * Remove ODF overrides from OCP 4.12/3 that force storageClass to gp2; all released versions should use gp3-csi now.
 * Include overrides for OCP 4.12 and OCP 4.13 to use the older `ocs-storagecluster-ceph-rbd` storageClass.
+
+## Changes for v2.0 (TBD)
+
+* Split HMI Demo out to separate [repository](https://github.com/validatedpatterns-demos/rhvp.ansible_edge_hmi)
+* Switch to modular common
+* Use the Validated Patterns ODF Chart
+
