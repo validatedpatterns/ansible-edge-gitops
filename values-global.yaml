@@ -14,3 +14,4 @@ main:
   clusterGroupName: hub
   multiSourceConfig:
     enabled: true
+    clusterGroupChartVersion: 0.9.*
