@@ -1,0 +1,38 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Configure this pattern's AAP Controller
+  become: false
+  connection: local
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ansible_host: ""
+    admin_password: ""
+    secrets: ""
+  tasks:
+    - name: Wait for API to become available
+      retries: 300
+      delay: 5
+      register: api_status
+      until: api_status.status == 200
+      ansible.builtin.uri:
+        url: https://{{ ansible_host }}/api/v2/config/
+        method: GET
+        user: admin
+        password: "{{ admin_password }}"
+        body_format: json
+        validate_certs: false
+        force_basic_auth: true
+      no_log: true
+
+    - name: Load license the awx way
+      awx.awx.license:
+        controller_host: "{{ ansible_host }}"
+        controller_username: admin
+        controller_password: "{{ admin_password }}"
+        manifest: "{{ secrets.manifest_file_ref }}"
+        validate_certs: false
+      retries: 30
+      delay: 10
+      register: result
+      until: result is not failed

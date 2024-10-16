@@ -8,5 +8,5 @@
 - name: Extract secrets from Kubernetes
   ansible.builtin.import_playbook: parse_secrets_from_k8s.yml
 
-- name: Configure controller using credentials
-  ansible.builtin.import_playbook: ansible_configure_controller.yml
+- name: Entitle AAP using credentials
+  ansible.builtin.import_playbook: entitle_aap.yml

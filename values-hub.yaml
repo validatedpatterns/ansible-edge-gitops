@@ -37,11 +37,21 @@ clusterGroup:
         playbook: ansible/odf_clean_pvcs.yml
         image: quay.io/hybridcloudpatterns/utility-container:latest
         verbosity: -vvv
-#      - name: configure-aap-controller
-#        playbook: ansible/imperative_configure_controller.yml
-#        image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
-#        verbosity: -vvv
-#        timeout: "900"
+      - name: configure-vault-secret
+        playbook: ansible/copy_vault_secret_for_aap.yml
+        image: quay.io/hybridcloudpatterns/utility-container:latest
+        verbosity: -vvv
+        timeout: "900"
+      - name: entitle-aap-controller
+        playbook: ansible/imperative_entitle_aap.yml
+        image: quay.io/hybridcloudpatterns/utility-container:latest
+        verbosity: -vvv
+        timeout: "900"
+      #- name: configure-aap-controller
+      #  playbook: ansible/imperative_entitle_aap.yml
+      #  image: quay.io/hybridcloudpatterns/utility-container:latest
+      #  verbosity: -vvv
+      #  timeout: "900"
     clusterRoleYaml:
       - apiGroups:
           - "*"
