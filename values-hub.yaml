@@ -69,6 +69,12 @@ clusterGroup:
           - get
           - list
           - watch
+      - apiGroups:
+          - "*"
+        resources:
+          - secrets
+        verbs:
+          - "*"
 
   applications:
     aap:
