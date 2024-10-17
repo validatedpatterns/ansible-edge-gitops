@@ -12,6 +12,14 @@
     controller_configuration_dir: /tmp/controller_configuration_dir
     entitle_aap: true
   tasks:
+    - name: Assign variables for IAC Configuration
+      ansible.builtin.set_fact:
+        controller_hostname: "{{ ansible_host }}"
+        controller_username: admin
+        controller_password: "{{ admin_password }}"
+        controller_validate_certs: false
+        controller_configuration_secure_logging: false
+
     - name: Check on license key to determine need to entitle
       block:
         - name: Wait for API to become available
@@ -62,13 +70,6 @@
         namespace: ansible-automation-platform
         kind: ConfigMap
       register: repo_config
-
-    - name: Assign variables for IAC Configuration
-      ansible.builtin.set_fact:
-        controller_hostname: "{{ ansible_host }}"
-        controller_username: admin
-        controller_password: "{{ admin_password }}"
-        controller_validate_certs: false
 
     - name: Checkout infrastructure-as-code repository
       ansible.builtin.git:
