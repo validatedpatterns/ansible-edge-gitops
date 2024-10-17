@@ -63,4 +63,4 @@
 * Comment out portworx install and test, as the only OCP version that supports is 4.12, which is now past
   the end of its maintenance support lifecycle.
 * Refactor installation mechannism to use standard configuration-as-code approach, which will make it easier to drop
-  in a new config-as-code repo.
+  in a new config-as-code repository.
