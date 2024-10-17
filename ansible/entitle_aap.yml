@@ -1,6 +1,6 @@
 #!/usr/bin/env ansible-playbook
 ---
-- name: Configure this pattern's AAP Controller
+- name: Entitle this pattern's AAP Controller
   become: false
   connection: local
   hosts: localhost
@@ -9,7 +9,7 @@
     ansible_host: ""
     admin_password: ""
     secrets: ""
-    entite_aap: true
+    entitle_aap: true
   tasks:
     - name: Check on license key to determine need to entitle
       block:

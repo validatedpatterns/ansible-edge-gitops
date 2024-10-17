@@ -1,0 +1,12 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Configure this pattern's AAP Controller
+  become: false
+  connection: local
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ansible_host: ""
+    admin_password: ""
+    secrets: ""
+  tasks: []

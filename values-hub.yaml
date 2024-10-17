@@ -47,11 +47,11 @@ clusterGroup:
         image: quay.io/hybridcloudpatterns/utility-container:latest
         verbosity: -vvv
         timeout: "900"
-      #- name: configure-aap-controller
-      #  playbook: ansible/imperative_entitle_aap.yml
-      #  image: quay.io/hybridcloudpatterns/utility-container:latest
-      #  verbosity: -vvv
-      #  timeout: "900"
+      - name: configure-aap-controller
+        playbook: ansible/imperative_configure_aap.yml
+        image: quay.io/hybridcloudpatterns/utility-container:latest
+        verbosity: -vvv
+        timeout: "900"
     clusterRoleYaml:
       - apiGroups:
           - "*"
