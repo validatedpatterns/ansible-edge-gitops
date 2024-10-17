@@ -55,6 +55,12 @@
 
 ## Changes for v2.0 (TBD)
 
-* Split HMI Demo out to separate [repository](https://github.com/validatedpatterns-demos/rhvp.ansible_edge_hmi)
+* Split HMI Demo Project out to separate [repository](https://github.com/validatedpatterns-demos/rhvp.ansible_edge_hmi)
+* Split HMI Config out to separate [repository](https://github.com/validatedpatterns-demos/ansible-edge-gitops-hmi-config-as-code.git)
+* Drop the custom execution environment because AAP can resolve these dependencies itself
 * Switch to modular common
-* Use the Validated Patterns ODF Chart
+* Use the Validated Patterns ODF Chart (dropping our custom version)
+* Comment out portworx install and test, as the only OCP version that supports is 4.12, which is now past
+  the end of its maintenance support lifecycle.
+* Refactor installation mechannism to use standard configuration-as-code approach, which will make it easier to drop
+  in a new config-as-code repo.

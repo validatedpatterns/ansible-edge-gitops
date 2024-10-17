@@ -14,8 +14,8 @@ help:
 install upgrade deploy: operator-deploy post-install ## Install or upgrade the pattern via the operator
 	echo "Installed/Upgraded"
 
-portworx-install portworx-upgrade portworx-deploy: ## Install with portworx instead
-	EXTRA_HELM_OPTS='-f values-portworx.yaml' make install
+#portworx-install portworx-upgrade portworx-deploy: ## Install with portworx instead
+#	EXTRA_HELM_OPTS='-f values-portworx.yaml' make install
 
 post-install: ## Post-install tasks - load-secrets
 	make load-secrets
@@ -31,8 +31,8 @@ test: ## Run tests
 	@set -e; for i in $(CHARTS); do echo "$${i}"; helm template "$${i}"; done
 	echo Tests SUCCESSFUL
 
-portworx-test:
-	EXTRA_HELM_OPTS='-f values-portworx.yaml' make test
+#portworx-test:
+#	EXTRA_HELM_OPTS='-f values-portworx.yaml' make test
 
 update-tests: ## Update test results
 	./scripts/update-tests.sh $(CHART_OPTS)
