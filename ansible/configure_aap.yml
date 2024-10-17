@@ -9,4 +9,50 @@
     ansible_host: ""
     admin_password: ""
     secrets: ""
-  tasks: []
+    controller_configuration_dir: /tmp/controller_configuration_dir
+  tasks:
+    - name: Determine which repo to clone
+      kubernetes.core.k8s_info:
+        name: aap-configascode-cm
+        namespace: ansible-automation-platform
+        kind: ConfigMap
+      register: repo_config
+
+    - name: Retrieve config details about vault
+      kubernetes.core.k8s_info:
+        name: vault-info
+        namespace: ansible-automation-platform
+        kind: Secret
+      register: vault_config
+
+    - name: Assign variables
+      ansible.builtin.set_fact:
+        controller_hostname: "{{ ansible_host }}"
+        controller_username: admin
+        controller_password: "{{ admin_password }}"
+        vault_ca: "{{ vault_config.resources[0].data.vault_ca | b64decode }}"
+        vault_root_token: "{{ vault_config.resources[0].data.vault_root_token | b64decode }}"
+        vault_url: "{{ vault_config.resources[0].data.vault_url | b64decode }}"
+        controller_validate_certs: false
+
+    - name: Checkout infrastructure-as-code repository
+      ansible.builtin.git:
+        repo: "{{ repo_config.resources[0].data.aap_configascode_repo }}"
+        version: "{{ repo_config.resources[0].data.aap_configascode_revision }}"
+        dest: "{{ controller_configuration_dir }}"
+        clone: true
+        update: true
+        recursive: true
+
+    - name: Include vars from infrastructure-as-code repository
+      ansible.builtin.include_vars:
+        dir: "{{ controller_configuration_dir }}"
+        ignore_unknown_extensions: true
+        extensions:
+          - json
+          - yaml
+          - yml
+
+    - name: Configure AAP Controller
+      ansible.builtin.include_role:
+        name: infra.controller_configuration.dispatch
