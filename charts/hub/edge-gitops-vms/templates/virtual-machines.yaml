@@ -81,7 +81,7 @@ items:
           namespace: openshift-virtualization-os-images
         pvc:
           accessModes:
-            - {{ coalesce $vmr.accessMode $.Values.defaultAccessMode "ReadWriteOnce" }}
+            - {{ coalesce $vmr.accessMode $def.accessMode }}
           resources:
             requests:
               storage: {{ coalesce $vmr.storage $def.storage }}
