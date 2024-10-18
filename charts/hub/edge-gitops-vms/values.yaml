@@ -20,7 +20,6 @@ vmDefaults:
   flavor: medium
   workload: desktop
   os: rhel9
-  role: kiosk
   storage: 30Gi
   memory: 4Gi
   machineType: pc-q35-rhel8.4.0
@@ -42,7 +41,7 @@ vms:
     count: 2
     flavor: medium
     workload: desktop
-    #os: rhel8
+    os: rhel8
     role: kiosk
     storage: 30Gi
     memory: 4Gi
@@ -51,9 +50,6 @@ vms:
     threads: 1
     template: rhel8-desktop-medium
     sshsecret: secret/data/hub/kiosk-ssh
-    cloudinitsecret: secret/data/hub/cloud-init
-    sshpubkeyfield: publickey
-    machineType: pc-q35-rhel8.4.0
     ports:
       - name: ssh
         port: 22
