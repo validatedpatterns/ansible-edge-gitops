@@ -18,7 +18,7 @@ spec:
   dataFrom:
     - extract:
         key: {{ coalesce $vmr.cloudinitsecret $def.cloudinitsecret }}
-{{- $ctr := int (coalesce $vmr.count 1) }}
+{{- $ctr := int (coalesce $vmr.count $def.count) }}
 {{- range $i := until $ctr }}
 {{- $idx := printf "%03d" (add $i 1) }}
 {{- $identifier := printf "%s-%s-%s" $vmr.os $vmr.role $idx }}
@@ -40,8 +40,8 @@ spec:
   data:
     - secretKey: key
       remoteRef:
-        key: {{ $vmr.sshsecret }}
-        property: {{ $vmr.sshpubkeyfield }}
+        key: {{ coalesce $vmr.sshsecret $def.sshsecret }}
+        property: {{ coalesce $vmr.sshpubkeyfield $def.sshpubkeyfield }}
 ---
 apiVersion: v1
 items:
@@ -64,7 +64,7 @@ items:
     labels:
       app: {{ $identifier }}
       edge-gitops-role: {{ $vmr.role }}
-      vm.kubevirt.io/template: {{ $vmr.template }}
+      vm.kubevirt.io/template: {{ coalesce $vmr.template $def.template }}
       vm.kubevirt.io/template.revision: "1"
       vm.kubevirt.io/template.version: v0.19.4
     name: {{ $identifier }}
@@ -91,12 +91,12 @@ items:
     template:
       metadata:
         annotations:
-          vm.kubevirt.io/flavor: {{ $vmr.flavor }}
-          vm.kubevirt.io/os: {{ $vmr.os }}
-          vm.kubevirt.io/workload: {{ $vmr.workload }}
+          vm.kubevirt.io/flavor: {{ coalesce $vmr.flavor $def.flavor }}
+          vm.kubevirt.io/os: {{ coalesce $vmr.os $def.os }}
+          vm.kubevirt.io/workload: {{ coalesce $vmr.workload $def.workload }}
         labels:
           kubevirt.io/domain: {{ $identifier }}
-          kubevirt.io/size: {{ $vmr.flavor }}
+          kubevirt.io/size: {{ coalesce $vmr.flavor $def.flavor }}
           vm.kubevirt.io/name: {{ $identifier }}
       spec:
         accessCredentials:
@@ -108,9 +108,9 @@ items:
                   secretName: authorizedsshkeys-{{ $identifier }}
         domain:
           cpu:
-            cores: {{ $vmr.cores }}
-            sockets: {{ $vmr.sockets }}
-            threads: {{ $vmr.threads }}
+            cores: {{ coalesce $vmr.cores $def.cores }}
+            sockets: {{ coalesce $vmr.sockets $def.sockets }}
+            threads: {{ coalesce $vmr.threads $def.threads }}
           devices:
             disks:
             - disk:
@@ -129,10 +129,10 @@ items:
             networkInterfaceMultiqueue: true
             rng: {}
           machine:
-            type: pc-q35-rhel8.4.0
+            type: {{ coalesce $vmr.machineType $def.machineType }}
           resources:
             requests:
-              memory: {{ $vmr.memory }}
+              memory: {{ coalesce $vmr.memory $def.memory }}
         evictionStrategy: LiveMigrate
         networks:
         - name: default

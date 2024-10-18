@@ -31,6 +31,7 @@ vmDefaults:
   role: kiosk
   storage: 30Gi
   memory: 4Gi
+  machineType: pc-q35-rhel8.4.0
   cores: 1
   sockets: 1
   threads: 1
@@ -58,8 +59,9 @@ vms:
     threads: 1
     template: rhel8-desktop-medium
     sshsecret: secret/data/hub/kiosk-ssh
-    # cloudinitsecret: 'may also be specified, same format as sshsecret'
+    cloudinitsecret: secret/data/hub/cloud-init
     sshpubkeyfield: publickey
+    machineType: pc-q35-rhel8.4.0
     ports:
       - name: ssh
         port: 22
