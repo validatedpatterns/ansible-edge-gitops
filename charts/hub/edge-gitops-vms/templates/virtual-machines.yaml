@@ -1,3 +1,4 @@
+{{- $def := .Values.vmDefaults }}
 {{- range $vm, $vmr := .Values.vms }}
 ---
 apiVersion: "external-secrets.io/v1beta1"
@@ -16,7 +17,7 @@ spec:
     template:
   dataFrom:
     - extract:
-        key: {{ coalesce $vmr.cloudinitsecret $.Values.cloudInitDefaultSecretName }}
+        key: {{ coalesce $vmr.cloudinitsecret $def.cloudinitsecret }}
 {{- $ctr := int (coalesce $vmr.count 1) }}
 {{- range $i := until $ctr }}
 {{- $idx := printf "%03d" (add $i 1) }}

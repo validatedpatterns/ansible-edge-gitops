@@ -19,6 +19,31 @@ vmNamespace: edge-gitops-vms
 waitForMetalNode: true
 jobTerminationGracePeriod: 3600
 
+vmDefaults:
+  cloudInitSecret: secret/data/hub/cloud-init
+  accessMode: "ReadWriteMany"
+  storageClassName: "ocs-storagecluster-ceph-rbd-virtualization"
+  volumeMode: "Block"
+  count: 1
+  flavor: medium
+  workload: desktop
+  os: rhel9
+  role: kiosk
+  storage: 30Gi
+  memory: 4Gi
+  cores: 1
+  sockets: 1
+  threads: 1
+  template: rhel9-desktop-medium
+  sshsecret: secret/data/hub/vm-ssh
+  cloudinitsecret: secret/data/hub/cloud-init
+  sshpubkeyfield: publickey
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22
+
 vms:
   kiosk:
     count: 2
