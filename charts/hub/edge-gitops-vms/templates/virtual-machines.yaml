@@ -77,16 +77,16 @@ items:
       spec:
         sourceRef:
           kind: DataSource
-          name: {{ $vmr.os }}
+          name: {{ coalesce $vmr.dataSource $def.dataSource $vmr.os $def.os }}
           namespace: openshift-virtualization-os-images
         pvc:
           accessModes:
             - {{ coalesce $vmr.accessMode $.Values.defaultAccessMode "ReadWriteOnce" }}
           resources:
             requests:
-              storage: {{ $vmr.storage }}
-          storageClassName: {{ coalesce $vmr.storageClassName $.Values.defaultStorageClassName "gp2" }}
-          volumeMode: {{ coalesce $vmr.volumeMode $.Values.defaultVolumeMode "Filesystem" }}
+              storage: {{ coalesce $vmr.storage $def.storage }}
+          storageClassName: {{ coalesce $vmr.storageClassName $def.storageClassName }}
+          volumeMode: {{ coalesce $vmr.volumeMode $def.volumeMode }}
     running: true
     template:
       metadata:
@@ -159,7 +159,7 @@ items:
     ipFamilies:
     - IPv4
     ipFamilyPolicy: SingleStack
-    ports: {{ $vmr.ports | toPrettyJson }}
+    ports: {{ (coalesce $vmr.ports $def.ports) | toPrettyJson }}
     selector:
       vm.kubevirt.io/name: {{ $identifier }}
     sessionAffinity: None
