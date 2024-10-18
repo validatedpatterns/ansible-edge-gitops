@@ -21,7 +21,7 @@ spec:
 {{- $ctr := int (coalesce $vmr.count $def.count) }}
 {{- range $i := until $ctr }}
 {{- $idx := printf "%03d" (add $i 1) }}
-{{- $identifier := printf "%s-%s-%s" $vmr.os $vmr.role $idx }}
+{{- $identifier := printf "%s-%s-%s" (coalesce $vmr.os $def.os) $vmr.role $idx }}
 ---
 apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
