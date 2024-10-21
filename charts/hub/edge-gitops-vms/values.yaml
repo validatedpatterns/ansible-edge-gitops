@@ -41,17 +41,9 @@ vmDefaults:
 vms:
   kiosk:
     count: 2
-    flavor: medium
-    workload: desktop
     os: rhel8
     role: kiosk
-    storage: 30Gi
-    memory: 4Gi
-    cores: 1
-    sockets: 1
-    threads: 1
     template: rhel8-desktop-medium
-    sshsecret: secret/data/hub/vm-ssh
     ports:
       - name: ssh
         port: 22
