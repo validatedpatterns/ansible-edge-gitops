@@ -30,6 +30,8 @@ vmDefaults:
   sshsecret: secret/data/hub/vm-ssh
   cloudinitsecret: secret/data/hub/cloud-init
   sshpubkeyfield: publickey
+  # extraLabels is available for default extra labels to add to the virtualmachine
+  # extraAnnotations is available for default extra labels to add to the virtualmachine
   ports:
     - name: ssh
       port: 22
@@ -49,7 +51,7 @@ vms:
     sockets: 1
     threads: 1
     template: rhel8-desktop-medium
-    sshsecret: secret/data/hub/kiosk-ssh
+    sshsecret: secret/data/hub/vm-ssh
     ports:
       - name: ssh
         port: 22
