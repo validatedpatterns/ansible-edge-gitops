@@ -86,8 +86,8 @@ items:
           name: {{ coalesce $vmr.dataSource $def.dataSource $vmr.os $def.os }}
           namespace: openshift-virtualization-os-images
         pvc:
-          #accessModes:
-          #  - {{ coalesce $vmr.accessMode $def.accessMode }}
+          accessModes:
+            - {{ coalesce $vmr.accessMode $def.accessMode }}
           resources:
             requests:
               storage: {{ coalesce $vmr.storage $def.storage }}
