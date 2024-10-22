@@ -91,8 +91,8 @@ items:
           resources:
             requests:
               storage: {{ coalesce $vmr.storage $def.storage }}
-          #storageClassName: {{ coalesce $vmr.storageClassName $def.storageClassName }}
-          #volumeMode: {{ coalesce $vmr.volumeMode $def.volumeMode }}
+          storageClassName: {{ coalesce $vmr.storageClassName $def.storageClassName }}
+          volumeMode: {{ coalesce $vmr.volumeMode $def.volumeMode }}
     running: true
     template:
       metadata:
