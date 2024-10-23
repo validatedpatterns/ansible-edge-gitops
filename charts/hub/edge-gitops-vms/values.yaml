@@ -19,14 +19,14 @@ vmDefaults:
   count: 1
   flavor: medium
   workload: desktop
-  os: rhel9
+  os: rhel8
   storage: 30Gi
   memory: 4Gi
   machineType: pc-q35-rhel8.4.0
   cores: 1
   sockets: 1
   threads: 1
-  template: rhel9-desktop-medium
+  template: rhel8-desktop-medium
   sshsecret: secret/data/hub/vm-ssh
   cloudinitsecret: secret/data/hub/cloud-init
   sshpubkeyfield: publickey
@@ -41,18 +41,7 @@ vmDefaults:
 vms:
   kiosk:
     count: 2
-    os: rhel8
     role: kiosk
-    template: rhel8-desktop-medium
-    ports:
-      - name: ssh
-        port: 22
-        protocol: TCP
-        targetPort: 22
-      - name: rdp
-        port: 3389
-        protocol: TCP
-        targetPort: 3389
 
 serviceAccountName: ansible-edge-gitops-sa
 rbac:
