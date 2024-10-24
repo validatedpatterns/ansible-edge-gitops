@@ -1,6 +1,0 @@
----
-- name: Test play for kiosk_mode
-  hosts: localhost
-  remote_user: root
-  roles:
-    - kiosk_mode

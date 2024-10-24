@@ -6,44 +6,42 @@ secretStore:
   name: vault-backend
   kind: ClusterSecretStore
 
-cloudInitDefaultSecretName: secret/data/hub/cloud-init
-
-# Or "RWO" and "gp2"; other choices are possible too but
-# these are defaults for ODF which is included in the pattern
-defaultAccessMode: "ReadWriteMany"
-defaultStorageClassName: "ocs-storagecluster-ceph-rbd-virtualization"
-defaultVolumeMode: "Block"
-
 vmNamespace: edge-gitops-vms
 
 waitForMetalNode: true
 jobTerminationGracePeriod: 3600
 
+vmDefaults:
+  cloudInitSecret: secret/data/hub/cloud-init
+  accessMode: "ReadWriteMany"
+  storageClassName: "ocs-storagecluster-ceph-rbd-virtualization"
+  volumeMode: "Block"
+  count: 1
+  flavor: medium
+  workload: desktop
+  os: rhel8
+  storage: 30Gi
+  memory: 4Gi
+  machineType: pc-q35-rhel8.4.0
+  cores: 1
+  sockets: 1
+  threads: 1
+  template: rhel8-desktop-medium
+  sshsecret: secret/data/hub/vm-ssh
+  cloudinitsecret: secret/data/hub/cloud-init
+  sshpubkeyfield: publickey
+  # extraLabels is available for default extra labels to add to the virtualmachine
+  # extraAnnotations is available for default extra labels to add to the virtualmachine
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22
+
 vms:
   kiosk:
     count: 2
-    flavor: medium
-    workload: desktop
-    os: rhel8
     role: kiosk
-    storage: 30Gi
-    memory: 4Gi
-    cores: 1
-    sockets: 1
-    threads: 1
-    template: rhel8-desktop-medium
-    sshsecret: secret/data/hub/kiosk-ssh
-    # cloudinitsecret: 'may also be specified, same format as sshsecret'
-    sshpubkeyfield: publickey
-    ports:
-      - name: ssh
-        port: 22
-        protocol: TCP
-        targetPort: 22
-      - name: rdp
-        port: 3389
-        protocol: TCP
-        targetPort: 3389
 
 serviceAccountName: ansible-edge-gitops-sa
 rbac:

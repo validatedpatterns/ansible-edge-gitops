@@ -1,3 +1,4 @@
+{{- $def := .Values.vmDefaults }}
 {{- range $vm, $vmr := .Values.vms }}
 ---
 apiVersion: "external-secrets.io/v1beta1"
@@ -16,11 +17,11 @@ spec:
     template:
   dataFrom:
     - extract:
-        key: {{ coalesce $vmr.cloudinitsecret $.Values.cloudInitDefaultSecretName }}
-{{- $ctr := int (coalesce $vmr.count 1) }}
+        key: {{ coalesce $vmr.cloudinitsecret $def.cloudinitsecret }}
+{{- $ctr := int (coalesce $vmr.count $def.count) }}
 {{- range $i := until $ctr }}
 {{- $idx := printf "%03d" (add $i 1) }}
-{{- $identifier := printf "%s-%s-%s" $vmr.os $vmr.role $idx }}
+{{- $identifier := printf "%s-%s-%s" (coalesce $vmr.os $def.os) $vmr.role $idx }}
 ---
 apiVersion: "external-secrets.io/v1beta1"
 kind: ExternalSecret
@@ -39,8 +40,8 @@ spec:
   data:
     - secretKey: key
       remoteRef:
-        key: {{ $vmr.sshsecret }}
-        property: {{ $vmr.sshpubkeyfield }}
+        key: {{ coalesce $vmr.sshsecret $def.sshsecret }}
+        property: {{ coalesce $vmr.sshpubkeyfield $def.sshpubkeyfield }}
 ---
 apiVersion: v1
 items:
@@ -60,12 +61,18 @@ items:
         ]
       argocd.argoproj.io/sync-wave: "2"
       argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      {{- range $ann_k, $ann_v := (coalesce $vmr.extraAnnotations $def.extraAnnotations nil) }}
+      {{ $ann_k }}: {{ $ann_v }}
+      {{- end }}
     labels:
       app: {{ $identifier }}
       edge-gitops-role: {{ $vmr.role }}
-      vm.kubevirt.io/template: {{ $vmr.template }}
+      vm.kubevirt.io/template: {{ coalesce $vmr.template $def.template }}
       vm.kubevirt.io/template.revision: "1"
       vm.kubevirt.io/template.version: v0.19.4
+      {{- range $lbl_k, $lbl_v := (coalesce $vmr.extraLabels $def.extraLabels nil) }}
+      {{ $lbl_k }}: {{ $lbl_v }}
+      {{- end }}
     name: {{ $identifier }}
   spec:
     dataVolumeTemplates:
@@ -76,26 +83,26 @@ items:
       spec:
         sourceRef:
           kind: DataSource
-          name: {{ $vmr.os }}
+          name: {{ coalesce $vmr.dataSource $def.dataSource $vmr.os $def.os }}
           namespace: openshift-virtualization-os-images
         pvc:
           accessModes:
-            - {{ coalesce $vmr.accessMode $.Values.defaultAccessMode "ReadWriteOnce" }}
+            - {{ coalesce $vmr.accessMode $def.accessMode }}
           resources:
             requests:
-              storage: {{ $vmr.storage }}
-          storageClassName: {{ coalesce $vmr.storageClassName $.Values.defaultStorageClassName "gp2" }}
-          volumeMode: {{ coalesce $vmr.volumeMode $.Values.defaultVolumeMode "Filesystem" }}
+              storage: {{ coalesce $vmr.storage $def.storage }}
+          storageClassName: {{ coalesce $vmr.storageClassName $def.storageClassName }}
+          volumeMode: {{ coalesce $vmr.volumeMode $def.volumeMode }}
     running: true
     template:
       metadata:
         annotations:
-          vm.kubevirt.io/flavor: {{ $vmr.flavor }}
-          vm.kubevirt.io/os: {{ $vmr.os }}
-          vm.kubevirt.io/workload: {{ $vmr.workload }}
+          vm.kubevirt.io/flavor: {{ coalesce $vmr.flavor $def.flavor }}
+          vm.kubevirt.io/os: {{ coalesce $vmr.os $def.os }}
+          vm.kubevirt.io/workload: {{ coalesce $vmr.workload $def.workload }}
         labels:
           kubevirt.io/domain: {{ $identifier }}
-          kubevirt.io/size: {{ $vmr.flavor }}
+          kubevirt.io/size: {{ coalesce $vmr.flavor $def.flavor }}
           vm.kubevirt.io/name: {{ $identifier }}
       spec:
         accessCredentials:
@@ -107,9 +114,9 @@ items:
                   secretName: authorizedsshkeys-{{ $identifier }}
         domain:
           cpu:
-            cores: {{ $vmr.cores }}
-            sockets: {{ $vmr.sockets }}
-            threads: {{ $vmr.threads }}
+            cores: {{ coalesce $vmr.cores $def.cores }}
+            sockets: {{ coalesce $vmr.sockets $def.sockets }}
+            threads: {{ coalesce $vmr.threads $def.threads }}
           devices:
             disks:
             - disk:
@@ -128,10 +135,10 @@ items:
             networkInterfaceMultiqueue: true
             rng: {}
           machine:
-            type: pc-q35-rhel8.4.0
+            type: {{ coalesce $vmr.machineType $def.machineType }}
           resources:
             requests:
-              memory: {{ $vmr.memory }}
+              memory: {{ coalesce $vmr.memory $def.memory }}
         evictionStrategy: LiveMigrate
         networks:
         - name: default
@@ -158,7 +165,7 @@ items:
     ipFamilies:
     - IPv4
     ipFamilyPolicy: SingleStack
-    ports: {{ $vmr.ports | toPrettyJson }}
+    ports: {{ (coalesce $vmr.ports $def.ports) | toPrettyJson }}
     selector:
       vm.kubevirt.io/name: {{ $identifier }}
     sessionAffinity: None

@@ -15,6 +15,7 @@ clusterGroup:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
+      channel: stable-2.4
 
     openshift-virtualization:
       name: kubevirt-hyperconverged
@@ -37,8 +38,8 @@ clusterGroup:
         image: quay.io/hybridcloudpatterns/utility-container:latest
         verbosity: -vvv
       - name: configure-aap-controller
-        playbook: ansible/imperative_configure_controller.yml
-        image: quay.io/hybridcloudpatterns/ansible-edge-gitops-ee:latest
+        playbook: ansible/imperative_configure_aap.yml
+        image: quay.io/hybridcloudpatterns/utility-container:latest
         verbosity: -vvv
         timeout: "900"
     clusterRoleYaml:
@@ -74,13 +75,15 @@ clusterGroup:
       name: vault
       namespace: vault
       project: hub
-      path: common/hashicorp-vault
+      chart: hashicorp-vault
+      chartVersion: 0.1.*
 
     golang-external-secrets:
       name: golang-external-secrets
       namespace: golang-external-secrets
       project: hub
-      path: common/golang-external-secrets
+      chart: golang-external-secrets
+      chartVersion: 0.1.*
 
     openshift-cnv:
       name: openshift-cnv
@@ -92,7 +95,10 @@ clusterGroup:
       name: odf
       namespace: openshift-storage
       project: hub
-      path: charts/hub/openshift-data-foundations
+      chart: openshift-data-foundations
+      chartVersion: 0.1.*
+      extraValueFiles:
+        - '$patternref/overrides/values-odf-chart.yaml'
 
     edge-gitops-vms:
       name: edge-gitops-vms
@@ -100,7 +106,7 @@ clusterGroup:
       project: hub
       path: charts/hub/edge-gitops-vms
       extraValueFiles:
-        - '/overrides/values-egv-{{ $.Values.global.clusterVersion }}.yaml'
+        - '$patternref/overrides/values-egv-{{ $.Values.global.clusterVersion }}.yaml'
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []

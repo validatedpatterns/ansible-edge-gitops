@@ -1,7 +1,6 @@
-global:
-  pattern: example
-  targetRevision: main
-  repoURL: https://github.com/hybridcloudpatterns/ansible-edge-gitops.git
+configAsCode:
+  revision: main
+  repo: https://github.com/validatedpatterns-demos/ansible-edge-gitops-hmi-config-as-code.git
 
 secretStore:
   name: vault-backend
@@ -9,16 +8,3 @@ secretStore:
 
 aapManifest:
   key: secret/data/hub/aap-manifest
-
-kioskSsh:
-  key: secret/data/hub/kiosk-ssh
-
-rhsm:
-  key: secret/data/hub/rhsm
-
-kioskExtra:
-  key: secret/data/hub/kiosk-extra
-
-awsCreds:
-  inject: false
-  key: secret/data/hub/aws-creds

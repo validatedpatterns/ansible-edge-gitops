@@ -14,7 +14,7 @@
 
 ## Changes for v1.2 (February 9, 2023)
 
-* Kiosk_mode improvements: kiosk_mode role now has a variable `kiosk_port` which influences the kiosk-mode script and controls which port firefox connects to. (Previously this was hard-coded to port 8088; the var defaults to 8088 so existing setups will continue to work. This will make it easier to tailor or customize the pattern to work with containers other than Ignition.
+* Kiosk_mode improvements: kiosk_mode role now has a variable `kiosk_port` which influences the kiosk-mode script and controls which port firefox connects to. (Previously this was hardcoded to port 8088; the var defaults to 8088 so existing setups will continue to work. This will make it easier to tailor or customize the pattern to work with containers other than Ignition.
 
 * cloud-init changes: move the cloud-init configuration file, user, and password to secrets from edge-gitops-vms values. This was a regrettable oversight in v1.0 and v1.1.
 
@@ -26,7 +26,7 @@
 
 * No "visible" changes so not updating the branch pointer
 
-* Updated ansible code to follow best practices and silent many linter warnings
+* Updated ansible code to follow best practices and silent many linting warnings
 
 * Updated edge-gitops-vms chart to add SkipDryRunOnMissingResource annotations to prevent errors occuring due to race conditions with OpenShift Virtualization
 
@@ -52,3 +52,15 @@
 * Update deploy_kubevirt_worker.yml Ansible playbook to copy securityGroups and blockDevices config from first machineSet. Tag naming schemes changed from OCP 4.15 to 4.16; this method ensures forward and backward compatibility.
 * Remove ODF overrides from OCP 4.12/3 that force storageClass to gp2; all released versions should use gp3-csi now.
 * Include overrides for OCP 4.12 and OCP 4.13 to use the older `ocs-storagecluster-ceph-rbd` storageClass.
+
+## Changes for v2.0 (TBD)
+
+* Split HMI Demo Project out to separate [repository](https://github.com/validatedpatterns-demos/rhvp.ansible_edge_hmi)
+* Split HMI Config out to separate [repository](https://github.com/validatedpatterns-demos/ansible-edge-gitops-hmi-config-as-code.git)
+* Drop the custom execution environment because AAP can resolve these dependencies itself
+* Switch to modular common
+* Use the Validated Patterns ODF Chart (dropping our custom version)
+* Comment out portworx install and test, as the only OCP version that supports is 4.12, which is now past
+  the end of its maintenance support lifecycle.
+* Refactor installation mechannism to use standard configuration-as-code approach, which will make it easier to drop
+  in a new config-as-code repository.

@@ -10,7 +10,7 @@
       kubernetes.core.k8s_info:
         kind: ConfigMap
         namespace: ansible-automation-platform
-        name: aeg-aap-cm
+        name: aap-configascode-cm
       register: aap_cm
       until: aap_cm.resources | length == 1
       retries: 20
@@ -18,5 +18,5 @@
 
     - name: Store needed values
       ansible.builtin.set_fact:
-        aeg_project_repo: "{{ aap_cm.resources[0].data.aeg_project_repo }}"
-        aeg_project_branch: "{{ aap_cm.resources[0].data.aeg_project_branch }}"
+        aap_configascode_repo: "{{ aap_cm.resources[0].data.aap_configascode_repo }}"
+        aap_configascode_revision: "{{ aap_cm.resources[0].data.aap_configascode_revision }}"

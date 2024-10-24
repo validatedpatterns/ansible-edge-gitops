@@ -1,6 +1,0 @@
-[kiosk]
-rhel8-kiosk-001.edge-gitops-vms.svc
-rhel8-kiosk-002.edge-gitops-vms.svc
-
-[all:vars]
-ansible_user=cloud-user

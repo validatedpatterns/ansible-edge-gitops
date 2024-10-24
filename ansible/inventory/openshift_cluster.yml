@@ -1,5 +1,0 @@
----
-plugin: kubernetes.core.k8s
-connections:
-  - namespaces:
-      - edge-gitops-vms
