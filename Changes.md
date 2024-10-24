@@ -64,3 +64,5 @@
   the end of its maintenance support lifecycle.
 * Refactor installation mechannism to use standard configuration-as-code approach, which will make it easier to drop
   in a new config-as-code repository.
+* Move VM definitions outside of edge-gitops-vms chart so that derived patterns do not inherit the HMI kiosks. Kiosk
+  VMs now defined by default in overrides.

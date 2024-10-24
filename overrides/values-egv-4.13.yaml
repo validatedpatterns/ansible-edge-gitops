@@ -1,2 +1,3 @@
 ---
-defaultStorageClassName: "ocs-storagecluster-ceph-rbd"
+vmDefaults:
+  storageClassName: "ocs-storagecluster-ceph-rbd"

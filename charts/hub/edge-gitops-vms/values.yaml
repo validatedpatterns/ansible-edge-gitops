@@ -38,10 +38,9 @@ vmDefaults:
       protocol: TCP
       targetPort: 22
 
-vms:
-  kiosk:
-    count: 2
-    role: kiosk
+# Define the VMs you want to create with any specific attributes from vmDefaults
+# in an overrides file.
+vms: {}
 
 serviceAccountName: ansible-edge-gitops-sa
 rbac:
