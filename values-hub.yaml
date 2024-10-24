@@ -106,6 +106,7 @@ clusterGroup:
       project: hub
       path: charts/hub/edge-gitops-vms
       extraValueFiles:
+        - '$patternref/overrides/values-egv-vms.yaml'
         - '$patternref/overrides/values-egv-{{ $.Values.global.clusterVersion }}.yaml'
 
   # Only the hub cluster here - managed entities are edge nodes

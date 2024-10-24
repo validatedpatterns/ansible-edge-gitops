@@ -38,10 +38,7 @@ vmDefaults:
       protocol: TCP
       targetPort: 22
 
-vms:
-  kiosk:
-    count: 2
-    role: kiosk
+vms: {}
 
 serviceAccountName: ansible-edge-gitops-sa
 rbac:
