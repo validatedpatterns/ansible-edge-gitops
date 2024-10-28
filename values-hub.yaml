@@ -20,6 +20,7 @@ clusterGroup:
     openshift-virtualization:
       name: kubevirt-hyperconverged
       namespace: openshift-cnv
+      channel: stable
 
     openshift-data-foundation:
       name: odf-operator
