@@ -6,5 +6,5 @@
 ## Start Here
 
 If you've followed a link to this repository, but are not really sure what it contains
-or how to use it, head over to [Ansible Edge GitOps](http://hybrid-cloud-patterns.io/ansible-edge-gitops/)
+or how to use it, head over to [Ansible Edge GitOps](https://validatedpatterns.io/patterns/ansible-edge-gitops/)
 for additional context and installation instructions
