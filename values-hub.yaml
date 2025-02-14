@@ -97,7 +97,7 @@ clusterGroup:
       namespace: openshift-storage
       project: hub
       chart: openshift-data-foundations
-      chartVersion: 0.1.*
+      chartVersion: 0.2.*
       extraValueFiles:
         - '$patternref/overrides/values-odf-chart.yaml'
 
