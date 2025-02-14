@@ -22,7 +22,7 @@ requirements:
     controlPlane:
       platform:
         aws:
-          replicas: 1
+          replicas: 3
           type: m5.4xlarge
 
 # Loosely defined extra features like hypershift support, non-openshift
