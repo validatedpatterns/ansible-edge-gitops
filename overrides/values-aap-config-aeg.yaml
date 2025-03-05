@@ -1,0 +1,4 @@
+---
+agof:
+  iac_repo: https://github.com/validatedpatterns-demos/ansible-edge-gitops-hmi-config-as-code.git
+  iac_revision: main

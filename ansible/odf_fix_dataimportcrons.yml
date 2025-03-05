@@ -1,0 +1,138 @@
+#!/usr/bin/env ansible-playbook
+---
+# This workaround was implemented to fix a problem where openshift-cnv would
+# not recognize a default virt storage class change and change the format of
+# datasources. The issue was fixed in OpenShift Virtualization 4.16.4.
+- name: Determine if we have PVC clean-up to do
+  become: false
+  connection: local
+  hosts: localhost
+  gather_facts: false
+  vars:
+    kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
+    dataimportcron_cleanup: false
+    image_cleanup_namespace: "openshift-virtualization-os-images"
+    cluster_version: "{{ global['clusterVersion'] | default('UNSET') }}"
+  tasks:
+    - name: Check cluster version
+      ansible.builtin.debug:
+        var: cluster_version
+
+    - name: Exit if normal version check is not right
+      ansible.builtin.meta: end_play
+      when: cluster_version not in [ '4.16', 'UNSET' ]
+
+    - name: Find default storageclass
+      ansible.builtin.shell: |
+        set -o pipefail
+        oc get storageclass -o json | jq -r '.items[] | select(.metadata.annotations."storageclass.kubernetes.io/is-default-class")'
+      register: default_sc_output
+      changed_when: false
+
+    - name: Find virtualization default storageclass
+      ansible.builtin.shell: |
+        set -o pipefail
+        oc get storageclass -o json | jq -r '.items[] | select(.metadata.annotations."storageclass.kubevirt.io/is-default-virt-class")'
+      register: default_virt_sc_output
+      changed_when: false
+
+    - name: Compare default virtualization storageclass and default storageclass to determine whether to clean PVCs
+      block:
+        - name: Parse results
+          ansible.builtin.set_fact:
+            default_sc: '{{ default_sc_output.stdout | from_json }}'
+            default_virt_sc: '{{ default_virt_sc_output.stdout | from_json }}'
+
+        - name: Commit to dataimportcron cleanup
+          ansible.builtin.set_fact:
+            dataimportcron_cleanup: true
+          when:
+            - default_virt_sc.metadata.name == "ocs-storagecluster-ceph-rbd-virtualization"
+            - default_sc.metadata.name != default_virt_sc.metadata.name
+      rescue:
+        - name: Note that we exited
+          ansible.builtin.debug:
+            msg: "Caught an error before we could determine to clean up dataimportcrons, exiting"
+
+        - name: End play (successfully)
+          ansible.builtin.meta: end_play
+
+    - name: Cleanup incorrect datasourceimport images (PVCs)
+      when:
+        - dataimportcron_cleanup
+      block:
+        - name: Find dataimportcrons
+          kubernetes.core.k8s_info:
+            kind: dataimportcron
+            namespace: '{{ image_cleanup_namespace }}'
+            api_version: cdi.kubevirt.io/v1beta1
+          register: dic_list
+
+        - name: Extract dic names
+          ansible.builtin.set_fact:
+            dic_names: "{{ dic_names | default([]) + [ item.metadata.name ] }}"
+          loop: "{{ dic_list.resources }}"
+
+        - name: Show names
+          ansible.builtin.debug:
+            var: dic_names
+
+        - name: Find datasources to cleanup
+          kubernetes.core.k8s_info:
+            kind: datasource
+            namespace: '{{ image_cleanup_namespace }}'
+            api_version: cdi.kubevirt.io/v1beta1
+          register: ds_cleanup_list
+
+        - name: Keep track of objects to remove
+          ansible.builtin.set_fact:
+            cron_cleanups: []
+            ds_cleanups: []
+
+        - name: Record datasources that need cleanup
+          ansible.builtin.set_fact:
+            cron_cleanups: "{{ cron_cleanups + [ item.metadata.labels['cdi.kubevirt.io/dataImportCron'] ] }}"
+            ds_cleanups: "{{ ds_cleanups + [ item.metadata.name ] }}"
+          loop: "{{ ds_cleanup_list.resources }}"
+          when:
+            - item['metadata']['labels']['cdi.kubevirt.io/dataImportCron'] is defined
+            - item['metadata']['labels']['cdi.kubevirt.io/dataImportCron'] in dic_names
+            - item.status.conditions[0].message != "DataSource is ready to be consumed"
+
+        - name: Check on removables
+          ansible.builtin.debug:
+            msg:
+              - "cron_cleanups: {{ cron_cleanups }}"
+              - "ds_cleanups: {{ ds_cleanups }}"
+
+        - name: Delete datasources in cleanup list
+          kubernetes.core.k8s:
+            kind: datasource
+            namespace: '{{ image_cleanup_namespace }}'
+            api_version: cdi.kubevirt.io/v1beta1
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ ds_cleanups }}"
+
+        - name: Delete datavolumes in cleanup list
+          kubernetes.core.k8s:
+            kind: datavolume
+            namespace: '{{ image_cleanup_namespace }}'
+            api_version: cdi.kubevirt.io/v1beta1
+            label_selectors:
+              - 'cdi.kubevirt.io/dataImportCron={{ item }}'
+            state: absent
+          loop: "{{ cron_cleanups }}"
+
+        - name: Delete dataimportcrons in cleanup list
+          kubernetes.core.k8s:
+            kind: dataimportcron
+            namespace: '{{ image_cleanup_namespace }}'
+            api_version: cdi.kubevirt.io/v1beta1
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ cron_cleanups }}"
+      rescue:
+        - name: Note that we exited
+          ansible.builtin.debug:
+            msg: "Caught an error while cleaning up dataimportcrons, exiting"

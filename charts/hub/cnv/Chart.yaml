@@ -1,5 +1,0 @@
-apiVersion: v2
-name: cnv
-description: OpenShift Virtualization
-type: application
-version: 0.1.0

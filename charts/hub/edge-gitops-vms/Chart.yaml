@@ -1,6 +1,0 @@
-apiVersion: v2
-name: edge-gitops-vms
-description: Edge GitOps VMs
-type: application
-version: 0.1.0
-dependencies: [ ]
