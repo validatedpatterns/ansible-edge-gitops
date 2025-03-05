@@ -10,12 +10,13 @@ clusterGroup:
     - openshift-cnv
     - openshift-storage
     - edge-gitops-vms
+    - aap-config
 
   subscriptions:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
-      channel: stable-2.4
+      channel: stable-2.5
 
     openshift-virtualization:
       name: kubevirt-hyperconverged
@@ -35,14 +36,8 @@ clusterGroup:
         playbook: ansible/deploy_kubevirt_worker.yml
         verbosity: -vvv
       - name: clean-golden-images
-        playbook: ansible/odf_clean_pvcs.yml
-        image: quay.io/hybridcloudpatterns/utility-container:latest
+        playbook: ansible/odf_fix_dataimportcrons.yml
         verbosity: -vvv
-      - name: configure-aap-controller
-        playbook: ansible/imperative_configure_aap.yml
-        image: quay.io/hybridcloudpatterns/utility-container:latest
-        verbosity: -vvv
-        timeout: "900"
     clusterRoleYaml:
       - apiGroups:
           - "*"
@@ -50,6 +45,8 @@ clusterGroup:
           - machinesets
           - persistentvolumeclaims
           - datavolumes
+          - dataimportcrons
+          - datasources
         verbs:
           - "*"
       - apiGroups:
@@ -64,13 +61,19 @@ clusterGroup:
   applications:
     aap:
       name: ansible-automation-platform
+      namespace: ansible-automation-platform
       project: hub
-      path: charts/hub/ansible-automation-platform
+      chart: ansible-automation-platform-instance
+      chartVersion: 0.1.*
 
     aap-config:
       name: aap-config
+      namespace: aap-config
       project: hub
-      path: charts/hub/aap-config
+      chart: aap-config
+      chartVersion: 0.1.*
+      extraValueFiles:
+        - '$patternref/overrides/values-aap-config-aeg.yaml'
 
     vault:
       name: vault
@@ -90,7 +93,8 @@ clusterGroup:
       name: openshift-cnv
       namespace: openshift-cnv
       project: hub
-      path: charts/hub/cnv
+      chart: openshift-virtualization-instance
+      chartVersion: 0.1.*
 
     odf:
       name: odf
@@ -105,10 +109,10 @@ clusterGroup:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
       project: hub
-      path: charts/hub/edge-gitops-vms
+      chart: edge-gitops-vms
+      chartVersion: 0.2.*
       extraValueFiles:
         - '$patternref/overrides/values-egv-vms.yaml'
-        - '$patternref/overrides/values-egv-{{ $.Values.global.clusterVersion }}.yaml'
 
   # Only the hub cluster here - managed entities are edge nodes
   managedClusterGroups: []

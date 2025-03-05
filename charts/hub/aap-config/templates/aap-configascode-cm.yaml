@@ -1,9 +1,0 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: aap-configascode-cm
-  namespace: ansible-automation-platform
-data:
-  aap_configascode_repo: "{{ $.Values.configAsCode.repo }}"
-  aap_configascode_revision: "{{ $.Values.configAsCode.revision }}"

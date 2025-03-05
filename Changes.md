@@ -53,16 +53,19 @@
 * Remove ODF overrides from OCP 4.12/3 that force storageClass to gp2; all released versions should use gp3-csi now.
 * Include overrides for OCP 4.12 and OCP 4.13 to use the older `ocs-storagecluster-ceph-rbd` storageClass.
 
-## Changes for v2.0 (TBD)
+## Changes for v2.0 (March 5, 2025)
 
 * Split HMI Demo Project out to separate [repository](https://github.com/validatedpatterns-demos/rhvp.ansible_edge_hmi)
 * Split HMI Config out to separate [repository](https://github.com/validatedpatterns-demos/ansible-edge-gitops-hmi-config-as-code.git)
 * Drop the custom execution environment because AAP can resolve these dependencies itself
 * Switch to modular common
 * Use the Validated Patterns ODF Chart (dropping our custom version)
-* Comment out portworx install and test, as the only OCP version that supports is 4.12, which is now past
+* Drop portworx chart and Makefile targets, as the only OCP version that supports is 4.12, which is now past
   the end of its maintenance support lifecycle.
 * Refactor installation mechannism to use standard configuration-as-code approach, which will make it easier to drop
   in a new config-as-code repository.
 * Move VM definitions outside of edge-gitops-vms chart so that derived patterns do not inherit the HMI kiosks. Kiosk
   VMs now defined by default in overrides.
+* Use Validated Patterns charts for Installing Ansible Automation Platform, OpenShift Virtualization, and
+  edge-gitops-vms.
+* Switch to AAP-2.5 support as provided by Validated Patterns aap-config chart.
