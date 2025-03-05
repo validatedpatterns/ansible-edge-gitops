@@ -10,6 +10,7 @@ clusterGroup:
     - openshift-cnv
     - openshift-storage
     - edge-gitops-vms
+    - aap-config
 
   subscriptions:
     aap-operator:
