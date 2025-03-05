@@ -20,7 +20,7 @@
 
     - name: Exit if normal version check is not right
       ansible.builtin.meta: end_play
-      when: cluster_version not in [ '4.16', 'UNSET' ]
+      when: cluster_version not in [ '4.17', '4.16', 'UNSET' ]
 
     - name: Find default storageclass
       ansible.builtin.shell: |
