@@ -14,7 +14,7 @@
 
 ## Changes for v1.2 (February 9, 2023)
 
-* Kiosk_mode improvements: kiosk_mode role now has a variable `kiosk_port` which influences the kiosk-mode script and controls which port firefox connects to. (Previously this was hard-coded to port 8088; the var defaults to 8088 so existing setups will continue to work. This will make it easier to tailor or customize the pattern to work with containers other than Ignition.
+* Kiosk_mode improvements: kiosk_mode role now has a variable `kiosk_port` which influences the kiosk-mode script and controls which port firefox connects to. (Previously this was hardcoded to port 8088; the var defaults to 8088 so existing setups will continue to work. This will make it easier to tailor or customize the pattern to work with containers other than Ignition.
 
 * cloud-init changes: move the cloud-init configuration file, user, and password to secrets from edge-gitops-vms values. This was a regrettable oversight in v1.0 and v1.1.
 
@@ -26,7 +26,7 @@
 
 * No "visible" changes so not updating the branch pointer
 
-* Updated ansible code to follow best practices and silent many linter warnings
+* Updated ansible code to follow best practices and silent many linting warnings
 
 * Updated edge-gitops-vms chart to add SkipDryRunOnMissingResource annotations to prevent errors occuring due to race conditions with OpenShift Virtualization
 
@@ -52,3 +52,5 @@
 * Update deploy_kubevirt_worker.yml Ansible playbook to copy securityGroups and blockDevices config from first machineSet. Tag naming schemes changed from OCP 4.15 to 4.16; this method ensures forward and backward compatibility.
 * Remove ODF overrides from OCP 4.12/3 that force storageClass to gp2; all released versions should use gp3-csi now.
 * Include overrides for OCP 4.12 and OCP 4.13 to use the older `ocs-storagecluster-ceph-rbd` storageClass.
+* Backport odf_fix_dataimportcrons.yml from development Ansible Edge GitOps/Federated Edge Observability and
+  use stable channel for KubeVirt/OCP-V (3/25/2025)
