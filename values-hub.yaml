@@ -19,6 +19,7 @@ clusterGroup:
     openshift-virtualization:
       name: kubevirt-hyperconverged
       namespace: openshift-cnv
+      channel: stable
 
     openshift-data-foundation:
       name: odf-operator
@@ -33,7 +34,7 @@ clusterGroup:
         playbook: ansible/deploy_kubevirt_worker.yml
         verbosity: -vvv
       - name: clean-golden-images
-        playbook: ansible/odf_clean_pvcs.yml
+        playbook: ansible/odf_fix_dataimportcrons.yml
         image: quay.io/hybridcloudpatterns/utility-container:latest
         verbosity: -vvv
       - name: configure-aap-controller
@@ -48,6 +49,8 @@ clusterGroup:
           - machinesets
           - persistentvolumeclaims
           - datavolumes
+          - datasources
+          - dataimportcrons
         verbs:
           - "*"
       - apiGroups:
