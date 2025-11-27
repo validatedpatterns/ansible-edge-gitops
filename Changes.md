@@ -18,9 +18,9 @@
 
 * cloud-init changes: move the cloud-init configuration file, user, and password to secrets from edge-gitops-vms values. This was a regrettable oversight in v1.0 and v1.1.
 
-* Common updates: Update common to upstream hybrid-cloud-patterns/common main branch.
+* Common updates: Update common to upstream validatedpatterns/common main branch.
 
-* Secrets update: Documented secrets-template is now compliant with the version 2.0 secrets mechanism from hybrid-cloud-patterns/common. Secrets following the older unversioned format will still work.
+* Secrets update: Documented secrets-template is now compliant with the version 2.0 secrets mechanism from validatedpatterns/common. Secrets following the older unversioned format will still work.
 
 ## Changes for v1.2 (April 27, 2023)
 
