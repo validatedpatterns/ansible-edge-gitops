@@ -23,7 +23,7 @@ requirements:
       platform:
         aws:
           replicas: 3
-          type: m5.4xlarge
+          type: m5.metal
 
 # Loosely defined extra features like hypershift support, non-openshift
 # kubernetes support, spoke support

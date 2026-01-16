@@ -78,7 +78,6 @@ clusterGroup:
       - apiGroups:
           - '*'
         resources:
-          - machinesets
           - persistentvolumeclaims
           - datavolumes
           - dataimportcrons
@@ -94,10 +93,7 @@ clusterGroup:
           - list
           - watch
     jobs:
-      - name: deploy-kubevirt-worker
-        playbook: ansible/deploy_kubevirt_worker.yml
-        verbosity: -vvv
       - name: clean-golden-images
         playbook: ansible/odf_fix_dataimportcrons.yml
         verbosity: -vvv
-  managedClusterGroups: []
+  managedClusterGroups: {}

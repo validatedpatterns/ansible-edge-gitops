@@ -75,3 +75,4 @@
 * Switch to patternizer and remove common
 * Stop deploying storagesystem as ODF does not need it anymore (as of 4.18/4.20)
 * Update Ansible linter
+* Require metal nodes as workers - remove code to create machinesets
