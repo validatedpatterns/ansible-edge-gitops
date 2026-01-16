@@ -1,9 +1,8 @@
----
 clusterGroup:
   name: hub
   isHubCluster: true
-
   namespaces:
+    - ansible-edge-gitops
     - vault
     - golang-external-secrets
     - ansible-automation-platform
@@ -11,53 +10,20 @@ clusterGroup:
     - openshift-storage
     - edge-gitops-vms
     - aap-config
-
+  projects:
+    - hub
   subscriptions:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
       channel: stable-2.5
-
+    openshift-data-foundation:
+      name: odf-operator
+      namespace: openshift-storage
     openshift-virtualization:
       name: kubevirt-hyperconverged
       namespace: openshift-cnv
       channel: stable
-
-    openshift-data-foundation:
-      name: odf-operator
-      namespace: openshift-storage
-
-  projects:
-    - hub
-
-  imperative:
-    jobs:
-      - name: deploy-kubevirt-worker
-        playbook: ansible/deploy_kubevirt_worker.yml
-        verbosity: -vvv
-      - name: clean-golden-images
-        playbook: ansible/odf_fix_dataimportcrons.yml
-        verbosity: -vvv
-    clusterRoleYaml:
-      - apiGroups:
-          - "*"
-        resources:
-          - machinesets
-          - persistentvolumeclaims
-          - datavolumes
-          - dataimportcrons
-          - datasources
-        verbs:
-          - "*"
-      - apiGroups:
-          - "*"
-        resources:
-          - "*"
-        verbs:
-          - get
-          - list
-          - watch
-
   applications:
     aap:
       name: ansible-automation-platform
@@ -65,7 +31,6 @@ clusterGroup:
       project: hub
       chart: ansible-automation-platform-instance
       chartVersion: 0.1.*
-
     aap-config:
       name: aap-config
       namespace: aap-config
@@ -73,38 +38,7 @@ clusterGroup:
       chart: aap-config
       chartVersion: 0.1.*
       extraValueFiles:
-        - '$patternref/overrides/values-aap-config-aeg.yaml'
-
-    vault:
-      name: vault
-      namespace: vault
-      project: hub
-      chart: hashicorp-vault
-      chartVersion: 0.1.*
-
-    golang-external-secrets:
-      name: golang-external-secrets
-      namespace: golang-external-secrets
-      project: hub
-      chart: golang-external-secrets
-      chartVersion: 0.1.*
-
-    openshift-cnv:
-      name: openshift-cnv
-      namespace: openshift-cnv
-      project: hub
-      chart: openshift-virtualization-instance
-      chartVersion: 0.1.*
-
-    odf:
-      name: odf
-      namespace: openshift-storage
-      project: hub
-      chart: openshift-data-foundations
-      chartVersion: 0.2.*
-      extraValueFiles:
-        - '$patternref/overrides/values-odf-chart.yaml'
-
+        - $patternref/overrides/values-aap-config-aeg.yaml
     edge-gitops-vms:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
@@ -112,7 +46,58 @@ clusterGroup:
       chart: edge-gitops-vms
       chartVersion: 0.2.*
       extraValueFiles:
-        - '$patternref/overrides/values-egv-vms.yaml'
-
-  # Only the hub cluster here - managed entities are edge nodes
+        - $patternref/overrides/values-egv-vms.yaml
+    golang-external-secrets:
+      name: golang-external-secrets
+      namespace: golang-external-secrets
+      project: hub
+      chart: golang-external-secrets
+      chartVersion: 0.1.*
+    odf:
+      name: odf
+      namespace: openshift-storage
+      project: hub
+      chart: openshift-data-foundations
+      chartVersion: 0.2.*
+      extraValueFiles:
+        - $patternref/overrides/values-odf-chart.yaml
+    openshift-cnv:
+      name: openshift-cnv
+      namespace: openshift-cnv
+      project: hub
+      chart: openshift-virtualization-instance
+      chartVersion: 0.1.*
+    vault:
+      name: vault
+      namespace: vault
+      project: hub
+      chart: hashicorp-vault
+      chartVersion: 0.1.*
+  imperative:
+    clusterRoleYaml:
+      - apiGroups:
+          - '*'
+        resources:
+          - machinesets
+          - persistentvolumeclaims
+          - datavolumes
+          - dataimportcrons
+          - datasources
+        verbs:
+          - '*'
+      - apiGroups:
+          - '*'
+        resources:
+          - '*'
+        verbs:
+          - get
+          - list
+          - watch
+    jobs:
+      - name: deploy-kubevirt-worker
+        playbook: ansible/deploy_kubevirt_worker.yml
+        verbosity: -vvv
+      - name: clean-golden-images
+        playbook: ansible/odf_fix_dataimportcrons.yml
+        verbosity: -vvv
   managedClusterGroups: []

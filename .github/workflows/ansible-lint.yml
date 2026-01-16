@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Lint Ansible Playbook
-        uses: ansible/ansible-lint-action@v6
+        uses: ansible/ansible-lint@v25
         # Let's point it to the path
         with:
-          path: "ansible/"
+          args: "-c .ansible-lint ansible/"
