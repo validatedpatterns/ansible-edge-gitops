@@ -1,5 +1,5 @@
 ---
-waitForMetalNode: true
+waitForMetalNode: false
 
 vms:
   kiosk:
