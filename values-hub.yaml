@@ -61,6 +61,14 @@ clusterGroup:
       chartVersion: 0.2.*
       extraValueFiles:
         - $patternref/overrides/values-odf-chart.yaml
+    ensure-openshift-console-plugins:
+      name: ensure-openshift-console-plugins
+      namespace: openshift-console
+      project: hub
+      chart: ensure-openshift-console-plugins
+      chartVersion: 0.1.*
+      extraValueFiles:
+        - '$patternref/overrides/values-console-plugins.yaml'
     openshift-cnv:
       name: openshift-cnv
       namespace: openshift-cnv
