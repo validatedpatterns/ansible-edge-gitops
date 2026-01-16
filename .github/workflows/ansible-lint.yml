@@ -8,10 +8,10 @@ jobs:
 
     steps:
       # Important: This sets up your GITHUB_WORKSPACE environment variable
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Lint Ansible Playbook
-        uses: ansible/ansible-lint-action@v6
+        uses: ansible/ansible-lint@v25
         # Let's point it to the path
         with:
-          path: "ansible/"
+          args: "-c .ansible-lint ansible/"
