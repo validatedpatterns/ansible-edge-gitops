@@ -61,6 +61,14 @@ clusterGroup:
       chartVersion: 0.2.*
       extraValueFiles:
         - $patternref/overrides/values-odf-chart.yaml
+    ensure-openshift-console-plugins:
+      name: ensure-openshift-console-plugins
+      namespace: openshift-console
+      project: hub
+      chart: ensure-openshift-console-plugins
+      chartVersion: 0.1.*
+      extraValueFiles:
+        - '$patternref/overrides/values-console-plugins.yaml'
     openshift-cnv:
       name: openshift-cnv
       namespace: openshift-cnv
@@ -78,7 +86,6 @@ clusterGroup:
       - apiGroups:
           - '*'
         resources:
-          - machinesets
           - persistentvolumeclaims
           - datavolumes
           - dataimportcrons
@@ -94,10 +101,7 @@ clusterGroup:
           - list
           - watch
     jobs:
-      - name: deploy-kubevirt-worker
-        playbook: ansible/deploy_kubevirt_worker.yml
-        verbosity: -vvv
       - name: clean-golden-images
         playbook: ansible/odf_fix_dataimportcrons.yml
         verbosity: -vvv
-  managedClusterGroups: []
+  managedClusterGroups: {}

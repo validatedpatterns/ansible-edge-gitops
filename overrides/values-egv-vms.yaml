@@ -1,4 +1,6 @@
 ---
+waitForMetalNode: false
+
 vms:
   kiosk:
     count: 2
