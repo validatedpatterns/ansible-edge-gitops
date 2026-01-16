@@ -1,15 +1,13 @@
----
 global:
   pattern: ansible-edge-gitops
-
-  options:
-    useCSV: false
-    syncPolicy: Automatic
-    installPlanApproval: Automatic
-
+  secretLoader:
+    disabled: true
   hub:
     provider: aws
-
+  options:
+    installPlanApproval: Automatic
+    syncPolicy: Automatic
+    useCSV: false
 main:
   clusterGroupName: hub
   multiSourceConfig:
