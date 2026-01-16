@@ -1,7 +1,7 @@
 global:
   pattern: ansible-edge-gitops
   secretLoader:
-    disabled: true
+    disabled: false
   hub:
     provider: aws
   options:
