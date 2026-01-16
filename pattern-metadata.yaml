@@ -1,8 +1,8 @@
 # This goal of this metadata is mainly used as a source of truth for
 # documentation and qe
-metadata_version: "1.0"
+metadata_version: "2.0"
 name: ansible-edge-gitops
-pattern_version: "1.0"
+pattern_version: "2.0"
 display_name: Ansible Edge GitOps
 repo_url: https://github.com/validatedpatterns/ansible-edge-gitops
 docs_repo_url: https://github.com/validatedpatterns/docs
