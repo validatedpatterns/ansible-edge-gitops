@@ -69,3 +69,11 @@
 * Use Validated Patterns charts for Installing Ansible Automation Platform, OpenShift Virtualization, and
   edge-gitops-vms.
 * Switch to AAP-2.5 support as provided by Validated Patterns aap-config chart.
+
+
+## Further Changes for v2.0 (January 16, 2026)
+
+* Switch to patternizer and remove common
+* Stop deploying storagesystem as ODF does not need it anymore (as of 4.18/4.20)
+* Update Ansible linter
+
