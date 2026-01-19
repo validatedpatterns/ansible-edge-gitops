@@ -81,27 +81,5 @@ clusterGroup:
       project: hub
       chart: hashicorp-vault
       chartVersion: 0.1.*
-  imperative:
-    clusterRoleYaml:
-      - apiGroups:
-          - '*'
-        resources:
-          - persistentvolumeclaims
-          - datavolumes
-          - dataimportcrons
-          - datasources
-        verbs:
-          - '*'
-      - apiGroups:
-          - '*'
-        resources:
-          - '*'
-        verbs:
-          - get
-          - list
-          - watch
-    jobs:
-      - name: clean-golden-images
-        playbook: ansible/odf_fix_dataimportcrons.yml
-        verbosity: -vvv
+  imperative: {}
   managedClusterGroups: {}
