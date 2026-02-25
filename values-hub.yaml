@@ -39,6 +39,9 @@ clusterGroup:
       chartVersion: 0.1.*
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
+      overrides:
+        - name: configJob.image
+          value: quay.io/validatedpatterns/utility-container:v1.0.2
     edge-gitops-vms:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
