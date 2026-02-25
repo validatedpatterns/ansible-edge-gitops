@@ -79,3 +79,7 @@
 * Add ODF console plugin
 * Remove dataimportcron and PVC cleanup, as the underlying issues were fixed in 4.17
 * Remove now obsolete ansible code and shell scripts
+
+## Further Changes for v2.0 (February 25, 2026)
+
+* Pin utility-container version to v1.0.2 to workaround issue with loading AAP config
