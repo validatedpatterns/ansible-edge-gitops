@@ -39,6 +39,9 @@ clusterGroup:
       chartVersion: 0.1.*
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
+      overrides:
+        - name: configJob.image
+          value: quay.io/validatedpatterns/utility-container:v1.0.2
     edge-gitops-vms:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
@@ -81,27 +84,5 @@ clusterGroup:
       project: hub
       chart: hashicorp-vault
       chartVersion: 0.1.*
-  imperative:
-    clusterRoleYaml:
-      - apiGroups:
-          - '*'
-        resources:
-          - persistentvolumeclaims
-          - datavolumes
-          - dataimportcrons
-          - datasources
-        verbs:
-          - '*'
-      - apiGroups:
-          - '*'
-        resources:
-          - '*'
-        verbs:
-          - get
-          - list
-          - watch
-    jobs:
-      - name: clean-golden-images
-        playbook: ansible/odf_fix_dataimportcrons.yml
-        verbosity: -vvv
+  imperative: {}
   managedClusterGroups: {}
