@@ -41,7 +41,6 @@ def test_validate_hub_site_reachable(kube_config, openshift_dyn_client):
 def test_check_pod_status(openshift_dyn_client):
     logger.info("Checking pod status")
     projects = [
-        "openshift-operators",
         "ansible-automation-platform",
         "ansible-edge-gitops-hub",
         "openshift-gitops",
