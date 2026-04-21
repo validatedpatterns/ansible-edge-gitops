@@ -83,3 +83,10 @@
 ## Further Changes for v2.0 (February 25, 2026)
 
 * Pin utility-container version to v1.0.2 to workaround issue with loading AAP config
+
+## Changes for v2.1 (April 2026)
+
+* Switch to openshift productized external secrets operator
+* Use AAP 2.6
+* Unpin utility container
+* Update to 0.3.* of edge-gitops-vms
