@@ -1,4 +1,3 @@
-#!/usr/bin/env ansible-playbook
----
-- name: Retrieve AAP credentials
-  ansible.builtin.import_playbook: ../ansible/ansible_get_credentials.yml
+#!/usr/bin/env bash
+
+ansible-playbook rhvp.cluster_utils.aap_get_admin_credentials
