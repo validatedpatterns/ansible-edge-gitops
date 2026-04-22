@@ -38,14 +38,20 @@ clusterGroup:
       name: aap-config
       namespace: aap-config
       chart: aap-config
-      chartVersion: 0.1.*
+      #chartVersion: 0.1.*
+      repoURL: https://github.com/mhjacks/aap-config-chart.git
+      chartVersion: update_for_ocp_eso
+      path: "."
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
     edge-gitops-vms:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
       chart: edge-gitops-vms
-      chartVersion: 0.3.*
+      #chartVersion: 0.3.*
+      repoURL: https://github.com/mhjacks/edge-gitops-vms-chart.git
+      chartVersion: update_for_ocp_eso
+      path: "."
       extraValueFiles:
         - $patternref/overrides/values-egv-vms.yaml
     openshift-external-secrets:
