@@ -37,11 +37,8 @@ clusterGroup:
     aap-config:
       name: aap-config
       namespace: aap-config
-      #chart: aap-config
-      #chartVersion: 0.1.*
-      repoURL: https://github.com/mhjacks/aap-config-chart.git
-      chartVersion: update_for_ocp_eso
-      path: "."
+      chart: aap-config
+      chartVersion: 0.2.*
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
     edge-gitops-vms:
