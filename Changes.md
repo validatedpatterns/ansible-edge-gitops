@@ -86,7 +86,7 @@
 
 ## Changes for v2.1 (April 2026)
 
-* Switch to openshift productized external secrets operator
+* Switch to openshift productized (supported) external secrets operator
 * Use AAP 2.6
 * Unpin utility container
-* Update to 0.3.* of edge-gitops-vms
+* Update to 0.4.* of edge-gitops-vms
