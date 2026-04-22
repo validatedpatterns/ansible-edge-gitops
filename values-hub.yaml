@@ -44,11 +44,8 @@ clusterGroup:
     edge-gitops-vms:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
-      #chart: edge-gitops-vms
-      #chartVersion: 0.3.*
-      repoURL: https://github.com/mhjacks/edge-gitops-vms-chart.git
-      chartVersion: update_for_ocp_eso
-      path: "."
+      chart: edge-gitops-vms
+      chartVersion: 0.4.*
       extraValueFiles:
         - $patternref/overrides/values-egv-vms.yaml
     openshift-external-secrets:
