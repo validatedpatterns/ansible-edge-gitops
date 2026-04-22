@@ -1,22 +1,26 @@
+---
 clusterGroup:
   name: hub
-  isHubCluster: true
   namespaces:
-    - ansible-edge-gitops
-    - vault
-    - golang-external-secrets
-    - ansible-automation-platform
-    - openshift-cnv
-    - openshift-storage
-    - edge-gitops-vms
-    - aap-config
-  projects:
-    - hub
+    vault:
+    external-secrets-operator:
+      operatorGroup: true
+      targetNamespaces: []
+    external-secrets:
+    ansible-automation-platform:
+    openshift-cnv:
+    openshift-storage:
+    edge-gitops-vms:
+    aap-config:
   subscriptions:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
-      channel: stable-2.5
+      channel: stable-2.6
+    eso:
+      name: openshift-external-secrets-operator
+      namespace: external-secrets-operator
+      channel: stable-v1
     openshift-data-foundation:
       name: odf-operator
       namespace: openshift-storage
@@ -28,38 +32,30 @@ clusterGroup:
     aap:
       name: ansible-automation-platform
       namespace: ansible-automation-platform
-      project: hub
       chart: ansible-automation-platform-instance
       chartVersion: 0.1.*
     aap-config:
       name: aap-config
       namespace: aap-config
-      project: hub
       chart: aap-config
-      chartVersion: 0.1.*
+      chartVersion: 0.2.*
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
-      overrides:
-        - name: configJob.image
-          value: quay.io/validatedpatterns/utility-container:v1.0.2
     edge-gitops-vms:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
-      project: hub
       chart: edge-gitops-vms
-      chartVersion: 0.2.*
+      chartVersion: 0.4.*
       extraValueFiles:
         - $patternref/overrides/values-egv-vms.yaml
-    golang-external-secrets:
-      name: golang-external-secrets
-      namespace: golang-external-secrets
-      project: hub
-      chart: golang-external-secrets
-      chartVersion: 0.1.*
+    openshift-external-secrets:
+      name: openshift-external-secrets
+      namespace: external-secrets
+      chart: openshift-external-secrets
+      chartVersion: 0.0.*
     odf:
       name: odf
       namespace: openshift-storage
-      project: hub
       chart: openshift-data-foundations
       chartVersion: 0.2.*
       extraValueFiles:
@@ -67,7 +63,6 @@ clusterGroup:
     ensure-openshift-console-plugins:
       name: ensure-openshift-console-plugins
       namespace: openshift-console
-      project: hub
       chart: ensure-openshift-console-plugins
       chartVersion: 0.1.*
       extraValueFiles:
@@ -75,13 +70,11 @@ clusterGroup:
     openshift-cnv:
       name: openshift-cnv
       namespace: openshift-cnv
-      project: hub
       chart: openshift-virtualization-instance
       chartVersion: 0.1.*
     vault:
       name: vault
       namespace: vault
-      project: hub
       chart: hashicorp-vault
       chartVersion: 0.1.*
   imperative: {}
