@@ -16,7 +16,7 @@ clusterGroup:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
-      channel: stable-2.6
+      channel: stable-2.7
     eso:
       name: openshift-external-secrets-operator
       namespace: external-secrets-operator
@@ -45,7 +45,7 @@ clusterGroup:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
       chart: edge-gitops-vms
-      chartVersion: 0.4.*
+      chartVersion: 0.5.*
       extraValueFiles:
         - $patternref/overrides/values-egv-vms.yaml
     openshift-external-secrets:

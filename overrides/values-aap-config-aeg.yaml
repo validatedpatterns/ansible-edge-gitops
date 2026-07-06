@@ -1,4 +1,6 @@
 ---
 agof:
-  iac_repo: https://github.com/validatedpatterns-demos/ansible-edge-gitops-hmi-config-as-code.git
-  iac_revision: main
+  #cac_repo: https://github.com/validatedpatterns-demos/ansible-edge-gitops-hmi-config-as-code.git
+  #cac_revision: main
+  cac_repo: https://github.com/mhjacks/ansible-edge-gitops-hmi-config-as-code.git
+  cac_revision: v2_to_be
