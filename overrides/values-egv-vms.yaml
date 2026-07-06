@@ -8,3 +8,13 @@ vms:
     count: 2
     role: kiosk
     os: rhel10
+
+  kiosk-rhel8:
+    count: 2
+    role: kiosk
+    os: rhel8
+
+  kiosk-rhel9:
+    count: 2
+    role: kiosk
+    os: rhel9
