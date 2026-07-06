@@ -1,7 +1,10 @@
 ---
 waitForMetalNode: false
 
+vmNamespace: edge-gitops-vms
+
 vms:
   kiosk:
     count: 2
     role: kiosk
+    os: rhel10
