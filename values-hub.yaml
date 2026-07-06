@@ -37,8 +37,11 @@ clusterGroup:
     aap-config:
       name: aap-config
       namespace: aap-config
-      chart: aap-config
-      chartVersion: 0.2.*
+      repoURL: https://github.com/mhjacks/aap-config-chart.git
+      chartVersion: parallelize_cac
+      path: "."
+      #chart: aap-config
+      #chartVersion: 0.2.*
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
     edge-gitops-vms:
