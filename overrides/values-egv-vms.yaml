@@ -5,3 +5,4 @@ vms:
   kiosk:
     count: 2
     role: kiosk
+    machineType: q35
