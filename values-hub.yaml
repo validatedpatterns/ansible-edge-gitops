@@ -16,7 +16,7 @@ clusterGroup:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
-      channel: stable-2.5
+      channel: stable-2.6
     openshift-data-foundation:
       name: odf-operator
       namespace: openshift-storage
