@@ -84,3 +84,4 @@
 
 * Pin utility-container version to v1.0.2 to workaround issue with loading AAP config
 * Unpin utility-container; use v1 branch hmi-config-as-code to avoid breaking changes
+* Update golang-external-secrets to allow API v1
