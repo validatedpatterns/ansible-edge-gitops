@@ -16,7 +16,7 @@ clusterGroup:
     aap-operator:
       name: ansible-automation-platform-operator
       namespace: ansible-automation-platform
-      channel: stable-2.5
+      channel: stable-2.6
     openshift-data-foundation:
       name: odf-operator
       namespace: openshift-storage
@@ -39,9 +39,6 @@ clusterGroup:
       chartVersion: 0.1.*
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
-      overrides:
-        - name: configJob.image
-          value: quay.io/validatedpatterns/utility-container:v1.0.2
     edge-gitops-vms:
       name: edge-gitops-vms
       namespace: edge-gitops-vms
@@ -55,7 +52,7 @@ clusterGroup:
       namespace: golang-external-secrets
       project: hub
       chart: golang-external-secrets
-      chartVersion: 0.1.*
+      chartVersion: 0.2.*
     odf:
       name: odf
       namespace: openshift-storage

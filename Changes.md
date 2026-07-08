@@ -83,3 +83,6 @@
 ## Further Changes for v2.0 (February 25, 2026)
 
 * Pin utility-container version to v1.0.2 to workaround issue with loading AAP config
+* Unpin utility-container; use v1 branch hmi-config-as-code and inventory to avoid breaking changes
+* Update golang-external-secrets to allow API v1
+* Update AAP to v2.6, 4.22 does not have 2.5 in the Operator catalog
