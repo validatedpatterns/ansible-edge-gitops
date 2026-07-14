@@ -36,7 +36,7 @@ clusterGroup:
       namespace: aap-config
       project: hub
       chart: aap-config
-      chartVersion: 0.1.*
+      chartVersion: 0.2.*
       extraValueFiles:
         - $patternref/overrides/values-aap-config-aeg.yaml
     edge-gitops-vms:
