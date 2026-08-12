@@ -1,6 +1,5 @@
 ---
 storageSystem:
-  deploy: false
   inventory:
     useSpecificNodes: false
 
