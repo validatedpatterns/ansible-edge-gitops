@@ -19,7 +19,7 @@ def test_check_vm_status(openshift_dyn_client):
     while time.time() < timeout:
         app = ArgoCD.get(
             dyn_client=openshift_dyn_client,
-            namespace="ansible-edge-gitops-hub",
+            namespace="vp-gitops",
             name="edge-gitops-vms",
         )
         app = next(app)

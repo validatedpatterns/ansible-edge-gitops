@@ -1,5 +1,6 @@
 global:
   pattern: ansible-edge-gitops
+  singleArgoCD: true
   secretLoader:
     disabled: false
   hub:
