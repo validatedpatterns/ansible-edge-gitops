@@ -43,8 +43,7 @@ def test_check_pod_status(openshift_dyn_client):
     projects = [
         "openshift-operators",
         "ansible-automation-platform",
-        "ansible-edge-gitops-hub",
-        "openshift-gitops",
+        "vp-gitops",
         "edge-gitops-vms",
         "vault",
     ]
@@ -70,7 +69,7 @@ def test_validate_argocd_reachable_hub_site(openshift_dyn_client):
 @pytest.mark.validate_argocd_applications_health_hub_site
 def test_validate_argocd_applications_health_hub_site(openshift_dyn_client):
     logger.info("Get all applications deployed by argocd on hub site")
-    projects = ["openshift-gitops", "ansible-edge-gitops-hub"]
+    projects = ["vp-gitops"]
     unhealthy_apps = application.get_argocd_application_status(
         openshift_dyn_client, projects
     )
