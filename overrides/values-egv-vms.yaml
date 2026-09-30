@@ -1,6 +1,4 @@
 ---
-waitForMetalNode: false
-
 vmNamespace: edge-gitops-vms
 
 vms:
