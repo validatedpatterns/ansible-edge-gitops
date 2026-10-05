@@ -8,8 +8,10 @@ global:
     installPlanApproval: Automatic
     syncPolicy: Automatic
     useCSV: false
+  singleArgoCD: true
+
 main:
-  clusterGroupName: hub
+  variant: hub
   multiSourceConfig:
     enabled: true
     clusterGroupChartVersion: 0.9.*

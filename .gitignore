@@ -9,3 +9,6 @@ vault.init
 pattern-vault.init.bak
 super-linter.log
 .vscode
+__pycache__/
+tests/ci/.results/
+tests/ci/.pytest_cache/
