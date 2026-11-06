@@ -1,14 +1,10 @@
 import os
-import re
-import pytest
 import subprocess
-from pathlib import Path
+import pytest
 from ocp_resources.virtual_machine import VirtualMachine
 from openshift.dynamic.exceptions import NotFoundError
-from playwright.sync_api import Page, expect, sync_playwright
+from playwright.sync_api import sync_playwright
 from validatedpatterns_tests.interop import application, components, subscription
-
-
 from .helpers import (
     kubeadmin_password,
     route_url,
@@ -143,7 +139,6 @@ def test_aap_login(openshift_dyn_client):
     secrets_url = console_url + "/k8s/ns/ansible-automation-platform/core~v1~Secret"
     aap_url = route_url(openshift_dyn_client, "ansible-automation-platform", "aap")
     password = kubeadmin_password()
-    results_dir = _results_dir()
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)

@@ -39,9 +39,9 @@ def gateway_url(openshift_dyn_client, namespace, name):
 
     instance = gateways[0].instance
     addresses = getattr(instance.status, "addresses", None) or []
-    assert addresses, (
-        f"Expected gateway '{namespace}/{name}' to have at least one status address"
-    )
+    assert (
+        addresses
+    ), f"Expected gateway '{namespace}/{name}' to have at least one status address"
 
     listeners = getattr(instance.spec, "listeners", None) or []
     scheme = "https"
