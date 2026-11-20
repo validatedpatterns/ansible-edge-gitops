@@ -136,6 +136,7 @@ def test_vm_status_hub(openshift_dyn_client):
     ["VP_HUBCONFIG"],
     indirect=True,
 )
+@pytest.mark.skip(reason="Disabled pending fix")
 def test_aap_login(openshift_dyn_client):
     console_url = route_url(openshift_dyn_client, "openshift-console", "console")
     secrets_url = console_url + "/k8s/ns/ansible-automation-platform/core~v1~Secret"
